@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="InstanceName" value="@Model.InstanceName" />
+  <setParameter name="BuildsDirectory" value="@Model.BuildsDirectory" />
+  <setParameter name="AppMachineName" value="@Model.AppServerName" />
+  <setParameter name="WebMachineName" value="@Model.WebServerName" />
+  <setParameter name="ServiceUsername" value="@Model.ServiceUserName" />
+  <setParameter name="BuildVersionNumber" value="@Model.BuildNumber" />
+</parameters>
+<!-- Generated from template file at @DateTime.Now -->

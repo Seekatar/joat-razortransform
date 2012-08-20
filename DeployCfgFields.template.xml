@@ -1,0 +1,104 @@
+﻿<!--
+  Editing fields for merging:
+  
+  attributes on template elemement are simply GUI state values, do not edit
+  
+  Each item creates a line in the GUI in the order they appear in this file
+  
+  name = name of item.  Must start with letter and be valid C# identifier, WITH spaces allowed.  When 
+          the variable name is created, spaces are removed and all words are capitalized.  E.g. Database instance -> @Model.DatabaseInstance
+  displayName = optional name used for display only.
+  type = type of item:
+          Label = a grouping in the GUI.  You can also add another attribute "expanded=true" to initially expand a group.
+          Hidden = an string item used when generating the Model, but not shown in the UI
+          Folder = shows an edit field with ... button for browser for a folder
+          Array = allows nesting of items.  loadFrom allows loading default values from another XML file under node named with rootNode
+            minCount enforces a minimum number of items in the array
+          Bool = check box.  Valid values are True and False
+          String/Int32/UncPath/Password reserved for future use
+  description = tooltip for item.  Required for all non-Labels
+  defaultValue = value to show in the GUI.  If the save checkbox is checked, these are updated when the XML is generated.
+  
+-->
+<template title="Deploy Config Generator" lastPath=".." saveValues="true">
+  <item name="Instance details" type="Label" description="Details about the instance, which contains one or more Tenants" expanded="true"/>
+  <item name="makeEssAndMss" displayName="Create ESS and MSS" type="Bool" description="Create ESS and MSS web apps during the deploy." defaultValue="False" />
+  <item name="makeBOPerTenant" displayName="Create BO Per Tenant" type="Bool" description="Create a back office web app for each tenant." defaultValue="False" />
+  <item name="Instance name" type="String" description="Name of the instance" defaultValue="2012R4POC" />
+  <item name="Version" type="String" description="Version to insert in database.  E.g. 2012.4" defaultValue="2012.4" />
+  <item name="Build Number" type="String" description="Full version number of the build. E.g. 2012.4.201" defaultValue="2012.4.000" />
+  <item name="Instance type" type="InstanceType" description="Type of instance 1000=Dev 900=AppDev 800=QA 600=UAT 0=Prod" defaultValue="0" />
+
+  <item name="Tenants" type="Array" description="List of tenants in addition to Default.  Must has at least  one." loadFrom="DefaultBootStrap.xml" rootNode="//tenant[@name != 'Default']" minCount="1">
+    <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces"/>
+    <item displa1yName="Description" name="description" type="string" description="description of tenant" />
+    <item displayName="ControlId" name="controlId" type="string" description="Control Id for tenant" />
+  </item>
+  
+  <item name="Users" type="Array" description="List of users that can log into SysAdmin, Studio, and Excalibur" loadFrom="DefaultBootStrap.xml" rootNode="//user" minCount="2">
+    <item displayName="User name" name="username" type="string" description="User Id"/>
+    <item displayName="First" name="first" type="string" description="First name" />
+    <item displayName="Last" name="last" type="string" description="Last name"/>
+    <item displayName="ExternalId" name="externalid" type="Guid" description="externalId"/>
+  </item>
+
+  <item name="Database details" type="Label" description="Database values"/>
+  <item name="SQL Server" type="String" description="SQLServer name and instance" defaultValue="hs1devsql01\engineering"/>
+  <item name="SQL User" type="String" description="User to make dbo_owner for new databases" defaultValue="sbcsystems\lifeworksadmin" />
+  <item name="Database file path" type="String" description="Location of SQL Server files on the SQL Server box itself" defaultValue="c:\SqlData" />
+  <item name="Instance database" type="Hidden" description="Instance DB name" defaultValue="LIFEWORKS_@(Model.InstanceName)_INSTANCE"/>
+  <item name="Config database" type="Hidden" description="Config DB name" defaultValue="LIFEWORKS_@(Model.InstanceName)_@(Model.Tenants[0].name)_CONFIG" />
+  <item name="Entity database" type="Hidden" description="Entity and Workflow DB name" defaultValue="LIFEWORKS_@(Model.InstanceName)_@(Model.Tenants[0].name)_ENTITY" />
+  <item name="Script file path" type="Hidden" description="Location of the Database folder in the builds directory." defaultValue="@(System.IO.Path.Combine(Model.BuildsDirectory,Model.BuildNumber))\Database" />
+
+  <item name="App Server details" type="Label" description="Basic settings for the App Server services"/>
+  <item name="App Server name" type="String" description="name of server" defaultValue="hs1engapp01"/>
+  <item name="Server Net port" type="Int32" description="Value of port for server to listen on for net:" defaultValue="33335" />
+  <item name="Server REST port" type="Int32" description="Value of port for server to listen on for http:" defaultValue="33336" />
+  <item name="Service Physical Path" type="Folder" description="Path for service on the server box" defaultValue="C:\INSTANCES\@Model.InstanceName\App"/>
+  <item name="Web Service Port" type="Int32" description="Port of web services" defaultValue="6991" />
+  <item name="Service User Name" type="String" description="User to run server services site as" defaultValue="@Model.SQLUser"/>
+
+  <item name="Web Site details" type="Label" description="Settings for the web sties." />
+  <item name="Web Server name" type="String" description="name of server" defaultValue="hs1engweb01"/>
+  <item name="Web Site Port" type="Int32" description="Port for web site" defaultValue="8080" />
+  <item name="Web Physical Path base" type="Folder" description="Base path of web content on web server" defaultValue="C:\INSTANCES\@(Model.InstanceName)\Web"/>
+  <item name="Web Site Name" type="String" description="Name of WebSite" defaultValue="Default Web Site"/>
+  <item name="BwAppName" displayName="Bw App Name" type="String" description="Name of BW site, appened to the site name." defaultValue="Bw"/>
+  <item name="SysAdmin App Name" type="String" description="Name of sysadmin app, appened to the site name." defaultValue="SysAdmin_@(Model.InstanceName)"/>
+  <item name="Excalibur App Name" type="String" description="Name of Excalibur app, appened to the site name." defaultValue="Excalibur_@(Model.Tenants[0].name)" />
+  <item name="Studio Site Name" type="String" description="Name of Studio site, appened to the site name." defaultValue="Studio" />
+  <item name="Web Service App Name" type="String" description="Name of Web Service app, appened to the site name." defaultValue="WebService"/>
+  <item name="Web Service Classic App Name" type="String" description="Name of Web Service Classic app, appened to the site name." defaultValue="WebServiceClassic"/>
+  <item name="Web App Pool User Name" type="String" description="User to run web app pools as" defaultValue="@(Model.SQLUser)"/>
+  <item name="Web App Pool Password" type="Hidden" description="Password for user.  Override on command line." defaultValue="password"/>
+  <item name="Case Sensitive Password" type="Bool" description="Password case sensitivity.  This should always be set to true.  However, older version allowed false." defaultValue="True"/>
+  <item displayName ="Session State" name="SessionStateMode" type="SQLSessionState" description="How to save session state.  If using SQLServer, same SQLServer is used." defaultValue="SQLServer"/>
+  <!--
+  <item name="BW" type="Label" description="Settings specific to BW" />
+  -->
+  <item name="ControlId " type="Hidden" description="Control id for this tenant." defaultValue="@(Model.Tenants[0].name)" />
+  <item name="Self ServiceDatabase Name" type="Hidden" description="For ESS and MSS ONLY.  BW Service name, usually tenant. Leave blank if one Bw Site for all Tenants." defaultValue="" />
+  <item name="Self Service ControlId " type="Hidden" description="For ESS and MSS ONLY.  Control id for back office. Leave blank if one Bw Site for all Tenants." defaultValue="" />
+  <item name="Self Service Default SiteId" type="Hidden" description="For ESS and MSS ONLY.  Name of the back office site. Leave blank if one Bw Site for all Tenants." defaultValue="" />
+
+  <item name="Misc" type="Label"/>
+  <item name="Default User Domain" type="String"  description="Default domain for checking users" defaultValue="sbcsystems" />
+  <item name="Cache Server" type="String" description="AppFabric CacheServer name" defaultValue="Hs1csgdevapp02" />
+  <item name="Builds directory" type="UncPath" description="Base location of build files.  This is the level above the build you're installing." defaultValue="\\sbcsystems.local\development\builds\Camelot\trunk"/>
+  <item name="SeedData Physical Path" type="Hidden" description="Where the seedata executable will be.  Usually SeedData under the deploy folder." defaultValue="@(System.IO.Path.GetFullPath(Model.DestinationFolder))\SeedData" />
+  <item name="Service Principal Name" type="String" description="SPN for user running App Service.  setspn -L [username] will show the SPN" defaultValue="eng/lifeworks" />
+
+  <enum name="SQLSessionState">
+    <value key="inproc" value="Store In Proc" />
+    <value key="SQLServer" value="Store in SQL Server" />
+  </enum>
+
+  <enum name="InstanceType">
+    <value key="1000" value="Dev" />
+    <value key="900" value="AppDev" />
+    <value key="800" value="QA" />
+    <value key="600" value="UAT" />
+    <value key="0" value="Prod" />
+  </enum>
+</template>

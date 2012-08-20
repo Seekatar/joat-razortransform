@@ -1,0 +1,24 @@
+<bootstrap name="@(Model.InstanceName)" domain="@Model.DefaultUserDomain" ou="@Model.DefaultUserDomain">
+  <tenants>
+    <tenant name="Default" description="this the required default tenant" >
+      <defaultDomain name="default" />
+      <databases instance="Server=@Model.SQLServer;Initial Catalog=@Model.InstanceDatabase;Integrated Security=True;MultipleActiveResultSets=True;Max Pool Size=100;Min Pool Size=0;Pooling=True"/>
+    </tenant>
+    @foreach( var t in @Model.Tenants){
+    <tenant name="@t.name" description="@t.description" controlId="@t.controlId" >
+      <cacheClient serverName="@Model.CacheServer" serverPort="22233" />
+      <defaultDomain name="@(t.name)" />
+      <databases instance="Server=@Model.SQLServer;Initial Catalog=@Model.InstanceDatabase;Integrated Security=True;MultipleActiveResultSets=True;Max Pool Size=100;Min Pool Size=0;Pooling=True"
+                 config="Server=@Model.SQLServer;Initial Catalog=LIFEWORKS_@(Model.InstanceName)_@(t.name)_CONFIG;Integrated Security=True;MultipleActiveResultSets=True;Max Pool Size=100;Min Pool Size=0;Pooling=True"
+                 entity="Server=@Model.SQLServer;Initial Catalog=LIFEWORKS_@(Model.InstanceName)_@(t.name)_ENTITY;Integrated Security=True;MultipleActiveResultSets=True;Max Pool Size=100;Min Pool Size=0;Pooling=True"
+                 workflow="Server=@Model.SQLServer;Initial Catalog=LIFEWORKS_@(Model.InstanceName)_@(t.name)_ENTITY;Integrated Security=True;MultipleActiveResultSets=True;Max Pool Size=100;Min Pool Size=0;Pooling=True"/>
+    </tenant>
+    }
+  </tenants>
+  <users>
+    @foreach( var u in @Model.Users ){
+    <user first="@u.first" last="@u.last" username="@u.username" domain="@Model.DefaultUserDomain" externalid="@u.externalid"/>
+    }
+  </users>
+</bootstrap>
+<!-- Generated from template file at @DateTime.Now -->

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="WebSitePhysicalPath" value="@Model.WebPhysicalPathBase" />
+  <setParameter name="WebSiteBinding" value="http://*:@Model.WebSitePort" />
+  <setParameter name="WebAppPhysicalPath" value="@Model.WebPhysicalPathBase\WebService" />
+  <setParameter name="WebAppPoolType" value="Integrated" />
+  <setParameter name="WebAppPoolUsername" value="@Model.WebAppPoolUserName" />
+  <setParameter name="InstanceName" value="@Model.InstanceName"/>
+
+  <setParameter name="IIS Web Application Name" value="@Model.WebSiteName/@(Model.InstanceName)WebService" />
+  <setParameter name="ApplicationServer" value="@Model.AppServerName" />
+  <setParameter name="ApplicationServerPort" value="@Model.WebServicePort" />
+  <setParameter name="BaseUri" value="http://hs1devweb01/@(Model.InstanceName)WebService/" />
+  <setParameter name="BindingSecurityTransport" value="None" />
+  <setParameter name="HttpsGetEnabled" value="False" />
+  <setParameter name="LogLevel" value="WARN" />
+  <setParameter name="WcfLogLevel" value="Off" />
+</parameters>
+<!-- Generated from template file at @DateTime.Now -->
