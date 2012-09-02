@@ -1,6 +1,0 @@
-﻿<deployparams>
-    <appserver name="@Model.AppServerName" path="@Model.ServicePhysicalPath" user="@Model.ServiceUserName"/>
-    <webserver name="@Model.WebServerName" path="@Model.WebPhysicalPathBase" />
-    <sqlserver name="@Model.SQLServer" />
-</deployparams>
-<!-- Generated from template file at @DateTime.Now -->

@@ -1,20 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Dynamic;
-using System.IO;
 using System.Xml.Linq;
-using System.Threading;
 
 namespace RazorTransform
 {
@@ -43,136 +36,139 @@ namespace RazorTransform
             }
         }
 
-        static string DEFAULT_FILE_NAME = "DeployCfgFields.xml";
-        ConfigSettings _cs;
+        static string DEFAULT_OBJECT_FILE_NAME = "RtObject.xml";
+        static string DEFAULT_VALUE_FILE_NAME = "RtValues.xml";
+
+        ConfigSettings _cs = new ConfigSettings();
+
         string _destination = "..";
-        string _sourceFile = DEFAULT_FILE_NAME;
+        string _valueFileName = DEFAULT_VALUE_FILE_NAME;
+        string _definitionFileName = DEFAULT_OBJECT_FILE_NAME;
+
         List<Control> _controls = new List<Control>();
-        XDocument _doc;
+        XDocument _valuesDoc = null;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public bool Initialize(IList<string> args)
+        public bool Initialize(Settings settings)
         {
+            _settings = settings;
+                 
             bool ret = false;
-            bool loadLastPath = true;
             try
             {
-                int skipCount = 0;
-                if (args != null && args.Count() > 0)
-                {
-                    if (File.Exists(args[0]))
-                    {
-                        _sourceFile = args[0];
-                        skipCount++;
-                    }
+                _valueFileName = settings.ValuesFile;
+                _destination = settings.OutputFolder;
 
-                    if (args.Count() > 1 && Directory.Exists(args[1]))
-                    {
-                        _destination = args[1];
-                        loadLastPath = false;
-                        skipCount++;
-                    }
-                }
-
-                loadTemplateFile(loadLastPath, args.Count > skipCount ? args.Skip(skipCount) : null );
+                loadTemplateFile();
                 ret = true;
             }
             catch (Exception e)
             {
-                MessageBox.Show(String.Format(Resource.ExceptionFormat, e.Message), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(String.Format(Resource.ExceptionFormat, e.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Close();
             }
             return ret;
         }
 
-        private void loadTemplateFile(bool loadLastPath = true, IEnumerable<string> overrideParms = null)
+        Settings _settings = new Settings();
+
+        private void loadTemplateFile()
         {
             // load the config file
-            _cs = new ConfigSettings();
 
-            // if source doesn't exist look for *.template.xml
-            var source = _sourceFile;
-            if (!File.Exists(source))
-                source = _sourceFile.Replace(".xml", ".template.xml");
+            XElement objectValues = null;
+            if (File.Exists(_valueFileName))
+            {
+                _valuesDoc = XDocument.Load(_valueFileName);
+                objectValues = _valuesDoc.Root;
 
-            _doc = XDocument.Load(source);
+            }
+            _cs.Info.Add(_settings.ArrayConfigInfo); // add so we can save it when we save
 
-            var root = _doc.Root;
-            if (root.Attribute("title") != null)
-                this.Title = root.Attribute("title").Value;
-            if (loadLastPath && root.Attribute("lastPath") != null && Directory.Exists(System.IO.Path.GetFullPath(root.Attribute("lastPath").Value)))
-                _destination = System.IO.Path.GetFullPath(root.Attribute("lastPath").Value);
+
+            _destination = _settings.OutputFolder;
+
             if (_destination == "..")
                 _destination = System.IO.Path.GetFullPath("..");
-            if (root.Attribute("saveValues") != null)
-                cbSaveAsDefaults.IsChecked = (bool)(root.Attribute("saveValues"));
 
-            _cs.LoadFromXElement(root, _destination, overrideParms);
+            if (!String.IsNullOrWhiteSpace(_settings.Title))
+                this.Title += " " + _settings.Title;
 
-            editControl.Load(_cs.Info);
+            this.Title += " -> " + _destination;
 
-            txtSourceFile.Text = _sourceFile;
-            txtDestinationFolder.Text = _destination;
+            // load the main file
+            if (!File.Exists(_definitionFileName))
+                throw new FileNotFoundException(String.Format(Resource.FileNotFound, _definitionFileName));
+
+            var definitionDoc = XDocument.Load(_definitionFileName);
+            _cs.LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
+
+            editControl.Load(_cs.Groups);
+
         }
 
         private CancellationTokenSource _cts = null;
         public bool RanTransformOk = false;
 
         private 
-#if ASYNC 
-            async 
-#endif
         void btnOkAndClose_Click(object sender, RoutedEventArgs e)
         {
             btnOk_Click(sender, e);
-            if ( RanTransformOk )
-                btnCancel_Click(sender, e);
         }
 
-#if ASYNC
-        async
+#if ASYNC 
+        async 
 #endif
         void btnOk_Click(object sender, RoutedEventArgs e)
         {
+          
             RanTransformOk = false;
 
-            _destination = txtDestinationFolder.Text;
             if (!Directory.Exists(_destination))
             {
                 MessageBox.Show(Resource.DestMustExist,Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
             else
             {
-                bool saveValues = cbSaveAsDefaults.IsChecked.HasValue && cbSaveAsDefaults.IsChecked.Value;
                 try
                 {
-                    var d = _cs.GetProperties(saveValues, true);
+                    var d = _cs.GetProperties(!_settings.Test, true, _destination);
 
                     // save right away in case it errors out
-                    if (saveValues)
+                    if (!_settings.Test)
                     {
-                        _doc.Root.SetAttributeValue("lastPath", _destination);
-                        _doc.Root.SetAttributeValue("saveValues", saveValues);
-                        _doc.Save(_sourceFile); // always save Xml to write out last settings
+                        _cs.Save(_valueFileName);
                     }
 
                     RazorFileTransformer rf = new RazorFileTransformer(d);
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = btnGetMaskFolder.IsEnabled = btnGetSourceFile.IsEnabled = editControl.IsEnabled = false;
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = false;
                     btnCancel.Content = Resource.Cancel;
                     _cts = new CancellationTokenSource();
 
 #if ASYNC
-                    await rf.TransformFilesAsync(_destination, _cts.Token, false, new Progress(this));
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    int count = await rf.TransformFilesAsync(_settings.TemplateFolder, _destination, !_settings.Test, _cts.Token, false, new Progress(this));
+                    sw.Stop();
+                    _cts = null;
+                    if (sender == btnOk)
+                    {
+                        MessageBox.Show(String.Format(Resource.Success, count, _destination, sw.Elapsed.TotalSeconds), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        btnCancel_Click(sender, e);
+                    }
 #else
                     Mouse.SetCursor(Cursors.Wait);
                     rf.TransformFiles(_destination);
 #endif
                     if ( sender == btnOk )
-                        MessageBox.Show(Resource.Success, Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                    	MessageBox.Show(String.Format(Resource.Success,count,_destination), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
                     RanTransformOk = true;
 
                 }
@@ -182,15 +178,15 @@ namespace RazorTransform
                 }
                 catch (Exception ee)
                 {
-                    MessageBox.Show(String.Format(Resource.ExceptionFormat, ee.Message), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show(String.Format(Resource.ExceptionFormat, ee.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
                 finally
                 {
                     Mouse.SetCursor(null);
                     _cts = null;
-                    lblProgress.Content = String.Empty;
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = true;
                     btnCancel.Content = Resource.Close;
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = btnGetMaskFolder.IsEnabled = btnGetSourceFile.IsEnabled = editControl.IsEnabled = true;
+                    lblProgress.Content = String.Empty;
                 }
             }
         }
@@ -203,20 +199,6 @@ namespace RazorTransform
                 Close();
         }
 
-        private void btnGetMaskFolder_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.FolderBrowserDialog fb = new System.Windows.Forms.FolderBrowserDialog();
-            fb.Description = Resource.BrowsePrompt;
-            fb.ShowNewFolderButton = false;
-            if (!String.IsNullOrWhiteSpace(txtDestinationFolder.Text))
-                fb.SelectedPath = txtDestinationFolder.Text;
-
-            if (fb.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                txtDestinationFolder.Text = _destination = fb.SelectedPath;
-                loadTemplateFile(false);
-            }
-        }
 
         private void StackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -231,22 +213,10 @@ namespace RazorTransform
             }
         }
 
-        private void btnGetSourceFile_Click(object sender, RoutedEventArgs e)
+        private void settingBtn_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new System.Windows.Forms.OpenFileDialog();
-            ofd.CheckFileExists = true;
-            ofd.DefaultExt = "XML";
-            ofd.AddExtension = true;
-            ofd.InitialDirectory = System.IO.Path.GetDirectoryName(_sourceFile);
-            ofd.FileName = _sourceFile;
-            ofd.RestoreDirectory = true;
-
-            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                txtSourceFile.Text = _sourceFile = ofd.FileName;
-                loadTemplateFile();
-            }
+            var aie = new ArrayItemEdit();
+            aie.ShowDialog(_settings.ConfigInfo);
         }
-
     }
 }

@@ -6,6 +6,7 @@ using System.Dynamic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Diagnostics;
 
 namespace RazorTransform
 {
@@ -23,20 +24,33 @@ namespace RazorTransform
     {
         dynamic _model;
 
-        private void transformFiles(string mask, bool recursive, CancellationToken cancel, IProgress<string> progress)
+        private int transformFiles(string inputMask, string outputFolder, bool saveFiles, bool recursive, CancellationToken cancel, IProgress<string> progress)
         {
             string currentFile = String.Empty;
+            int count = 0;
             try
             {
+                string folder = inputMask;
+                string mask = "*.*";
+
+                if (!Directory.Exists(inputMask))
+                {
+                    folder = Path.GetDirectoryName(inputMask);
+                    mask = Path.GetFileName(inputMask);
+                }
+
                 if (progress != null) progress.Report("Starting transforms");
-                foreach (var f in Directory.EnumerateFiles("Templates", "*.*"))
+
+                var sw = new Stopwatch();
+                sw.Start();
+
+                foreach (var f in Directory.EnumerateFiles(folder, mask))
                 {
                     currentFile = f;
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null)
-                        progress.Report(f);
+                    if (progress != null) progress.Report(f);
 
                     string template = File.ReadAllText(f);
                     string content = RazorEngine.Razor.Parse(template, _model);
@@ -44,34 +58,43 @@ namespace RazorTransform
                     if (content == null)
                         throw new Exception("Transform returned no content");
 
-                    if (content.Contains("@Model.") || content.Contains("@(") ) // allow one level of nesting of @Model. or @(
+                    if (content.Contains("@Model.") || content.Contains("@(")) // allow one level of nesting of @Model. or @(
                         content = RazorEngine.Razor.Parse(content, _model);
 
-                    File.WriteAllText(Path.Combine(mask, Path.GetFileName(f)), content);
+                    if (saveFiles)
+                        File.WriteAllText(Path.Combine(outputFolder, Path.GetFileName(f)), content);
+
+                    count++;
                 }
-                if (progress != null) progress.Report("Success");
+                sw.Stop();
+                if (progress != null) progress.Report(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds ));
 
             }
-            catch ( RazorEngine.Templating.TemplateCompilationException e )
+            catch (RazorEngine.Templating.TemplateCompilationException e)
             {
                 var sb = new StringBuilder();
-                sb.AppendFormat( "Error processing file {0} {1}", Path.GetFileName(currentFile), e.Message );
+                sb.AppendFormat("Error processing file {0} {1}", Path.GetFileName(currentFile), e.Message);
                 foreach (var ee in e.Errors)
                 {
-                    sb.AppendLine( String.Format( "   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column ) );
+                    sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
                 if (progress != null) progress.Report(sb.ToString());
 
                 throw new Exception(sb.ToString());
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ee)
             {
                 var sb = new StringBuilder();
-                sb.AppendFormat("Error processing file {0} {1}", Path.GetFileName(currentFile), ee.Message);
-                if (progress != null) progress.Report(sb.ToString());
+                sb.AppendFormat("Error processing file {0}", Path.GetFileName(currentFile));
+                if (progress != null) progress.Report(sb.ToString()+ee.BuildMessage());
 
-                throw new Exception(sb.ToString());
+                throw new Exception(sb.ToString(),ee);
             }
+            return count;
         }
 
         // constructor 
@@ -83,23 +106,18 @@ namespace RazorTransform
         /// <summary>
         /// Synchronous transform
         /// </summary>
-        /// <param name="mask"></param>
+        /// <param name="outputFolder"></param>
         /// <param name="recursive"></param>
         /// <param name="progress"></param>
-        public void TransformFiles(string mask, bool recursive = false, IProgress<string> progress = null)
+        public int TransformFiles(string inputMask, string outputFolder, bool saveFiles = true, bool recursive = false, IProgress<string> progress = null)
         {
-            transformFiles(mask, recursive, CancellationToken.None, progress );
+            return transformFiles(inputMask, outputFolder, saveFiles, recursive, CancellationToken.None, progress);
         }
 
 #if ASYNC
-        private Task<bool> transformFilesAsync(string mask, bool recursive, CancellationToken cancel , IProgress<string> progress )
+        public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<string> progress = null )
         {
-            return TaskEx.Run(() => { transformFiles(mask, recursive, cancel, progress); return true; });
-        }
-
-        public async Task<bool> TransformFilesAsync( string mask, CancellationToken cancel, bool recursive = false, IProgress<string> progress = null )
-        {
-            return await transformFilesAsync(mask, recursive, cancel, progress);
+            return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);  });
         }
 #endif
     }

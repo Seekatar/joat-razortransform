@@ -19,7 +19,7 @@ namespace RazorTransform
             {
                 KeyValuePair<ConfigInfo, List<ConfigInfo>> kvp = new KeyValuePair<ConfigInfo, List<ConfigInfo>>(type, new List<ConfigInfo>());
                 //find the index in the collection of type and select all subsequent items until another "Label" is found or end of the collection is found.
-                int index = list.FindIndex((ci) => ci.Name == type.Name);
+                int index = list.FindIndex((ci) => ci.DisplayName == type.DisplayName);
                 indexList.Add(index);
 
                 grouping.Add(kvp);
@@ -51,7 +51,7 @@ namespace RazorTransform
             {
                 grouping.Add(new KeyValuePair<ConfigInfo, List<ConfigInfo>>(
 
-                    new ConfigInfo { Name = "Details", Description = "Details", Type = "Label", Expanded = true },
+                    new ConfigInfo() { DisplayName = "Details", Description = "Details", Type = "Label", Expanded = true },
                     new List<ConfigInfo>(info)
 
                     ));

@@ -2,9 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:RazorTransform"
-        Title="Razor File Transformer" 
-	WindowStyle="ToolWindow"
-	Height="650" Width="784"  
+        Title="Razor File Transformer - aRTie "
+	WindowStyle="ToolWindow" 
+	WindowStartupLocation="CenterScreen" 
         MinHeight="100" MinWidth="300">
     <Window.Resources>
         <Style x:Key="CfgBigLabel">
@@ -24,26 +24,23 @@
         </Style>
     </Window.Resources>
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
+                <GradientStop Color="AliceBlue"  Offset="0"/>
+                <GradientStop Color="#FFFFFFFF" Offset="0.667"/>
+            </LinearGradientBrush>
+           
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <local:NameValueEdit Grid.Row="0" x:Name="editControl" />
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Label Content="Source _file" Width="{Binding ElementName=label1, Path=Width}" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Center" ToolTip="{Binding ElementName=txtSourceFile, Path=ToolTip}"/>
-            <TextBox HorizontalAlignment="Left" Margin="5" Name="txtSourceFile" VerticalAlignment="Center" Width="302" ToolTip="Location of XML file with model definition."/>
-            <Button Content="..." HorizontalAlignment="Left" Margin="5" Name="btnGetSourceFile" VerticalAlignment="Center" ToolTip="Browse for sourceFile." Click="btnGetSourceFile_Click" />
-        </StackPanel>
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Label Content="_Destination Folder" HorizontalAlignment="Left" Margin="5" Name="label1" VerticalAlignment="Center" ToolTip="{Binding ElementName=txtDestinationFolder, Path=ToolTip}"/>
-            <TextBox HorizontalAlignment="Left" Margin="5" Name="txtDestinationFolder" VerticalAlignment="Center" Width="302" ToolTip="Location of transformed files.  Any existing files are overwritten."/>
-            <Button Content="..." HorizontalAlignment="Left" Margin="5" Name="btnGetMaskFolder" VerticalAlignment="Center" ToolTip="Browse for destination folder." Click="btnGetMaskFolder_Click" />
-        </StackPanel>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" >
+    <StackPanel Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0">
+        <Button Content="Settings" x:Name="settingBtn" Click="settingBtn_Click"/>
+    </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
             <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch"></Label>
-            <CheckBox Content="_Save these value as new defaults" Height="23" HorizontalAlignment="Left" Margin="5" Name="cbSaveAsDefaults" VerticalAlignment="Center"  Width="276" ToolTip="Save off the values you enter in the Source file.  (Recommended.)"/>
             <Button Content="_Go! &amp; Close" HorizontalAlignment="Left" Margin="5" Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click" IsDefault="True" ToolTip="Run the transforms and if ok, exit."/>
             <Button Content="G_o!" HorizontalAlignment="Left" Margin="5" Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms."/>
             <Button Content="_Close" HorizontalAlignment="Right" Margin="5" Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" />

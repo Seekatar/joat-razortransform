@@ -16,8 +16,11 @@ namespace RazorTransform
     {
         FileStream _fs;
         TextWriter _tw;
-        public LogProgress(string fname)
+        bool _consoleAttached;
+
+        public LogProgress(string fname, bool consoleAttached )
         {
+            _consoleAttached = consoleAttached;
             try
             {
                 _fs = new FileStream(fname, FileMode.Create);
@@ -30,6 +33,8 @@ namespace RazorTransform
         {
             if (_tw != null)
                 _tw.WriteLine(t);
+            if ( _consoleAttached )
+                Console.WriteLine(t);
         }
 
         public void Dispose()
@@ -54,83 +59,97 @@ namespace RazorTransform
         [SuppressUnmanagedCodeSecurity]
         public static int Main(string[] args)
         {
-#if thisJustNeverPrintsAnythingOutForSomeReasonArrrrrrg
-            if (AttachConsole((int)-1))
-            {
-                Console.WriteLine("asdfasdfasdfasdfasdf");
-                Console.Out.WriteLine("asdfasdfasdf");
-                Console.Out.Flush();
-                Console.Out.Close();
-                var s = Console.OpenStandardOutput();
-                var ss = "asdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-                byte[] buffer = Encoding.ASCII.GetBytes(ss);
-                s.Write(buffer, 0, buffer.Length);
-                return;
-            }
-#endif
             int ret = EXIT_ERROR; // failed
 
             bool run = false;
             bool showHelp = false;
             bool maximize = false;
-            string logFile = String.Empty;
+
+            Settings settings = new Settings();
 
             var options = new Mono.Options.OptionSet()
                 .Add("run", v => run = true)
                 .Add("h|?|help", v => showHelp = true)
-                .Add("max", v => maximize = true)
-                .Add("logFile=", v => logFile = v);
+                .Add("object=", v => settings.ObjectFile = v)
+                .Add("values=", v => settings.ValuesFile = v)
+                .Add("output=", v => settings.OverrideOutputFolder = v)
+                .Add("log=", v => settings.LogFile = v)
+                .Add("test", v => settings.Test = true)
+                .Add("debug", v => { settings.Debug = true; ExceptionExtension.ShowStack = true; })
+                .Add("template=", v => settings.OverrideTemplateFolder = v);
 
             List<string> parms = options.Parse(args);
+            settings.SetOverrides(parms);
 
             if (showHelp)
                 ShowHelp();
             else
             {
-                if (run)
+                Exception settingsException = null;
+                try
                 {
-                    if (parms.Count < 2 || !File.Exists(parms[0]) || !Directory.Exists(parms[1]))
-                    {
-                        ShowHelp();
-                    }
-                    else
-                    {
-                        LogProgress progress;
-                        if (logFile != String.Empty)
-                            progress = new LogProgress(logFile);
-                        else
-                            progress = new LogProgress(Path.Combine(parms[1], Resource.Title.Replace(" ", "_") + ".log"));
+                    settings.Load();
+                }
+                catch (Exception e)
+                {
+                    settingsException = e;
+                }
 
-                        using (progress)
+
+                if (run) // run without the UI
+                {
+                    LogProgress progress;
+                    progress = new LogProgress(Path.Combine(settings.OutputFolder,settings.LogFile),AttachConsole((int)-1));
+
+                    using (progress)
+                    {
+                        if (settingsException != null)
+                            progress.Report(String.Format(Resource.SettingsException, settingsException.BuildMessage()));
+
+                        progress.Report(settings.ToString());
+                        if (settings.Test)
                         {
-                            try
-                            {
-                                var _cs = new ConfigSettings();
-                                _cs.LoadFromFile(parms[0], parms[1],parms.Skip(2));
+                            progress.Report(Resource.TestModeLogStart);
+                        }
 
-                                var d = _cs.GetProperties(true, true);
+                        try
+                        {
+                            var _cs = new ConfigSettings();
+                            _cs.LoadFromFile(settings); 
 
-                                RazorFileTransformer rf = new RazorFileTransformer(d);
-                                rf.TransformFiles(parms[1], false, progress);
-                                ret = EXIT_NO_ERROR; // ok
-                            }
-                            catch (Exception e)
+                            var d = _cs.GetProperties(true, true, settings.OutputFolder); 
+
+                            RazorFileTransformer rf = new RazorFileTransformer(d);
+                            rf.TransformFiles(settings.TemplateFolder, settings.OutputFolder, !settings.Test, false, progress);
+                            ret = EXIT_NO_ERROR; // ok
+                            if (settings.Test)
                             {
-                                progress.Report(e.Message);
+                                progress.Report(Resource.TestModeComplete);
                             }
+                        }
+                        catch (Exception e)
+                        {
+                            progress.Report(String.Format(Resource.ExceptionFormat,e.BuildMessage()));
                         }
                     }
                 }
                 else // show gui
                 {
+                    if (settingsException != null)
+                        MessageBox.Show(String.Format(Resource.SettingsException, settingsException.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
                     var app = new App();
                     var mw = new MainWindow();
-                    if (mw.Initialize(parms))
+                    if (mw.Initialize(settings))
                     {
-                        if ( maximize )
+                        if (maximize)
                             mw.WindowState = WindowState.Maximized;
                         mw.Show();
                         app.Run();
+                    }
+                    if (settings.Test)
+                    {
+                        MessageBox.Show(Resource.TestModeComplete, Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     ret = mw.RanTransformOk ? EXIT_NO_ERROR : EXIT_ERROR;
                 }

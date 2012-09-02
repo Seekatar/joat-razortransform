@@ -23,9 +23,33 @@ namespace RazorTransform
             InitializeComponent();
         }
 
+        /// <summary>
+        /// show the dialog for editing the item
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns>true if the item was saved</returns>
+        public bool ShowDialog( ConfigInfo orig )
+        {
+            var temp = new ConfigInfo(orig);
+            Load(temp);
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (ShowDialog() ?? false)
+            {
+                orig.CopyFrom(temp);
+                return true;
+            }
+            return false;
+
+        }
+
         public void Load(IEnumerable<ConfigInfo> info )
         {
             nvEdit.Load(info);
+        }
+
+        public void Load(ConfigInfo parent)
+        {
+            nvEdit.Load(parent);
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)

@@ -1,0 +1,9 @@
+<UserControl x:Class="RazorTransform.FolderInputBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="root">
+    <DockPanel>
+        <Button x:Name="theButton" DockPanel.Dock="Right" Width="30"  Click="theButton_Click">...</Button>
+        <TextBox x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding FolderName, ElementName=root}" Margin="0,0,2,0"/>
+    </DockPanel>
+</UserControl>

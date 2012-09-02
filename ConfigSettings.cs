@@ -14,7 +14,7 @@ namespace RazorTransform
 {
     public static class DictExtension
     {
-        public static void LoadFromXml( this Dictionary<string,string> dict, XElement element )
+        public static void LoadFromXml(this Dictionary<string, string> dict, XElement element)
         {
             foreach (var n in element.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == "value"; else return false; }))
             {
@@ -28,6 +28,8 @@ namespace RazorTransform
         }
     }
 
+#if using_childconfig
+    // array item
     public class ChildConfigInfo
     {
         public ChildConfigInfo(ChildConfigInfo src)
@@ -36,9 +38,9 @@ namespace RazorTransform
             CopyFrom(src);
         }
 
-        public ChildConfigInfo(ConfigInfo configInfo)
+        public ChildConfigInfo(ConfigInfo group)
         {
-            Parent = configInfo;
+            Parent = group;
             Children = new List<ConfigInfo>();
         }
 
@@ -52,6 +54,8 @@ namespace RazorTransform
 
         public IList<ConfigInfo> Children { get; set; }
         public ConfigInfo Parent { get; set; }
+
+        // value to show in the list
         public ConfigInfo Key
         {
             get
@@ -63,11 +67,11 @@ namespace RazorTransform
             }
         }
 
-        internal void CopyFrom(ChildConfigInfo src)
+        internal void CopyFrom(ConfigInfo src)
         {
             if (!Object.ReferenceEquals(this, src))
             {
-                MinCount = src.MinCount;
+                Min = src.Min;
                 Parent = src.Parent;
                 Children.Clear();
                 foreach (var i in src.Children)
@@ -79,6 +83,35 @@ namespace RazorTransform
 
 
     }
+#endif
+
+#if using_groups
+    /// <summary>
+    /// Collection of Info with a name
+    /// </summary>
+    public class Group
+    {
+        public Group() { Info = new List<ConfigInfo>(); MinCount = 0; MaxCount = Int32.MaxValue; }
+
+        public Group(XElement x) : this()
+        {
+            Name = (string)x.Attribute("name");
+            Description = (string)x.Attribute("description");
+            Expanded = (bool?)x.Attribute("expanded") ?? false;
+            ArrayValueName = (string)x.Attribute("arrayValueName");
+            MaxCount = (int?)x.Attribute("maxCount") ?? Int32.MaxValue;
+            MinCount = (int?)x.Attribute("minCount") ?? 0;
+        }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public List<ConfigInfo> Info { get; set; }
+        public bool Expanded { get; set; }
+        public bool IsArray { get { return !String.IsNullOrWhiteSpace(ArrayValueName); } }
+        public string ArrayValueName { get; set; }
+        public int MinCount { get; set; }
+        public int MaxCount { get; set; }
+    }
+#endif
 
     /// <summary>
     /// one piece of config info meta data
@@ -108,15 +141,14 @@ namespace RazorTransform
         }
         private XElement _element;
 
-        public ConfigInfo() { }
-
         /// <summary>
         /// constructor to load from Xml 
         /// </summary>
         /// <param name="x"></param>
-        public ConfigInfo(XElement x, string destinationFolder)
+        public ConfigInfo( XElement x, ConfigInfo parent = null)
         {
-            LoadFromXml(x, destinationFolder);
+            LoadFromXml(x);
+            Parent = parent;
         }
 
         /// <summary>
@@ -126,11 +158,14 @@ namespace RazorTransform
         /// <param name="value"></param>
         public ConfigInfo(ConfigInfo i, string value)
         {
-            Name = i.Name;
-            PropName = i.PropName;
+            DisplayName = i.DisplayName;
+            PropertyName = i.PropertyName;
             Description = i.Description;
             Value = value;
             Type = i.Type;
+            Parent = i.Parent;
+            Children = new List<ConfigInfo>();
+            Children.AddRange(i.Children.Select( o => new ConfigInfo(o) ));
         }
 
         /// <summary>
@@ -142,14 +177,35 @@ namespace RazorTransform
         {
         }
 
-        public string Name { get; set; }
-        public string PropName { get; set; }
-        public string Type { get; set; }
+        public ConfigInfo() {}
+
+        public IEnumerable<string> Arguments { get; set; }
+
+        public string DisplayName { get; set; }
         public string Description { get; set; }
         public string Value { get; set; }
-        public string Range { get; set; }
-        public bool Expanded { get; set; }
 
+        public string PropertyName { get; set; }
+        
+        public string Type { get; set; }
+
+        // group or parent if nested, null if group
+        public ConfigInfo Parent { get; set; }
+
+        // strings so type can figure out what min and max means.  e.g. int, decimal, date
+        public string Min { get; set; }
+        public string Max { get; set; }
+
+        public int MinInt { get { int i = 0; int.TryParse(Min, out i ); return i;} }
+        public int MaxInt { get { int i = int.MaxValue; int.TryParse(Max, out i ); return i;} }
+        public Decimal MinDecimal { get { Decimal i = 0; Decimal.TryParse(Min, out i ); return i;} }
+        public Decimal MaxDecimal { get { Decimal i = Decimal.MaxValue; Decimal.TryParse(Max, out i ); return i;} }
+
+        // mainly for parent-items
+        public  string ArrayValueName { get; set; }
+        public bool IsArray { get { return !String.IsNullOrWhiteSpace(ArrayValueName); } }
+        public bool Expanded { get; set; }
+        
         /// <summary>
         /// gets the value of Value as Type T
         /// </summary>
@@ -159,46 +215,54 @@ namespace RazorTransform
         {
             return (T)Convert.ChangeType(this.Value, typeof(T));
         }
-        private List<ChildConfigInfo> _children = new List<ChildConfigInfo>();
+        private List<ConfigInfo> _children = new List<ConfigInfo>();
 
-        public List<ChildConfigInfo> Children
+        public List<ConfigInfo> Children
         {
             get { return _children; }
             private set { _children = value; }
         }
 
-        
 
-        public void LoadFromXml(XElement x, String destinationFolder)
+
+        public void LoadFromXml(XElement x)
         {
             _element = x;
 
-            PropName = x.Attribute("name").Value;
-            if (x.Attribute("displayName") != null)
-                Name = x.Attribute("displayName").Value;
-            else
-                Name = PropName;
-            PropName = makeName(PropName);
+            PropertyName = (string)x.Attribute("name");
+            Type = (string)x.Attribute("type");
+            if (PropertyName == null)
+                throw new ArgumentNullException("name");
+            if (Type == null)
+            {
+                if (x.Name == "group")
+                    Type = "group";
+                else
+                    throw new ArgumentNullException("type for property "+PropertyName);
+            }
 
-            Type = x.Attribute("type").Value;
-            if (x.Attribute("description") != null)
-                Description = x.Attribute("description").Value;
-            if (x.Attribute("range") != null && !String.IsNullOrEmpty(x.Attribute("range").Value))
+            // if no display name, use propertyname
+            DisplayName = (string)x.Attribute("displayName") ?? PropertyName;
+            PropertyName = makeName(PropertyName);
+
+            Description = (string)x.Attribute("description") ?? DisplayName;
+
+            if (x.Attribute("arguments") != null && !String.IsNullOrEmpty(x.Attribute("arguments").Value))
             {
-                Range = x.Attribute("range").Value;
-            }
-            
-            if (x.Attribute("expanded") != null)
-            {
-                this.Expanded = Boolean.Parse(x.Attribute("expanded").Value);
+                Arguments = x.Attribute("arguments").Value.Split(",".ToCharArray()).Select(y => y.Trim());
             }
             else
             {
-                this.Expanded = false;
+                Arguments = new List<string>();
             }
-			
-            SetValue(x);
+            Min = (string)x.Attribute("min") ?? "";
+            Max = (string)x.Attribute("max") ?? "";
+            Expanded = (bool?)x.Attribute("expanded") ?? false;
 
+            ArrayValueName = (string)x.Attribute("arrayValueName");
+
+            SetDefaultValue(x);
+#if not_used
             if (Type == "Array")
             {
                 Children = new List<ChildConfigInfo>();
@@ -214,7 +278,7 @@ namespace RazorTransform
                 // add a 0th one for a template for "New" ones
                 foreach (var y in x.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == "item"; else return false; }))
                 {
-                    var i = new ConfigInfo(y as XElement, destinationFolder);
+                    var i = new ConfigInfo(y as XElement);
                     newOne.Children.Add(i);
                 }
                 if (x.Attribute("loadFrom") != null && x.Attribute("rootNode") != null)
@@ -256,16 +320,18 @@ namespace RazorTransform
                         fs.Close();
 
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        throw new Exception("Error loading child XML");
+                        throw new Exception(String.Format(Resource.ErrorLoadingChildXml, fname, e.BuildMessage()));
                     }
                 }
             }
+#endif
 
         }
 
-        private void SetValue(XElement x)
+        // grab the default value from the element and set it
+        private void SetDefaultValue(XElement x)
         {
             if (x.Attribute("defaultValue") != null && !String.IsNullOrEmpty(x.Attribute("defaultValue").Value))
             {
@@ -291,75 +357,89 @@ namespace RazorTransform
 
                 }
             }
-             
-
         }
 
         public void UpdateXml()
         {
             _element.SetAttributeValue("defaultValue", Value);
+
+            // old files didn't have display name, save it off
+            if (_element.Attribute("displayName") == null)
+            {
+                _element.SetAttributeValue("displayName", DisplayName);
+                _element.SetAttributeValue("name", PropertyName);
+            }
         }
 
-    }
 
-   
+        internal void CopyFrom(ConfigInfo src)
+        {
+            if (!Object.ReferenceEquals(this, src))
+            {
+                Parent = src.Parent;
+                Children.Clear();
+                foreach (var i in src.Children)
+                {
+                    Children.Add(new ConfigInfo(i));
+                }
+            }
+        }
+    }
+    
+
     /// <summary>
     /// class to read and contain the settings to be merged with all the other files
     /// </summary>
     class ConfigSettings
     {
-        string _destinationFolder;
         static IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
 
         public static IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
 
-        public ExpandoObject GetProperties(bool updateXml, bool htmlEncode)
+        public ExpandoObject GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null)
         {
-            return buildObject(Info, updateXml, htmlEncode);
+            return BuildObject(Info, updateXml, htmlEncode, destinationFolder);
         }
 
-        ExpandoObject buildObject(IEnumerable<ConfigInfo> info, bool updateXml, bool htmlEncode)
+        internal ExpandoObject BuildObject(IEnumerable<ConfigInfo> info, bool updateXml, bool htmlEncode, string destinationFolder = null)
         {
             var ret = new ExpandoObject();
-            (ret as IDictionary<string, object>).Add("DestinationFolder", _destinationFolder);
-
+            if ( destinationFolder != null )
+                (ret as IDictionary<string, object>).Add("DestinationFolder", destinationFolder);
 
             foreach (var i in info)
             {
                 try
                 {
-                    if (String.Equals("Label", i.Type, StringComparison.CurrentCultureIgnoreCase))
-                        continue;
-
-                    if (String.Equals("Array", i.Type, StringComparison.CurrentCultureIgnoreCase))
+                    if (i.IsArray)
                     {
                         var children = new List<ExpandoObject>();
-                        if (i.Children.Count - 1 < i.Children.First().MinCount)
-                            throw new Exception(String.Format(Resource.MinCount, i.Name, i.Children.First().MinCount));
+                        if (i.Children.Count - 1 < i.MinInt)
+                            throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.MinInt));
                         foreach (var c in i.Children.Skip(1))
                         {
-                            children.Add(buildObject(c.Children, false, true));
+                            children.Add(BuildObject(c.Children, false, true, destinationFolder));
                         }
-                        (ret as IDictionary<string, object>).Add(i.PropName, children);
+                        (ret as IDictionary<string, object>).Add(i.PropertyName, children);
                     }
                     else if (String.Equals("Bool", i.Type, StringComparison.CurrentCultureIgnoreCase))
                     {
                         bool value = false;
-                        if ( i.Value != null )
+                        if (i.Value != null)
                         {
                             bool result;
                             if (Boolean.TryParse(i.Value, out result))
                                 value = result;
                         }
-                        (ret as IDictionary<string, object>).Add(i.PropName, value);
+                        (ret as IDictionary<string, object>).Add(i.PropertyName, value);
                     }
                     else
                     {
                         string value = i.Value ?? String.Empty;
                         if (htmlEncode)
-                            (ret as IDictionary<string, object>).Add(i.PropName, HttpUtility.HtmlEncode(value.Trim()));
+                            (ret as IDictionary<string, object>).Add(i.PropertyName, HttpUtility.HtmlEncode(value.Trim()));
                         else
-                            (ret as IDictionary<string, object>).Add(i.PropName, value.Trim());
+                            (ret as IDictionary<string, object>).Add(i.PropertyName, value.Trim());
                     }
 
                     if (updateXml)
@@ -369,77 +449,161 @@ namespace RazorTransform
                 }
                 catch (Exception e)
                 {
-                    string msg = String.Format(Resource.ProcessError, i.Name, e.Message);
+                    string msg = String.Format(Resource.ProcessError, i.DisplayName, e.BuildMessage());
                     throw new Exception(msg);
 
                 }
             }
             return ret;
         }
+        public List<ConfigInfo> Groups { get; private set; }
         public List<ConfigInfo> Info { get; private set; }
 
         public ConfigSettings()
         {
             Info = new List<ConfigInfo>();
+            Groups = new List<ConfigInfo>();
         }
 
-        public bool LoadFromFile(string fileName, string destinationFolder, IEnumerable<string> overrideParms = null)
+        // load both object def and values from files
+        public bool LoadFromFile(Settings settings)
         {
-            XDocument doc = XDocument.Load(new System.IO.FileStream(fileName, System.IO.FileMode.Open));
-
-            return LoadFromXElement(doc.Root, destinationFolder, overrideParms);
-        }
-
-        public bool LoadFromXElement(XElement root, string destinationFolder, IEnumerable<string> overrideParms = null)
-        {
-            _destinationFolder = destinationFolder;
-
-            var overrides = parseOverrides(overrideParms);
-
-
-            foreach (var n in root.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == "enum"; else return false; }))
+            XDocument doc = null;
+            using (var fs = new System.IO.FileStream(settings.ObjectFile, System.IO.FileMode.Open))
             {
-                var x = n as XElement;
+                doc = XDocument.Load(fs);
+            }
+            return LoadValuesFromFile(doc.Root,settings);
+        }
+
+        // load object from xml and values from file (if exists)
+        public bool LoadValuesFromFile(XElement objectRoot, Settings settings)
+        {
+            XDocument valueDoc = null;
+            if (File.Exists(settings.ValuesFile))
+            {
+                using (var fs = new System.IO.FileStream(settings.ValuesFile, System.IO.FileMode.Open))
+                {
+                    valueDoc = XDocument.Load(fs);
+                }
+            }
+
+            return LoadFromXElement(objectRoot, valueDoc == null ? null : valueDoc.Root, settings.Overrides);
+        }
+
+        // load both from XML
+        public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
+        {
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == "enum"))
+            {
                 var name = x.Attribute("name");
                 if (name == null)
                     throw new ArgumentNullException("name on enum");
-                var dict = new Dictionary<string,string>();
+                var dict = new Dictionary<string, string>();
                 dict.LoadFromXml(x);
-                _enums.Add( name.Value, dict );
+                _enums.Add(name.Value, dict);
             }
-            
-            foreach (var x in root.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == "item"; else return false; }))
-            {
-                var i = new ConfigInfo(x as XElement, destinationFolder);
-                if (overrides.ContainsKey(i.PropName))
-                    i.Value = overrides[i.PropName];
 
-                Info.Add(i);
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == "group"))
+            {
+                var g = new ConfigInfo(x);
+                Groups.Add(g);
+
+                if (g.IsArray)
+                {
+                    loadArray(g, x, values);
+                }
+                else
+                {
+                    // add items in the group
+                    foreach (var e in x.Elements().Where(n => n.Name == "item"))
+                    {
+                        var i = new ConfigInfo(e,g);
+                        if (overrides.ContainsKey(i.PropertyName))
+                            i.Value = overrides[i.PropertyName];
+                        else if (values != null)
+                        {
+                            var v = values.Elements("value").Where(n => (string)n.Attribute("name") == i.PropertyName).Select(n => (string)n.Attribute("value")).SingleOrDefault();
+                            if (v != null)
+                                i.Value = v;
+                        }
+
+                        Info.Add(i);
+                        g.Children.Add(i);
+                    }
+                }
             }
             return true;
         }
 
-        private IDictionary<string,string> parseOverrides(IEnumerable<string> overrideParms)
+        // load a group that is an array
+        private void loadArray(ConfigInfo parent, XElement x, XElement values)
         {
-            var ret = new Dictionary<string, string>();
+            var newOne = new ConfigInfo() { Parent = parent, DisplayName = parent.DisplayName, Description = parent.Description, Type = "Array" };
+            Info.Add(parent);
+            parent.Children.Add(newOne);
 
-            if (overrideParms != null && overrideParms.Count() > 0)
+            // add a 0th one for a template for "New" ones
+            foreach (var y in x.Elements().Where(n => n.Name == "item" ))
             {
-                foreach (var o in overrideParms )
+                var i = new ConfigInfo(y,parent);
+                newOne.Children.Add(i);
+            }
+
+            // load the values from the values file, if it exists
+            if (values != null)
+            {
+                var myValues = values.Elements("value").Where( o => o.Attribute("name").Value == parent.ArrayValueName);
+                foreach (var mv in myValues)
                 {
-                    var i = o.IndexOf("="); // use this instead of split in case have = in value
-                    if ( i > 0 )
+                    var nextOne = new ConfigInfo() { Parent = parent };
+                    //Info.Add(nextOne);
+                    parent.Children.Add(nextOne);
+
+                    foreach (var i in newOne.Children)
                     {
-                        var s = o.Substring(0,i).Trim();
-                        var v = o.Substring(i+1).Trim();
-                        if (s.Length > 0 && v.Length > 0)
+                        var v = mv.Elements().Where(n => n.Attribute("name").Value == i.PropertyName).SingleOrDefault();
+                        if (v != null)
                         {
-                            ret.Add(s, v);
+                            nextOne.Children.Add(new ConfigInfo(i, v.Attribute("value").Value));
+                        }
+                        else
+                        {
+                            nextOne.Children.Add(new ConfigInfo(i, i.Value));
                         }
                     }
                 }
             }
-            return ret;
+        }
+
+        internal void Save(string _valueFileName)
+        {
+            var doc = XDocument.Parse("<RtValues/>");
+            var root = doc.Root;
+
+            foreach (var item in Info)
+            {
+                if (item.IsArray)
+                {
+                    foreach ( var child in item.Children.Skip(1) )
+                    {
+                        var x = new XElement("value", new XAttribute("name", item.ArrayValueName));
+
+                        root.Add(x);
+                        foreach (var childElement in child.Children)
+                        {
+                            x.Add(new XElement("value", new XAttribute("name", childElement.PropertyName), new XAttribute("value", childElement.Value)));
+                        }
+                    }
+                }
+                else
+                {
+                    var x = new XElement("value", new XAttribute("name", item.PropertyName), new XAttribute("value",item.Value ?? ""));
+                    root.Add(x);
+                }
+            }
+
+            doc.Save(_valueFileName);
         }
     }
 }
