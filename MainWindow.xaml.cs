@@ -145,7 +145,7 @@ namespace RazorTransform
                     }
 
                     RazorFileTransformer rf = new RazorFileTransformer(d);
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = false;
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = false;
                     btnCancel.Content = Resource.Cancel;
                     _cts = new CancellationTokenSource();
 
@@ -184,7 +184,7 @@ namespace RazorTransform
                 {
                     Mouse.SetCursor(null);
                     _cts = null;
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = true;
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = true;
                     btnCancel.Content = Resource.Close;
                     lblProgress.Content = String.Empty;
                 }
