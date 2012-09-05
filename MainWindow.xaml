@@ -20,6 +20,8 @@
             <Setter Property="Control.FontWeight" Value="Normal"/>
         </Style>
         <Style TargetType="Button">
+            <Setter Property="Control.FontSize" Value="12"/>
+            <Setter Property="Control.FontWeight" Value="Normal"/>
             <Setter Property="Padding" Value="10,2,10,2" />
         </Style>
     </Window.Resources>

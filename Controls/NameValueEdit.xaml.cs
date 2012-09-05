@@ -61,7 +61,6 @@ namespace RazorTransform
                 lastExpanderStack = expander.Content as StackPanel;
 
                 var side = new StackPanel() { Orientation = Orientation.Horizontal };
-                i = 0;
 
                 if (item.IsArray)
                 {

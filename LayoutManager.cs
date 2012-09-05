@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using RazorTransform.Properties;
 
 namespace RazorTransform
 {
@@ -34,8 +35,7 @@ namespace RazorTransform
                 l.ToolTip = ci.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
-                l.FontWeight = FontWeight.FromOpenTypeWeight(555);
-               
+                l.Style = Application.Current.Resources["CfgLabel"] as Style; 
 
                 var binding = new Binding();
                 binding.Source = ci;
@@ -48,6 +48,7 @@ namespace RazorTransform
                 t.SetValue(Grid.RowProperty, i);
                 t.HorizontalAlignment = HorizontalAlignment.Left;
                 t.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                t.Style = Application.Current.Resources["CfgText"] as Style;
 
                 if ((i & 1) == 0)
                     l.Background =  new SolidColorBrush(Colors.WhiteSmoke);
@@ -130,6 +131,7 @@ namespace RazorTransform
                     l.ToolTip = c.Description;
                     l.SetValue(Grid.ColumnProperty, 0);
                     l.SetValue(Grid.RowProperty, i);
+                    l.Style = Application.Current.Resources["CfgLabel"] as Style;
 
 
                     var t = new EditItemBox(parent.Children.Count - 1 > parent.MinInt);

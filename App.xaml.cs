@@ -139,6 +139,7 @@ namespace RazorTransform
                         MessageBox.Show(String.Format(Resource.SettingsException, settingsException.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
                     var app = new App();
+                    app.InitializeComponent();
                     var mw = new MainWindow();
                     if (mw.Initialize(settings))
                     {
