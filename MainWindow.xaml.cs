@@ -62,6 +62,7 @@ namespace RazorTransform
             {
                 _valueFileName = settings.ValuesFile;
                 _destination = settings.OutputFolder;
+                _definitionFileName = settings.ObjectFile;
 
                 loadTemplateFile();
                 ret = true;
@@ -155,6 +156,7 @@ namespace RazorTransform
                     int count = await rf.TransformFilesAsync(_settings.TemplateFolder, _destination, !_settings.Test, _cts.Token, false, new Progress(this));
                     sw.Stop();
                     _cts = null;
+                    RanTransformOk = true;
                     if (sender == btnOk)
                     {
                         MessageBox.Show(String.Format(Resource.Success, count, _destination, sw.Elapsed.TotalSeconds), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);

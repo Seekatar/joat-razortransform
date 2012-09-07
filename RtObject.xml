@@ -3,17 +3,23 @@
   <group name="Instance details" expanded="true">
     <item name="makeEssAndMss" displayName="Create ESS and MSS" type="Bool" description="Create ESS and MSS web apps during the deploy." defaultValue="False" />
     <item name="makeBOPerTenant" displayName="Create BO Per Tenant" type="Bool" description="Create a back office web app for each tenant." defaultValue="False" />
-    <item name="InstanceName" type="String" description="Name of the instance" defaultValue="2012R4" displayName="Instance name" />
-    <item name="Version" type="String" description="Version to insert in database.  E.g. 2012.4" defaultValue="2012.4" />
-    <item name="BuildNumber" type="String" description="Full version number of the build. E.g. 2012.4.201" defaultValue="2012.4.467" displayName="Build Number" />
+    <item name="InstanceName" type="String" description="Name of the instance" defaultValue="2012R6" displayName="Instance name" />
+    <item name="DefaultUserDomain" type="String" description="Default domain for checking users" defaultValue="msoit" displayName="Default User Domain" />
+    <item name="Version" type="String" description="Version to insert in database.  E.g. 2012.4" defaultValue="2012.6" />
+    <item name="BuildNumber" type="String" description="Full version number of the build. E.g. 2012.4.201" defaultValue="2012.6.467" displayName="Build Number" />
     <item name="InstanceType" type="InstanceType" description="Type of instance 1000=Dev 900=AppDev 800=QA 600=UAT 0=Prod" defaultValue="1000" displayName="Instance type" />
   </group>
-  <group name="Tenants" description="List of tenants in addition to Default.  Must has at least  one." arrayValueName="tenant" min="0">
+  <group name="Tenants" description="List of tenants in addition to Default." arrayValueName="tenant" min="0">
     <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
     <item displayName="Description" name="description" type="string" description="description of tenant" />
     <item displayName="ControlId" name="controlId" type="string" description="Control Id for tenant" />
   </group>
-  <group name="Users" description="List of users that can log into SysAdmin, Studio, and Excalibur" arrayValueName="user" min="2">
+  <group name="Domains" description="List Domains. Must have at least one." arrayValueName="domain" min="1">
+    <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
+    <item displayName="Provider Name" name="ProviderType" type="AuthProvider" description="Provider to handle authenticating." />
+    <item displayName="Parameters" name="ConstructorParameter" type="string" description="Parameter depends on the provider." />
+  </group>
+  <group name="Users" description="List of users that can log into SysAdmin, Studio, and Excalibur.  Must have at least two." arrayValueName="user" min="2">
     <item displayName="User name" name="username" type="string" description="User Id" />
     <item displayName="First" name="first" type="string" description="First name" />
     <item displayName="Last" name="last" type="string" description="Last name" />
@@ -28,8 +34,8 @@
   </group>
   <group name="App Server details">
     <item name="AppServerName" type="String" description="name of server" defaultValue="localhost" displayName="App Server name" />
-    <item name="ServerNetPort" type="ServerPort" description="Value of port for server to listen on for net:" defaultValue="32335" valueProvider="PortValueProvider" arguments="ApplicationServerNetUrl" displayName="Server Net port" />
-    <item name="ServerRESTPort" type="ServerPort" description="Value of port for server to listen on for http:" defaultValue="32336" valueProvider="PortValueProvider" arguments="ApplicationServerRestUrl" displayName="Server REST port" />
+    <item name="ServerNetPort" type="ServerPort" description="Value of port for server to listen on for net:" defaultValue="33335" valueProvider="PortValueProvider" arguments="ApplicationServerNetUrl" displayName="Server Net port" />
+    <item name="ServerRESTPort" type="ServerPort" description="Value of port for server to listen on for http:" defaultValue="33336" valueProvider="PortValueProvider" arguments="ApplicationServerRestUrl" displayName="Server REST port" />
     <item name="ServicePhysicalPath" type="Folder" description="Path for service on the server box" defaultValue="C:\INSTANCES\@Model.InstanceName\App" displayName="Service Physical Path" />
     <item name="WebServicePort" type="WebPort" description="Port of web services" defaultValue="6991" valueProvider="PortValueProvider" arguments="ApplicationServerPort" displayName="Web Service Port" />
     <item name="ServiceUserName" type="String" description="User to run server services site as" defaultValue="@Model.SQLUser" displayName="Service User Name" />
@@ -59,7 +65,6 @@
     <item name="BindingSecurityTransport" displayName="Binding Security Transport" type="BasicHttpSecurityMode" description="For self-hosted systems, the transport between the client and Web server" defaultValue="None" />
     <item name="HttpsGetEnabled" displayName="HTTPS Get Enabled" type="Bool" description="For self-hosted systems, turn on HTTPS between client and Web server" defaultValue="False" />
     <item displayName="Deploy Classic Web Services Also" name="deployClassicWebService" type="Bool" description="Check if you wish to deploy the legacy web services in addition to the current for older systems." defaultValue="False" />
-    <item name="DefaultUserDomain" type="String" description="Default domain for checking users" defaultValue="msoit" displayName="Default User Domain" />
   </group>
   <group name="Misc">
     <item name="CacheServer" type="String" description="AppFabric CacheServer name" defaultValue="localhost" displayName="Cache Server" />
@@ -83,5 +88,10 @@
     <value key="Message" value="SOAP Message" />
     <value key="TransportWithMessageCredential" value="Transport With Message Credential (HTTPS and SOAP)" />
     <value key="TransportCredentialOnly" value="Transport Credential Only (HTTP - not recommended)" />
+  </enum>
+  <enum name="AuthProvider">
+    <value key="Sbc.App.Provider.Security.AdAuthentication, Sbc.App" value="ActiveDirectory (requires domain as param)" />
+    <value key="Sbc.App.Provider.Security.OAuthAuthentication, Sbc.App" value="OAuth (requires name of client handler)" />
+    <value key="Sbc.App.Provider.Security.PersistenceStoreAuthentication, Sbc.App" value="Persistent Store (no parameters)" />
   </enum>
 </RtObject>
