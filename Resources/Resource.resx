@@ -145,23 +145,29 @@
     <value>File "{0}" not found.</value>
   </data>
   <data name="HelpString" xml:space="preserve">
-    <value>RazorTranformation Tool transforms an object described in &lt;inputFile&gt;into all the files in a Template subfolder
+    <value>RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
 
 Command line options are:
-   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [&lt;overrides....&gt;]
+   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] 
+
    -h -? show this help
+  -test runs the transforms without saving the output to make sure Razor views work
+  -nosave does not save the override values in &lt;objectFile&gt;, useful when using overrides 
+  -run runs transforms without pulling up the UI, and the file and folder must exist.  Output is written to &lt;logfile&gt;
 
  &lt;objectFile&gt; defaults to .\RtObject.xml
  &lt;valuesFile&gt;defaults to .\RtValues
  &lt;outputFolder&gt; defaults to ..
  &lt;templateFolder&gt; defaults to .\Template
  &lt;logFile&gt; defaults to RazorTransformTool.log
--run runs without pulling up the UI, and the file and folder must exist.  Output is written to &lt;logfile&gt;
-&lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
+ &lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
 </value>
   </data>
   <data name="MinCount" xml:space="preserve">
     <value>{0} must have at least {1} items</value>
+  </data>
+  <data name="NoSave" xml:space="preserve">
+    <value>NoSave option specified that prevented saving values.</value>
   </data>
   <data name="ProcessError" xml:space="preserve">
     <value>ErrorProcessing {0}:
@@ -171,8 +177,7 @@ Command line options are:
     <value>Continuing after exception loading settings:</value>
   </data>
   <data name="Success" xml:space="preserve">
-    <value>Success!
-Processed {0} files in {2:f2} secs to {1}</value>
+    <value>Success! Processed {0} files in {2:f2} secs to {1}</value>
   </data>
   <data name="TestModeComplete" xml:space="preserve">
     <value>Test mode specified.  No data was written out</value>

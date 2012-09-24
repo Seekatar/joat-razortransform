@@ -140,7 +140,7 @@ namespace RazorTransform
                     var d = _cs.GetProperties(!_settings.Test, true, _destination);
 
                     // save right away in case it errors out
-                    if (!_settings.Test)
+                    if (!_settings.Test && !_settings.NoSave)
                     {
                         _cs.Save(_valueFileName);
                     }
@@ -159,7 +159,17 @@ namespace RazorTransform
                     RanTransformOk = true;
                     if (sender == btnOk)
                     {
-                        MessageBox.Show(String.Format(Resource.Success, count, _destination, sw.Elapsed.TotalSeconds), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                        string msg = String.Format(Resource.Success, count, _destination, sw.Elapsed.TotalSeconds);
+                        if (_settings.Test)
+                        {
+                            msg += Environment.NewLine + Resource.TestModeComplete;
+                        }
+                        if (_settings.NoSave)
+                        {
+                            msg += Environment.NewLine + Resource.NoSave;
+                        }
+                        
+                        MessageBox.Show(msg, Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {

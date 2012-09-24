@@ -75,6 +75,7 @@ namespace RazorTransform
                 .Add("output=", v => settings.OverrideOutputFolder = v)
                 .Add("log=", v => settings.LogFile = v)
                 .Add("test", v => settings.Test = true)
+                .Add("nosave", v => settings.NoSave = true )
                 .Add("debug", v => { settings.Debug = true; ExceptionExtension.ShowStack = true; })
                 .Add("template=", v => settings.OverrideTemplateFolder = v);
 
@@ -126,6 +127,10 @@ namespace RazorTransform
                             {
                                 progress.Report(Resource.TestModeComplete);
                             }
+                            else if (settings.NoSave)
+                            {
+                                progress.Report(Resource.NoSave);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -147,10 +152,6 @@ namespace RazorTransform
                             mw.WindowState = WindowState.Maximized;
                         mw.Show();
                         app.Run();
-                    }
-                    if (settings.Test)
-                    {
-                        MessageBox.Show(Resource.TestModeComplete, Resource.Title, MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     ret = mw.RanTransformOk ? EXIT_NO_ERROR : EXIT_ERROR;
                 }

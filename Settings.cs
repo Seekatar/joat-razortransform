@@ -76,6 +76,7 @@ namespace RazorTransform
 
         // temp values
         public bool Test { get; set; }
+        public bool NoSave { get; set; }
         public bool Debug { get; set; }
         public string ObjectFile { get; set; }
         public string ValuesFile { get; set; }

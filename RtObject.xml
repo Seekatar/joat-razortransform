@@ -14,7 +14,7 @@
     <item displayName="Description" name="description" type="string" description="description of tenant" />
     <item displayName="ControlId" name="controlId" type="string" description="Control Id for tenant" />
   </group>
-  <group name="Domains" description="List Domains. Must have at least one." arrayValueName="domain" min="1">
+  <group name="Domains" description="List of authentication Domains." arrayValueName="domain" min="0">
     <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
     <item displayName="Provider Name" name="ProviderType" type="AuthProvider" description="Provider to handle authenticating." />
     <item displayName="Parameters" name="ConstructorParameter" type="string" description="Parameter depends on the provider." />
@@ -35,7 +35,6 @@
   <group name="App Server details">
     <item name="AppServerName" type="String" description="name of server" defaultValue="localhost" displayName="App Server name" />
     <item name="ServerNetPort" type="ServerPort" description="Value of port for server to listen on for net:" defaultValue="33335" valueProvider="PortValueProvider" arguments="ApplicationServerNetUrl" displayName="Server Net port" />
-    <item name="ServerRESTPort" type="ServerPort" description="Value of port for server to listen on for http:" defaultValue="33336" valueProvider="PortValueProvider" arguments="ApplicationServerRestUrl" displayName="Server REST port" />
     <item name="ServicePhysicalPath" type="Folder" description="Path for service on the server box" defaultValue="C:\INSTANCES\@Model.InstanceName\App" displayName="Service Physical Path" />
     <item name="WebServicePort" type="WebPort" description="Port of web services" defaultValue="6991" valueProvider="PortValueProvider" arguments="ApplicationServerPort" displayName="Web Service Port" />
     <item name="ServiceUserName" type="String" description="User to run server services site as" defaultValue="@Model.SQLUser" displayName="Service User Name" />
@@ -50,7 +49,6 @@
     <item name="ExcaliburAppName" type="String" description="Name of Excalibur app, appened to the site name." defaultValue="Excalibur_@(Model.InstanceName)" displayName="Excalibur App Name" />
     <item name="StudioAppName" displayName="Studio App Name" type="String" description="Name of Studio site, appened to the site name." defaultValue="Studio_@(Model.InstanceName)" />
     <item name="WebServiceAppName" type="String" description="Name of Web Service app, appened to the site name." defaultValue="WebService" displayName="Web Service App Name" />
-    <item name="WebServiceClassicAppName" type="String" description="Name of Web Service Classic app, appened to the site name." defaultValue="WebServiceClassic" displayName="Web Service Classic App Name" />
     <item name="WebAppPoolUserName" type="String" description="User to run web app pools as" defaultValue="@(Model.SQLUser)" displayName="Web App Pool User Name" />
     <item name="WebAppPoolPassword" type="Hidden" description="Password for user.  Override on command line." defaultValue="password" displayName="Web App Pool Password" />
     <item name="CaseSensitivePassword" type="Bool" description="Password case sensitivity.  This should always be set to true.  However, older version allowed false." defaultValue="True" displayName="Case Sensitive Password" />
@@ -64,7 +62,6 @@
     <item name="BaseUri" displayName="Base URI" type="String" description="*External* URI of the web service" defaultValue="http://@(Model.WebServerName)/webservice" />
     <item name="BindingSecurityTransport" displayName="Binding Security Transport" type="BasicHttpSecurityMode" description="For self-hosted systems, the transport between the client and Web server" defaultValue="None" />
     <item name="HttpsGetEnabled" displayName="HTTPS Get Enabled" type="Bool" description="For self-hosted systems, turn on HTTPS between client and Web server" defaultValue="False" />
-    <item displayName="Deploy Classic Web Services Also" name="deployClassicWebService" type="Bool" description="Check if you wish to deploy the legacy web services in addition to the current for older systems." defaultValue="False" />
   </group>
   <group name="Misc">
     <item name="CacheServer" type="String" description="AppFabric CacheServer name" defaultValue="localhost" displayName="Cache Server" />
