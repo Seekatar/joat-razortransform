@@ -5,7 +5,7 @@
         Title="Razor File Transformer - aRTie "
 	WindowStyle="ToolWindow" 
 	WindowStartupLocation="CenterScreen" 
-        MinHeight="100" MinWidth="300">
+        MinHeight="100" MinWidth="300" >
     <Window.Resources>
         <Style x:Key="CfgBigLabel">
             <Setter Property="Control.FontSize" Value="16"/>
@@ -20,8 +20,6 @@
             <Setter Property="Control.FontWeight" Value="Normal"/>
         </Style>
         <Style TargetType="Button">
-            <Setter Property="Control.FontSize" Value="12"/>
-            <Setter Property="Control.FontWeight" Value="Normal"/>
             <Setter Property="Padding" Value="10,2,10,2" />
         </Style>
     </Window.Resources>
@@ -35,17 +33,7 @@
         </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <local:NameValueEdit Grid.Row="0" x:Name="editControl" />
-    <StackPanel Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0">
-        <Button Content="Settings" x:Name="settingBtn" Click="settingBtn_Click"/>
-    </StackPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch"></Label>
-            <Button Content="_Go! &amp; Close" HorizontalAlignment="Left" Margin="5" Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click" IsDefault="True" ToolTip="Run the transforms and if ok, exit."/>
-            <Button Content="G_o!" HorizontalAlignment="Left" Margin="5" Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms."/>
-            <Button Content="_Close" HorizontalAlignment="Right" Margin="5" Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" />
-        </StackPanel>
-    </Grid>
+        <local:MainEdit Grid.Row="0" x:Name="editControl" />
+     </Grid>
 </Window>

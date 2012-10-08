@@ -28,9 +28,9 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( ConfigInfo orig )
+        public bool ShowDialog( TransformModelItem orig )
         {
-            var temp = new ConfigInfo(orig);
+            var temp = new TransformModelItem(orig);
             Load(temp);
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (ShowDialog() ?? false)
@@ -42,12 +42,12 @@ namespace RazorTransform
 
         }
 
-        public void Load(IEnumerable<ConfigInfo> info )
+        public void Load(IEnumerable<TransformModelItem> info )
         {
             nvEdit.Load(info);
         }
 
-        public void Load(ConfigInfo parent)
+        public void Load(TransformModelItem parent)
         {
             nvEdit.Load(parent);
         }

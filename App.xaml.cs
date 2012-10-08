@@ -12,37 +12,6 @@ using System.IO;
 
 namespace RazorTransform
 {
-    class LogProgress : IProgress<string>, IDisposable
-    {
-        FileStream _fs;
-        TextWriter _tw;
-        bool _consoleAttached;
-
-        public LogProgress(string fname, bool consoleAttached )
-        {
-            _consoleAttached = consoleAttached;
-            try
-            {
-                _fs = new FileStream(fname, FileMode.Create);
-                _tw = new StreamWriter(_fs);
-            }
-            catch
-            { }
-        }
-        public void Report(string t)
-        {
-            if (_tw != null)
-                _tw.WriteLine(t);
-            if ( _consoleAttached )
-                Console.WriteLine(t);
-        }
-
-        public void Dispose()
-        {
-            _tw.Dispose();
-            _fs.Dispose();
-        }
-    }
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -52,9 +21,6 @@ namespace RazorTransform
         static int EXIT_NO_ERROR = 0;
         static int EXIT_ERROR = 1;
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern bool AttachConsole(int processId); 
-
         [STAThread]
         [SuppressUnmanagedCodeSecurity]
         public static int Main(string[] args)
@@ -63,105 +29,86 @@ namespace RazorTransform
 
             bool run = false;
             bool showHelp = false;
-            bool maximize = false;
-
-            Settings settings = new Settings();
+            string outputFolder = "..";
+            string logFile = "RazorTransform.log";
+            Dictionary<string, object> parms = new Dictionary<string, object>();
 
             var options = new Mono.Options.OptionSet()
-                .Add("run", v => run = true)
+                .Add("run", v => { parms.Add("Run", true); run = true; })
                 .Add("h|?|help", v => showHelp = true)
-                .Add("object=", v => settings.ObjectFile = v)
-                .Add("values=", v => settings.ValuesFile = v)
-                .Add("output=", v => settings.OverrideOutputFolder = v)
-                .Add("log=", v => settings.LogFile = v)
-                .Add("test", v => settings.Test = true)
-                .Add("nosave", v => settings.NoSave = true )
-                .Add("debug", v => { settings.Debug = true; ExceptionExtension.ShowStack = true; })
-                .Add("template=", v => settings.OverrideTemplateFolder = v);
+                .Add("object=", v => parms.Add("ObjectFile", v))
+                .Add("values=", v => parms.Add("ValuesFile", v))
+                .Add("output=", v => { outputFolder = v; parms.Add("OverrideOutputFolder", v); })
+                .Add("log=", v => { logFile = v; parms.Add("LogFile", v); })
+                .Add("test", v => parms.Add("Test", true))
+                .Add("nosave", v => parms.Add("NoSave", true))
+                .Add("debug", v => { parms.Add("Debug", true); ExceptionExtension.ShowStack = true; })
+                .Add("template=", v => parms.Add("OverrideTemplateFolder", v));
 
-            List<string> parms = options.Parse(args);
-            settings.SetOverrides(parms);
+            List<string> overrides = options.Parse(args);
+
 
             if (showHelp)
                 ShowHelp();
             else
             {
-                Exception settingsException = null;
-                try
-                {
-                    settings.Load();
-                }
-                catch (Exception e)
-                {
-                    settingsException = e;
-                }
-
-
                 if (run) // run without the UI
                 {
-                    LogProgress progress;
-                    progress = new LogProgress(Path.Combine(settings.OutputFolder,settings.LogFile),AttachConsole((int)-1));
-
-                    using (progress)
+                    var transformer = new RazorTransformer();
+                    try
                     {
-                        if (settingsException != null)
-                            progress.Report(String.Format(Resource.SettingsException, settingsException.BuildMessage()));
+                        transformer.Initialize(parms, overrides);
 
-                        progress.Report(settings.ToString());
-                        if (settings.Test)
+                        transformer.Output.Report(transformer.Settings.ToString());
+                        if (transformer.Settings.Test)
                         {
-                            progress.Report(Resource.TestModeLogStart);
+                            transformer.Output.Report(Resource.TestModeLogStart);
                         }
 
-                        try
+                        var result = transformer.DoTransformAsync();
+                        result.Wait();
+
+                        if (result.Result.TranformOk)
                         {
-                            var _cs = new ConfigSettings();
-                            _cs.LoadFromFile(settings); 
-
-                            var d = _cs.GetProperties(true, true, settings.OutputFolder); 
-
-                            RazorFileTransformer rf = new RazorFileTransformer(d);
-                            rf.TransformFiles(settings.TemplateFolder, settings.OutputFolder, !settings.Test, false, progress);
                             ret = EXIT_NO_ERROR; // ok
-                            if (settings.Test)
+                            if (transformer.Settings.Test)
                             {
-                                progress.Report(Resource.TestModeComplete);
+                                transformer.Output.Report(Resource.TestModeComplete);
                             }
-                            else if (settings.NoSave)
+                            else if (transformer.Settings.NoSave)
                             {
-                                progress.Report(Resource.NoSave);
+                                transformer.Output.Report(Resource.NoSave);
                             }
                         }
-                        catch (Exception e)
-                        {
-                            progress.Report(String.Format(Resource.ExceptionFormat,e.BuildMessage()));
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        transformer.Output.Report(String.Format(Resource.ExceptionFormat, e.BuildMessage()));
                     }
                 }
                 else // show gui
                 {
-                    if (settingsException != null)
-                        MessageBox.Show(String.Format(Resource.SettingsException, settingsException.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
                     var app = new App();
                     app.InitializeComponent();
                     var mw = new MainWindow();
-                    if (mw.Initialize(settings))
+                    try
                     {
-                        if (maximize)
-                            mw.WindowState = WindowState.Maximized;
+                        mw.Initialize(parms, overrides);
                         mw.Show();
+
                         app.Run();
+
+                        ret = mw.RanTransformOk ? EXIT_NO_ERROR : EXIT_ERROR;
                     }
-                    ret = mw.RanTransformOk ? EXIT_NO_ERROR : EXIT_ERROR;
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(String.Format(Resource.ExceptionFormat, e.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        mw.Close();
+                    }
                 }
             }
 
             return ret;
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
         }
 
         public static void ShowHelp()

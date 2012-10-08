@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RazorTransform
 {
@@ -20,7 +12,7 @@ namespace RazorTransform
     public partial class NameValueEdit : UserControl
     {
         List<Expander> _expanders = new List<Expander>();
-        IEnumerable<ConfigInfo> _groups;
+        IEnumerable<TransformModelItem> _groups;
 
         public NameValueEdit()
         {
@@ -33,7 +25,7 @@ namespace RazorTransform
         /// load a single configinfo with children
         /// </summary>
         /// <param name="parent"></param>
-        public void Load(ConfigInfo parent)
+        public void Load(TransformModelItem parent)
         {
             _expanders.Clear();
             _stackPanel.Children.Clear();
@@ -45,7 +37,7 @@ namespace RazorTransform
             expander.IsExpanded = true;
         }
 
-        public void Load(IEnumerable<ConfigInfo> groups)
+        public void Load(IEnumerable<TransformModelItem> groups)
         {
             _groups = groups;
 
@@ -67,11 +59,7 @@ namespace RazorTransform
                     // add all the children 
                     if (item.Children.Count > 0 ) // must have 0th for adds at least
                     {
-                        // add all the children 
-                        if (item.Children.Count > 0) // must have 0th for adds at least
-                        {
-                            lastExpanderStack.Children.Add( LayoutManager.BuildGridView(item, add_Click, edit_Click, del_Click));
-                        }
+                        lastExpanderStack.Children.Add( LayoutManager.BuildGridView(item, add_Click, edit_Click, del_Click));
                     }
                 }
                 else
@@ -83,7 +71,7 @@ namespace RazorTransform
             }
         }
 
-        private Expander createExpander(ConfigInfo ci)
+        private Expander createExpander(TransformModelItem ci)
         {
             var expander = new Expander();
             expander.Style = this.Resources["CfgBigLabel"] as Style;
@@ -101,7 +89,7 @@ namespace RazorTransform
         void del_Click(object sender, RoutedEventArgs e)
         {
             // find it in the list
-            var delMe = (sender as Control).Tag as ConfigInfo;
+            var delMe = (sender as Control).Tag as TransformModelItem;
             if (delMe != null)
             {
                 delMe.Parent.Children.Remove(delMe);
@@ -114,7 +102,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="orig"></param>
         /// <returns></returns>
-        bool editArrayItem(ConfigInfo orig)
+        bool editArrayItem(TransformModelItem orig)
         {
             var nve = new ArrayItemEdit();
             return nve.ShowDialog(orig);
@@ -122,7 +110,7 @@ namespace RazorTransform
 
         void edit_Click(object sender, RoutedEventArgs e)
         {
-            if ( editArrayItem((sender as Control).Tag as ConfigInfo) )
+            if ( editArrayItem((sender as Control).Tag as TransformModelItem) )
                 ReLoad();
         }
 
@@ -144,7 +132,7 @@ namespace RazorTransform
         void add_Click(object sender, RoutedEventArgs e)
         {
             // create a new one from the 0th as a template
-            var newOne = new ConfigInfo((sender as Control).Tag as ConfigInfo);
+            var newOne = new TransformModelItem((sender as Control).Tag as TransformModelItem);
             if (editArrayItem(newOne))
             {
                 // add it to the parent array

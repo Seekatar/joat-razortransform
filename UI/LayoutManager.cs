@@ -6,13 +6,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using RazorTransform.Properties;
 
 namespace RazorTransform
 {
     public static class LayoutManager
     {
-        public static FrameworkElement BuildGridView(IEnumerable<ConfigInfo> items)
+        public static FrameworkElement BuildGridView(IEnumerable<TransformModelItem> items)
         {
 
             Grid grid = new Grid();
@@ -82,7 +81,7 @@ namespace RazorTransform
             return grid;
 
         }
-        public static FrameworkElement BuildGridView(ConfigInfo parent, 
+        public static FrameworkElement BuildGridView(TransformModelItem parent, 
             
             Action<object,RoutedEventArgs> addHandler,
             Action<object, RoutedEventArgs> editHandler,
@@ -178,25 +177,25 @@ namespace RazorTransform
             }
                 return grid;
         }
-        private static Control CreateControl( ConfigInfo info, Binding binding)
+        private static Control CreateControl( TransformModelItem info, Binding binding)
         {
-            switch (info.Type)
+            switch (info.Type.ToLower())
             {
-                case "Folder":
-                case "UncPath": return _Folder(info, binding);
-                case "Guid": return _Guid(info, binding);
-                case "Bool": return _Bool(info, binding);
-                case "Int32": return _Int32(info, binding);
+                case "folder":
+                case "uncpath": return _Folder(info, binding);
+                case "guid": return _Guid(info, binding);
+                case "bool": return _Bool(info, binding);
+                case "int32": return _Int32(info, binding);
 
-                case "String": return _Default(info, binding);
+                case "string": return _Default(info, binding);
                 default:
                     {
                         // is it an enum?
-                        if (ConfigSettings.Enums.ContainsKey(info.Type))
+                        if (TransformModel.Enums.ContainsKey(info.Type))
                         {
                             ComboBoxInput ret = _ComboBox(info, binding);
                             var listBinding = new Binding();
-                            listBinding.Source = ConfigSettings.Enums[info.Type];
+                            listBinding.Source = TransformModel.Enums[info.Type];
                             listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                             ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
                             return ret;
@@ -209,11 +208,11 @@ namespace RazorTransform
 
        
  
-        private static Func<ConfigInfo, Binding, Control> _Folder = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _Folder = (ci, binding) =>
         {
             return _UncPath(ci, binding);
         };
-        private static Func<ConfigInfo, Binding, Control> _UncPath = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _UncPath = (ci, binding) =>
         {
             var t = new FolderInputBox(ci.DisplayName, true);
 
@@ -221,14 +220,14 @@ namespace RazorTransform
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
             return t;
         };
-        private static Func<ConfigInfo, Binding, Control> _Guid = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _Guid = (ci, binding) =>
         {
             var t = new GuidInput();
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(GuidInput.GuidStrProperty, binding);
             return t;
         };
-        private static Func<ConfigInfo, Binding, Control> _Bool = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _Bool = (ci, binding) =>
             {
                 var bib = new BoolInput();
 
@@ -236,7 +235,7 @@ namespace RazorTransform
                 bib.SetBinding(BoolInput.BoolProperty, binding);
                 return bib;
             };
-        private static Func<ConfigInfo, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
         {
             var bib = new ComboBoxInput();
 
@@ -244,14 +243,14 @@ namespace RazorTransform
             bib.SetBinding(ComboBoxInput.ComboBoxProperty, binding);
             return bib;
         };
-        private static Func<ConfigInfo, Binding, Control> _Default = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _Default = (ci, binding) =>
         {
             var t = new TextBox();
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
             return t;
         };
-        private static Func<ConfigInfo, Binding, Control> _Int32 = (ci, binding) =>
+        private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
         {
             return _Default(ci, binding);
         };

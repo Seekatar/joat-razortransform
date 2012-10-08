@@ -9,15 +9,15 @@ using System.Runtime.Serialization;
 namespace RazorTransform
 {
     /// <summary>
-    /// encapsulatoin of settings.
+    /// encapsulation of settings.
     /// </summary>
     /// use RT for managing the settings -- wheee!
     /// could have used more static class, but eat our own dog food
     public class Settings
     {
         private ExpandoObject _settings = null;
-        private ConfigInfo _configInfo;
-        private ConfigInfo _arrayConfigInfo;
+        private TransformModelItem _configInfo;
+        private TransformModelItem _arrayConfigInfo;
 
         // object definition for settings is really static since code relies on it
         static string _settingsXml =
@@ -29,25 +29,31 @@ namespace RazorTransform
   </group>
 </RtObject>";
 
-        public void Load()
+        public void Load(IEnumerable<string> overrideParms)
         {
+            setOverrides(overrideParms);
+
             // load the settings
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
-            ConfigSettings settings = new ConfigSettings();
-            settings.LoadValuesFromFile(settingsDefinition, this);
+            TransformModel settings = new TransformModel();
+            settings.LoadValuesFromXml(settingsDefinition, this);
 
             // the config info it the [1] value or [0] if first time. (for array 0th is template)
             _configInfo = settings.Groups[0].Children[settings.Groups[0].Children.Count - 1];
 
             // get the settings objects which is an array of one item so not in root namespace of values
             dynamic settingsArray = settings.GetProperties(false, false);
-            if (settingsArray.Settings.Count == 0)
+            if (settingsArray._settings.Count == 0)
             {
-                // create a default one
+                // create a default one as template
                 _settings = settings.BuildObject(settings.Groups[0].Children[0].Children, false, false);
+
+                var newOne = new TransformModelItem(_configInfo);
+                _configInfo.Parent.Children.Add(newOne);
+                _configInfo = newOne;
             }
             else
-                _settings = settingsArray.Settings[0];
+                _settings = settingsArray._settings[0];
 
             _arrayConfigInfo = settings.Groups[0];
         }
@@ -64,14 +70,24 @@ namespace RazorTransform
         }
 
         // for saving
-        public ConfigInfo ArrayConfigInfo { get { return _arrayConfigInfo;  } }
+        public TransformModelItem ArrayConfigInfo { get { return _arrayConfigInfo;  } }
 
         // for editing
-        public ConfigInfo ConfigInfo { get { return _configInfo;  } }
+        public TransformModelItem ConfigInfo { get { return _configInfo;  } }
 
         // values saved in values file
         public string Title { get { return this["Title"]; } set { this["Title"] = value; } }
-        public string OutputFolder { get { return OverrideOutputFolder ?? this["LastPath"]; } set { this["LastPath"] = value; } }
+        public string OutputFolder 
+        { 
+            get 
+            { 
+                var temp = OverrideOutputFolder ?? this["LastPath"]; 
+                if (temp == "..")
+                    temp = System.IO.Path.GetFullPath("..");
+                return temp;
+            }
+            set { this["LastPath"] = value; }
+        }
         public string TemplateFolder { get { return OverrideTemplateFolder ?? this["LastTemplatePath"]; } set { this["LastTemplatePath"] = value; } }
 
         // temp values
@@ -84,10 +100,11 @@ namespace RazorTransform
         public string OverrideOutputFolder { get; set; }
         [IgnoreDataMemberAttribute]
         public string OverrideTemplateFolder { get; set; }
+        public bool Run { get; set; }
         public string LogFile { get; set; }
         public IDictionary<string, string> Overrides { get; set; }
 
-        public void SetOverrides(IEnumerable<string> overrideParms)
+        private void setOverrides(IEnumerable<string> overrideParms)
         {
             Overrides = new Dictionary<string, string>();
 
@@ -147,5 +164,20 @@ namespace RazorTransform
             }
             return sb.ToString();
         }
+
+        // set all the parameters from a dict passed in using reflection
+        internal void SetParameters(Dictionary<string, object> parms)
+        {
+            var props = this.GetType().GetProperties();
+            foreach ( var p in parms )
+            {
+                var prop = props.FirstOrDefault( o => o.Name == p.Key );
+                if ( prop != null )
+                {
+                    prop.SetValue( this, p.Value );
+                }
+            }
+        }
+
     }
 }

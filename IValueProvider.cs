@@ -10,6 +10,6 @@ namespace RazorTransform
     /// </summary>
     public interface IValueProvider
     {
-        object GetValue(ConfigInfo input);
+        object GetValue(TransformModelItem input);
     }
 }

@@ -51,6 +51,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -71,22 +72,37 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigItemExtensions.cs" />
+    <Compile Include="ITransformOutput.cs" />
+    <Compile Include="RazorTransformer.cs" />
+    <Compile Include="TransformModelItem.cs" />
+    <Compile Include="TransformResult.cs" />
+    <Compile Include="UI\GuiProgress.cs" />
+    <Compile Include="Controls\ITransformParentWindow.cs" />
+    <Compile Include="Util\CollectionExtensions.cs" />
     <Compile Include="Controls\ComboBoxInput.xaml.cs">
       <DependentUpon>ComboBoxInput.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MainEdit.xaml.cs">
+      <DependentUpon>MainEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IValueProvider.cs" />
-    <Compile Include="LayoutManager.cs" />
     <Compile Include="Settings.cs" />
+    <Content Include="Templates\ItemBTranforms.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="UI\LayoutManager.cs" />
     <Compile Include="Util\ExceptionExtension.cs" />
+    <Content Include="Templates\ItemBXml.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="ArrayItemEdit.xaml.cs">
+    <Compile Include="UI\ArrayItemEdit.xaml.cs">
       <DependentUpon>ArrayItemEdit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ConfigSettings.cs" />
+    <Compile Include="TransformModel.cs" />
     <Compile Include="Controls\BoolInput.xaml.cs">
       <DependentUpon>BoolInput.xaml</DependentUpon>
     </Compile>
@@ -105,6 +121,7 @@
     <Compile Include="Controls\NameValueEdit.xaml.cs">
       <DependentUpon>NameValueEdit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Util\LogProgress.cs" />
     <Compile Include="Util\Options.cs" />
     <Compile Include="RazorFileTransformer.cs" />
     <Compile Include="Resources\Resource.Designer.cs">
@@ -112,7 +129,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Page Include="ArrayItemEdit.xaml">
+    <Page Include="Controls\MainEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ArrayItemEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,7 +165,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -152,7 +173,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -183,6 +204,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
       <CustomToolNamespace>RazorTransform</CustomToolNamespace>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -195,8 +217,7 @@
   <ItemGroup>
     <Resource Include="Resources\favicon.ico" />
   </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

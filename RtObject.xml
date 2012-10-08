@@ -1,94 +1,48 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RtObject>
-  <group name="Instance details" expanded="true">
-    <item name="makeEssAndMss" displayName="Create ESS and MSS" type="Bool" description="Create ESS and MSS web apps during the deploy." defaultValue="False" />
-    <item name="makeBOPerTenant" displayName="Create BO Per Tenant" type="Bool" description="Create a back office web app for each tenant." defaultValue="False" />
-    <item name="InstanceName" type="String" description="Name of the instance" defaultValue="2012R6" displayName="Instance name" />
-    <item name="DefaultUserDomain" type="String" description="Default domain for checking users" defaultValue="msoit" displayName="Default User Domain" />
-    <item name="Version" type="String" description="Version to insert in database.  E.g. 2012.4" defaultValue="2012.6" />
-    <item name="BuildNumber" type="String" description="Full version number of the build. E.g. 2012.4.201" defaultValue="2012.6.467" displayName="Build Number" />
-    <item name="InstanceType" type="InstanceType" description="Type of instance 1000=Dev 900=AppDev 800=QA 600=UAT 0=Prod" defaultValue="1000" displayName="Instance type" />
+  <group name="Section A Strings -- expanded by default" expanded="true">
+    <item name="stringA1" type="String" description="String with a size range of 10-20" defaultValue="defaultValue" displayName="String #1" min="10" max="20"/>
+    <item name="stringA2" type="String" description="String with min size of 10." defaultValue="default" displayName="String #2" min="10" />
+    <item name="stringA3" type="String" description="String with max size of 10." defaultValue="default" displayName="String #3" max="10" /> />
   </group>
-  <group name="Tenants" description="List of tenants in addition to Default." arrayValueName="tenant" min="0">
+  <group name="Section B booleans" expanded="false">
+    <item name="boolA1" displayName="Boolean #1" type="Bool" description="This is a boolean value defaulting to False." defaultValue="False" />
+    <item name="boolA2" displayName="Boolean #2" type="Bool" description="This is a boolean value defaulting to True." defaultValue="True" />
+  </group>
+  <group name="Section C Integers" expanded="false">
+    <item name="intA1" type="Int32" description="Int32 with a range of 10-20" defaultValue="defaultValue" displayName="Int32 #1" min="10" max="20"/>
+    <item name="intA2" type="Int32" description="Int32 with min of 10." defaultValue="default" displayName="Int32 #2" min="10" />
+    <item name="intA3" type="Int32" description="Int32 with max of 10." defaultValue="default" displayName="Int32 #3" max="10" /> />
+  </group>
+  <group name="Section D Enumerations" expanded="false">
+    <item name="enumD1" type="EnumA" description="EnumA description" defaultValue="enumKeyA" displayName="Enumeration A"/>
+    <item name="enumD2" type="EnumB" description="EnumB description" defaultValue="enumKeyZ" displayName="Enumeration B" />
+    <item name="enumD3" type="EnumC" description="EnumC description" defaultValue="" displayName="Enumeration C" /> />
+  </group>
+  <group name="ItemA Array" description="Array of itemA objects with min number of 0." arrayValueName="itemA" min="0">
     <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
     <item displayName="Description" name="description" type="string" description="description of tenant" />
-    <item displayName="ControlId" name="controlId" type="string" description="Control Id for tenant" />
+    <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3">
+      <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
+      <item displayName="Description" name="description" type="string" description="description of tenant" />
+    </group>
   </group>
-  <group name="Domains" description="List of authentication Domains." arrayValueName="domain" min="0">
+  <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3">
     <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
-    <item displayName="Provider Name" name="ProviderType" type="AuthProvider" description="Provider to handle authenticating." />
-    <item displayName="Parameters" name="ConstructorParameter" type="string" description="Parameter depends on the provider." />
+    <item displayName="Description" name="description" type="string" description="description of tenant" />
   </group>
-  <group name="Users" description="List of users that can log into SysAdmin, Studio, and Excalibur.  Must have at least two." arrayValueName="user" min="2">
-    <item displayName="User name" name="username" type="string" description="User Id" />
-    <item displayName="First" name="first" type="string" description="First name" />
-    <item displayName="Last" name="last" type="string" description="Last name" />
-    <item displayName="ExternalId" name="externalid" type="Guid" description="externalId" />
-  </group>
-  <group name="Database details">
-    <item name="SQLServer" type="String" description="SQLServer name and instance" defaultValue="localhost" displayName="SQL Server" />
-    <item name="SQLUser" type="String" description="User to make dbo_owner for new databases" defaultValue="sbcsystems\lifeworksadmin" displayName="SQL User" />
-    <item name="DatabaseFilePath" type="String" description="Location of SQL Server files on the SQL Server box itself" defaultValue="d:\SqlData" displayName="Database file path" />
-    <item name="InstanceDatabase" type="Hidden" description="Instance DB name" defaultValue="LIFEWORKS_@(Model.InstanceName)_INSTANCE" displayName="Instance database" />
-    <item name="ScriptFilePath" type="Hidden" description="Location of the Database folder in the builds directory." defaultValue="@(System.IO.Path.Combine(Model.BuildsDirectory,Model.BuildNumber))\Database" displayName="Script file path" />
-  </group>
-  <group name="App Server details">
-    <item name="AppServerName" type="String" description="name of server" defaultValue="localhost" displayName="App Server name" />
-    <item name="ServerNetPort" type="ServerPort" description="Value of port for server to listen on for net:" defaultValue="33335" valueProvider="PortValueProvider" arguments="ApplicationServerNetUrl" displayName="Server Net port" />
-    <item name="ServicePhysicalPath" type="Folder" description="Path for service on the server box" defaultValue="C:\INSTANCES\@Model.InstanceName\App" displayName="Service Physical Path" />
-    <item name="WebServicePort" type="WebPort" description="Port of web services" defaultValue="6991" valueProvider="PortValueProvider" arguments="ApplicationServerPort" displayName="Web Service Port" />
-    <item name="ServiceUserName" type="String" description="User to run server services site as" defaultValue="@Model.SQLUser" displayName="Service User Name" />
-  </group>
-  <group name="Web Site details">
-    <item name="WebServerName" type="String" description="name of server" defaultValue="localhost" displayName="Web Server name" />
-    <item name="WebSitePort" type="Int32" description="Port for web site" defaultValue="8080" valueProvider="InstancePortProvider" arguments="WebSiteBinding,WebSitePort" range="2000-3000" displayName="Web Site Port" />
-    <item name="WebPhysicalPathBase" type="Folder" description="Base path of web content on web server" defaultValue="C:\INSTANCES\@(Model.InstanceName)\Web" displayName="Web Physical Path base" />
-    <item name="WebSiteName" type="String" description="Name of WebSite" defaultValue="Default Web Site" displayName="Web Site Name" />
-    <item name="BwAppName" displayName="Bw App Name" type="String" description="Name of BW site, appened to the site name." defaultValue="Bw" />
-    <item name="SysAdminAppName" type="String" description="Name of sysadmin app, appened to the site name." defaultValue="SysAdmin_@(Model.InstanceName)" displayName="SysAdmin App Name" />
-    <item name="ExcaliburAppName" type="String" description="Name of Excalibur app, appened to the site name." defaultValue="Excalibur_@(Model.InstanceName)" displayName="Excalibur App Name" />
-    <item name="StudioAppName" displayName="Studio App Name" type="String" description="Name of Studio site, appened to the site name." defaultValue="Studio_@(Model.InstanceName)" />
-    <item name="WebServiceAppName" type="String" description="Name of Web Service app, appened to the site name." defaultValue="WebService" displayName="Web Service App Name" />
-    <item name="WebAppPoolUserName" type="String" description="User to run web app pools as" defaultValue="@(Model.SQLUser)" displayName="Web App Pool User Name" />
-    <item name="WebAppPoolPassword" type="Hidden" description="Password for user.  Override on command line." defaultValue="password" displayName="Web App Pool Password" />
-    <item name="CaseSensitivePassword" type="Bool" description="Password case sensitivity.  This should always be set to true.  However, older version allowed false." defaultValue="True" displayName="Case Sensitive Password" />
-    <item displayName="Session State" name="SessionStateMode" type="SQLSessionState" description="How to save session state.  If using SQLServer, same SQLServer is used." defaultValue="InProc" />
-    <item displayName="Session State Database Server" name="SessionStateSQLServer" type="string" description="If SQLServer is used for state, the database server." defaultValue="@(Model.SQLServer)" />
-    <item name="SelfServiceDatabaseName" type="Hidden" description="For ESS and MSS ONLY.  BW Service name, usually tenant. Leave blank if one Bw Site for all Tenants." displayName="Self ServiceDatabase Name" />
-    <item name="SelfServiceControlId" type="Hidden" description="For ESS and MSS ONLY.  Control id for back office. Leave blank if one Bw Site for all Tenants." displayName="Self Service ControlId " />
-    <item name="SelfServiceDefaultSiteId" type="Hidden" description="For ESS and MSS ONLY.  Name of the back office site. Leave blank if one Bw Site for all Tenants." displayName="Self Service Default SiteId" />
-  </group>
-  <group name="Web Services">
-    <item name="BaseUri" displayName="Base URI" type="String" description="*External* URI of the web service" defaultValue="http://@(Model.WebServerName)/webservice" />
-    <item name="BindingSecurityTransport" displayName="Binding Security Transport" type="BasicHttpSecurityMode" description="For self-hosted systems, the transport between the client and Web server" defaultValue="None" />
-    <item name="HttpsGetEnabled" displayName="HTTPS Get Enabled" type="Bool" description="For self-hosted systems, turn on HTTPS between client and Web server" defaultValue="False" />
-  </group>
-  <group name="Misc">
-    <item name="CacheServer" type="String" description="AppFabric CacheServer name" defaultValue="localhost" displayName="Cache Server" />
-    <item name="BuildsDirectory" type="UncPath" description="Base location of build files.  This is the level above the build you're installing." defaultValue="C:\temp\builds" displayName="Builds directory" />
-    <item name="SeedDataPhysicalPath" type="Hidden" description="Where the seedata executable will be.  Usually SeedData under the deploy folder." defaultValue="@(System.IO.Path.GetFullPath(Model.DestinationFolder))\SeedData" displayName="SeedData Physical Path" />
-  </group>
-  <enum name="SQLSessionState">
-    <value key="InProc" value="Store In Proc" />
-    <value key="SQLServer" value="Store in SQL Server" />
+  <enum name="EnumA">
+    <value key="enumKeyA" value="Enum A" />
+    <value key="enumKeyB" value="Enum B" />
+    <value key="enumKeyC" value="Enum C" />
   </enum>
-  <enum name="InstanceType">
-    <value key="1000" value="Dev" />
-    <value key="900" value="AppDev" />
-    <value key="800" value="QA" />
-    <value key="600" value="UAT" />
-    <value key="0" value="Prod" />
+  <enum name="EnumB">
+    <value key="enumKeyX" value="Enum X" />
+    <value key="enumKeyY" value="Enum Y" />
+    <value key="enumKeyZ" value="Enum Z" />
   </enum>
-  <enum name="BasicHttpSecurityMode">
-    <value key="None" value="None" />
-    <value key="Transport" value="Transport (HTTPS)" />
-    <value key="Message" value="SOAP Message" />
-    <value key="TransportWithMessageCredential" value="Transport With Message Credential (HTTPS and SOAP)" />
-    <value key="TransportCredentialOnly" value="Transport Credential Only (HTTP - not recommended)" />
-  </enum>
-  <enum name="AuthProvider">
-    <value key="Sbc.App.Provider.Security.AdAuthentication, Sbc.App" value="ActiveDirectory (requires domain as param)" />
-    <value key="Sbc.App.Provider.Security.OAuthAuthentication, Sbc.App" value="OAuth (requires name of client handler)" />
-    <value key="Sbc.App.Provider.Security.PersistenceStoreAuthentication, Sbc.App" value="Persistent Store (no parameters)" />
+  <enum name="EnumC">
+    <value key="enumKeyQ" value="Enum Q" />
+    <value key="enumKeyP" value="Enum P" />
   </enum>
 </RtObject>
