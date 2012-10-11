@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RtObject>
-  <group name="Section A Strings -- expanded by default" expanded="true">
+  <group name="Section A Strings expanded by default" expanded="true">
     <item name="stringA1" type="String" description="String with a size range of 10-20" defaultValue="defaultValue" displayName="String #1" min="10" max="20"/>
     <item name="stringA2" type="String" description="String with min size of 10." defaultValue="default" displayName="String #2" min="10" />
     <item name="stringA3" type="String" description="String with max size of 10." defaultValue="default" displayName="String #3" max="10" /> />
@@ -20,13 +20,14 @@
     <item name="enumD3" type="EnumC" description="EnumC description" defaultValue="" displayName="Enumeration C" /> />
   </group>
   <group name="ItemA Array" description="Array of itemA objects with min number of 0." arrayValueName="itemA" min="0">
-    <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
-    <item displayName="Description" name="description" type="string" description="description of tenant" />
-    <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3">
-      <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
-      <item displayName="Description" name="description" type="string" description="description of tenant" />
+    <item displayName="Name for A" name="nameA" type="string" description="Name of tenant, no spaces" />
+    <item displayName="Description for A" name="descriptionA" type="string" description="description of tenant" />
+    <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemAB" min="0">
+      <item displayName="Name for B" name="nameB" type="string" description="Name of tenant, no spaces" />
+      <item displayName="Description for B" name="descriptionB" type="string" description="description of tenant" />
     </group>
   </group>
+
   <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3">
     <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
     <item displayName="Description" name="description" type="string" description="description of tenant" />

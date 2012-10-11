@@ -27,7 +27,7 @@
 
     <Border Grid.Row="2" Margin="10,15,10,20" BorderBrush="Black" Background="Black">
         <ScrollViewer  Margin="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="_stackPanel" Margin="0" SizeChanged="stackPanel_SizeChanged" Background="White">
+            <StackPanel Name="_stackPanel" Margin="0" Background="White">
             </StackPanel>
         </ScrollViewer>
     </Border>

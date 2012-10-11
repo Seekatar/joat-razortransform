@@ -1,0 +1,17 @@
+﻿@using System.IO
+@* 
+    this sample shows creating a new file
+    for every object in the Model.itemB array
+*@
+Creating output file for each Domain object of which there are @Model.itemB.Count
+@foreach ( var x in Model.itemB)
+{
+	// to make things interesting, we do a tranform in the transform!
+	var contents = RazorEngine.Razor.Parse(@"<Domain name=""@Model.name"" provider=""@Model.description"" />", x);
+
+	var fname = Path.Combine(Model.CurrentSettings.OutputFolder,x.name);
+    File.WriteAllText(fname,contents);
+    
+    // below we switch out of C#
+    @: Wrote output to @fname 
+}

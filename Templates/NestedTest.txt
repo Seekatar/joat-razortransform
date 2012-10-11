@@ -1,0 +1,16 @@
+@*
+	This test shows how nested arrays work in Artie
+	itemA is an array that has itemAB nested within it
+*@
+Count of itemA is @Model.itemA.Count
+@foreach ( var a in @Model.itemA )
+{
+	@:Name @a.nameA
+	@:Desc @a.descriptionA
+	@:Count of itemAB is @a.itemAB.Count
+	@foreach ( var b in a.itemAB ) 
+	{
+		@:   Name @b.nameB
+		@:   Desc @b.descriptionB
+	}
+}
