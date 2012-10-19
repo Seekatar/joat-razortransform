@@ -10,12 +10,6 @@ using System.Diagnostics;
 
 namespace RazorTransform
 {
-#if !ASYNC
-    interface IProgress<T>
-    {
-        void Report(T t);
-    }
-#endif
     /// <summary>
     /// class for running Razor transform on a set of files
     /// given an ExpandoObject
@@ -114,11 +108,9 @@ namespace RazorTransform
             return transformFiles(inputMask, outputFolder, saveFiles, recursive, CancellationToken.None, progress);
         }
 
-#if ASYNC
         public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<string> progress = null )
         {
             return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);  });
         }
-#endif
     }
 }

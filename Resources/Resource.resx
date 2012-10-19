@@ -147,6 +147,9 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>File "{0}" not found.</value>
   </data>
+  <data name="FolderNotFound" xml:space="preserve">
+    <value>Folder "{0}" not found</value>
+  </data>
   <data name="HelpString" xml:space="preserve">
     <value>RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
 
@@ -187,6 +190,9 @@ Command line options are:
   <data name="ProcessError" xml:space="preserve">
     <value>ErrorProcessing {0}:
 {1}</value>
+  </data>
+  <data name="RunningPowerShell" xml:space="preserve">
+    <value>Starting PowerShell processing...</value>
   </data>
   <data name="SettingsException" xml:space="preserve">
     <value>Continuing after exception loading settings: {0}</value>

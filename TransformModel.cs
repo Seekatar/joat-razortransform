@@ -184,7 +184,11 @@ namespace RazorTransform
                     // add items in the group
                     foreach (var e in x.Elements().Where(n => n.Name == "item"))
                     {
-                        var i = new TransformModelItem(e,g);
+                        TransformModelItem i = null;
+                        if ( ((string)e.Attribute("type")) == "Password" )
+                            i = new PasswordTransformModelItem(e,g);
+                        else
+                            i = new TransformModelItem(e,g);
                         if (overrides.ContainsKey(i.PropertyName))
                             i.Value = overrides[i.PropertyName];
                         else if (values != null)
@@ -276,7 +280,8 @@ namespace RazorTransform
 
             foreach (var item in _info)
             {
-                saveItem(root, item);
+                if ( !(item is PasswordTransformModelItem ))
+                    saveItem(root, item);
             }
 
             doc.Save(_valueFileName);

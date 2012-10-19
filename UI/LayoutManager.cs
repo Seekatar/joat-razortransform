@@ -186,7 +186,7 @@ namespace RazorTransform
                 case "guid": return _Guid(info, binding);
                 case "bool": return _Bool(info, binding);
                 case "int32": return _Int32(info, binding);
-
+                case "password": return _Password(info, binding);
                 case "string": return _Default(info, binding);
                 default:
                     {
@@ -248,6 +248,13 @@ namespace RazorTransform
             var t = new TextBox();
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
+            return t;
+        };
+        private static Func<TransformModelItem, Binding, Control> _Password = (ci, binding) =>
+        {
+            var t = new PasswordBox();
+            t.MinWidth = 150;
+            (ci as PasswordTransformModelItem).PasswordBox = t;
             return t;
         };
         private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>

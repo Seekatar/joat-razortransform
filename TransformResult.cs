@@ -10,11 +10,11 @@ namespace RazorTransform
     {
         public TransformResult()
         {
-            TranformOk = false;
+            TranformResult = ProcessingResult.failed;
             Elapsed = TimeSpan.FromSeconds(0);
             Count = 0;
         }
-        public bool TranformOk { get; set; }
+        public ProcessingResult TranformResult { get; set; }
         public TimeSpan Elapsed { get; set; }
         public int Count { get; set; }
     }

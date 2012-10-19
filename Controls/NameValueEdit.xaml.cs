@@ -20,23 +20,6 @@ namespace RazorTransform
             DataContext = this;
         }
 
-#if oldway
-        /// <summary>
-        /// load a single configinfo with children
-        /// </summary>
-        /// <param name="parent"></param>
-        public void Load(TransformModelItem parent)
-        {
-            _expanders.Clear();
-            _stackPanel.Children.Clear();
-
-            Expander expander = createExpander(parent);
-            var lastExpanderStackPanel = expander.Content as StackPanel;
-
-            lastExpanderStackPanel.Children.Add(LayoutManager.BuildGridView(parent.Children));
-            expander.IsExpanded = true;
-        }
-#else
         /// <summary>
         /// load a single configinfo with children
         /// </summary>
@@ -51,22 +34,8 @@ namespace RazorTransform
             groups.Add(copy);
             groups.AddRange(parent.Children.Where(o => o.IsArray)); //.Select( o => new TransformModelItem(o) ));
 
-            //if (parent.IsArray)
-            //{
-            //    // create a group of just the non-arrays
-
-            //    groups.AddRange( parent.Children.Where( o => !o.IsArray ) );
-            //    // add arrays as groups
-            //}
-            //else
-            //{
-            //    groups.Add(parent);
-            //    parent.Expanded = true;
-            //}
             Load(groups);
         }
-
-#endif
 
         /// <summary>
         /// populate the control with items from the groups

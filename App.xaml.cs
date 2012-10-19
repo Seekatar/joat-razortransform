@@ -57,7 +57,7 @@ namespace RazorTransform
                     var transformer = new RazorTransformer();
                     try
                     {
-                        transformer.Initialize(parms, overrides);
+                        transformer.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
 
                         transformer.Output.Report(transformer.Settings.ToString());
                         if (transformer.Settings.Test)
@@ -68,7 +68,7 @@ namespace RazorTransform
                         var result = transformer.DoTransformAsync();
                         result.Wait();
 
-                        if (result.Result.TranformOk)
+                        if (result.Result.TranformResult == ProcessingResult.ok)
                         {
                             ret = EXIT_NO_ERROR; // ok
                             if (transformer.Settings.Test)
@@ -93,7 +93,7 @@ namespace RazorTransform
                     var mw = new MainWindow();
                     try
                     {
-                        mw.Initialize(parms, overrides);
+                        mw.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
                         mw.Show();
 
                         app.Run();

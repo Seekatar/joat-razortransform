@@ -26,7 +26,7 @@ namespace RazorTransform
         {
             syncContext.Post(_ =>
             {
-                _window.lblProgress.Content = "Processing " + value;
+                _window.Report(value);
             }, null);
         }
 

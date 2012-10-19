@@ -29,7 +29,7 @@ namespace RazorTransform
   </group>
 </RtObject>";
 
-        public void Load(IEnumerable<string> overrideParms)
+        public void Load(IDictionary<string, string> overrideParms)
         {
             setOverrides(overrideParms);
 
@@ -104,9 +104,14 @@ namespace RazorTransform
         public string LogFile { get; set; }
         public IDictionary<string, string> Overrides { get; set; }
 
-        private void setOverrides(IEnumerable<string> overrideParms)
+        private void setOverrides(IDictionary<string, string> overrideParms)
         {
-            Overrides = new Dictionary<string, string>();
+            Overrides = overrideParms;
+        }
+
+        static public IDictionary<string, string> SplitCommandLineOverrides(IEnumerable<string> overrideParms)
+        {
+            var ret = new Dictionary<string, string>();
 
             if (overrideParms != null && overrideParms.Count() > 0)
             {
@@ -119,11 +124,12 @@ namespace RazorTransform
                         var v = o.Substring(i + 1).Trim();
                         if (s.Length > 0 && v.Length > 0)
                         {
-                            Overrides.Add(s, v);
+                            ret.Add(s, v);
                         }
                     }
                 }
             }
+            return ret;
         }
 
 
@@ -166,7 +172,7 @@ namespace RazorTransform
         }
 
         // set all the parameters from a dict passed in using reflection
-        internal void SetParameters(Dictionary<string, object> parms)
+        internal void SetParameters(IDictionary<string, object> parms)
         {
             var props = this.GetType().GetProperties();
             foreach ( var p in parms )

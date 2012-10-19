@@ -82,11 +82,13 @@ namespace RazorTransform
 
         public string DisplayName { get; set; }
         public string Description { get; set; }
-        public string Value { get; set; }
+        public virtual string Value { get; set; }
 
         public string PropertyName { get; set; }
 
         public string Type { get; set; }
+
+        public bool Hidden { get; set; }
 
         // group or parent if nested, null if group
         public TransformModelItem Parent { get; set; }
@@ -130,6 +132,14 @@ namespace RazorTransform
 
             PropertyName = (string)x.Attribute("name");
             Type = (string)x.Attribute("type");
+            if (Type != null && Type.ToLower() == "hidden")
+            {
+                Type = "string";
+                Hidden = true;
+            }
+            else
+                Hidden = (bool?)x.Attribute("hidden") ?? false;
+
             if (PropertyName == null)
                 throw new ArgumentNullException("name");
             if (Type == null)

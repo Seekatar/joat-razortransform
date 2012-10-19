@@ -1,21 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace RazorTransform
 {
@@ -25,10 +13,19 @@ namespace RazorTransform
     public partial class MainEdit : UserControl
     {
         private RazorTransformer _transformer = new RazorTransformer();
-        private Dictionary<string, object> _parms;
-        private List<string> _overrides;
+        private IDictionary<string, object> _parms;
+        private IDictionary<string, string> _overrides;
         private ITransformParentWindow _parent;
         private bool _embedded = false; // are we embedded in another app (hide certain buttons)
+        private ProcessingState _currentState = ProcessingState.idle;
+        enum ProcessingState
+        {
+            idle,
+            transforming,
+            transformed,
+            shellExecuting,
+            shellExecuted
+        }
 
         public MainEdit()
         {
@@ -45,15 +42,15 @@ namespace RazorTransform
         /// <summary>
         /// get the suffix for the title, usually configured Title and destination folder
         /// </summary>
-        public string TitleSuffix 
-        { 
-            get 
+        public string TitleSuffix
+        {
+            get
             {
                 return _transformer.Model.TitleSuffix;
-            }  
+            }
         }
 
-        public void Initalize(ITransformParentWindow parent, Dictionary<string, object> parms, List<string> overrides, bool embedded = false)
+        public void Initalize(ITransformParentWindow parent, IDictionary<string, object> parms, IDictionary<string, string> overrides, bool embedded = false)
         {
             _embedded = embedded;
             _parent = parent;
@@ -61,16 +58,14 @@ namespace RazorTransform
             _overrides = overrides;
         }
 
-        private async Task<bool> DoTransforms(bool sentFromOk)
+        private async Task<ProcessingResult> doTransforms(bool sentFromOk)
         {
-            btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = false;
-            btnCancel.IsEnabled = true;
-            btnCancel.Content = Resource.Cancel;
+            setButtonStates(ProcessingState.transforming);
 
             RanTransformOk = false;
             var transformResult = await _transformer.DoTransformAsync();
 
-            if (transformResult.TranformOk)
+            if (transformResult.TranformResult == ProcessingResult.ok )
             {
                 RanTransformOk = true;
                 if (sentFromOk)
@@ -89,16 +84,58 @@ namespace RazorTransform
                 }
             }
 
-            btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = true;
-
-            if (_embedded)
-                btnCancel.IsEnabled = false;
-            else
-                btnCancel.Content = Resource.Close;
-
             lblProgress.Content = String.Empty;
 
-            return transformResult.TranformOk;
+            setButtonStates(ProcessingState.transformed);
+
+            return transformResult.TranformResult;
+        }
+
+        private void setButtonStates(ProcessingState currentState)
+        {
+            _currentState = currentState;
+            switch (currentState)
+            {
+                case ProcessingState.transforming:
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = false;
+                    btnCancel.IsEnabled = true;
+
+                    btnCancel.Content = Resource.Cancel;
+                    break;
+                case ProcessingState.shellExecuting:
+                    // set buttons, control visibility
+                    editControl.Visibility = System.Windows.Visibility.Collapsed;
+
+                    settingBtn.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Hidden;
+                    btnCancel.Content = Resource.Cancel;
+                    break;
+                case ProcessingState.shellExecuted:
+                    btnCancel.IsEnabled = true;
+                    btnCancel.Content = Resource.Close;
+                    break;
+                case ProcessingState.transformed:
+                case ProcessingState.idle:
+                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = true;
+
+                    if (_embedded)
+                    {
+                        btnOkAndClose.Visibility = settingBtn.Visibility = System.Windows.Visibility.Hidden;
+                        btnCancel.Content = Resource.Cancel;
+                        btnCancel.IsEnabled = false;
+                    }
+                    else
+                    {
+                        btnOkAndClose.Visibility = settingBtn.Visibility = System.Windows.Visibility.Visible;
+                        btnCancel.Content = Resource.Close;
+                        btnCancel.IsEnabled = true;
+                    }
+
+                    btnOk.Visibility = System.Windows.Visibility.Visible;
+
+                    editControl.Visibility = System.Windows.Visibility.Visible;
+
+                    break;
+            }
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -107,17 +144,21 @@ namespace RazorTransform
             {
                 _parent.ProcessingComplete(RanTransformOk ? ProcessingResult.close : ProcessingResult.canceled);
             }
+            else
+            {
+                setButtonStates(ProcessingState.idle);
+            }
         }
 
 
         private async void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            await DoTransforms(true);
+            await doTransforms(true);
         }
 
         private async void btnOkAndClose_Click(object sender, RoutedEventArgs e)
         {
-            if ( await DoTransforms(false) )
+            if ( await doTransforms(false) == ProcessingResult.ok )
                 _parent.ProcessingComplete(ProcessingResult.ok);
         }
 
@@ -132,20 +173,20 @@ namespace RazorTransform
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void create_Loaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 _transformer.Initialize(_parms, _overrides, this);
                 editControl.Load(_transformer.Model.Groups);
-                if (_embedded)
-                {
-                    btnOkAndClose.Visibility = settingBtn.Visibility = System.Windows.Visibility.Hidden;
-                    btnCancel.Content = Resource.Cancel;
-                    btnCancel.IsEnabled = false;
-                }
+                setButtonStates(ProcessingState.idle);
                 _parent.SetTitle(TitleSuffix);
             }
+        }
+
+        internal void Report(string value)
+        {
+            lblProgress.Content = "Processing " + value;
         }
     }
 }

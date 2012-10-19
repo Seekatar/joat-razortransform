@@ -13,10 +13,9 @@ namespace RazorTransform
             InitializeComponent();
         }
 
-        internal void Initialize(Dictionary<string, object> parms, List<string> overrides)
+        internal void Initialize(Dictionary<string, object> parms, IDictionary<string, string> overrides)
         {
             editControl.Initalize(this,parms, overrides);
-
         }
 
         public bool RanTransformOk
