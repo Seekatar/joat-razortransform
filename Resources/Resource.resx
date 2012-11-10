@@ -135,7 +135,7 @@
     <comment>Button text</comment>
   </data>
   <data name="DestMustExist" xml:space="preserve">
-    <value>Destination folder must exist.</value>
+    <value>Destination folder must exist. {0}</value>
   </data>
   <data name="ErrorLoadingChildXml" xml:space="preserve">
     <value>Error loading child XML file {0}: {1}</value>

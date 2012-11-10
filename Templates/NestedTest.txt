@@ -10,6 +10,9 @@ Count of itemA is @Model.itemA.Count
 	@:Count of itemAB is @a.itemAB.Count
 	@foreach ( var b in a.itemAB ) 
 	{
+		@:   ParentName @b.Parent.nameA
+		@:   Parent.Desc @b.Parent.descriptionA
+		@:   Parent.Parent.stringA1 @b.Parent.Parent.stringA1
 		@:   Name @b.nameB
 		@:   Desc @b.descriptionB
 	}

@@ -59,7 +59,7 @@ namespace RazorTransform
                     {
                         transformer.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
 
-                        transformer.Output.Report(transformer.Settings.ToString());
+                        transformer.Output.Report(transformer.Settings.ToString(transformer.Model));
                         if (transformer.Settings.Test)
                         {
                             transformer.Output.Report(Resource.TestModeLogStart);

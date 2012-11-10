@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--
   This test shows transforming an array to XML
-  This also sleeps for a bit, allowing you to cancel the tranform
+  This also sleeps for a bit, allowing you to cancel the transform
 -->
 @{ System.Threading.Thread.Sleep(3000); }
 <test name="we slept so you can cancel" count="@Model.itemB.Count">

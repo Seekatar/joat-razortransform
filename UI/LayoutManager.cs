@@ -26,7 +26,7 @@ namespace RazorTransform
                 });
 
             int i = 0;
-            foreach (var ci in items.Where(x=>x.Type != "Hidden"))
+            foreach (var ci in items.Where(x=>!x.Hidden))
             {
 
                 var l = new Label() { Content = ci.DisplayName };

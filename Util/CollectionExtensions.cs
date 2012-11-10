@@ -21,6 +21,32 @@ namespace RazorTransform
             }
         }
 
+        public static IEnumerable<TransformModelItem> FindRecursive(this IEnumerable<TransformModelItem> info, Predicate<TransformModelItem> criteria)
+        {
+            var results = new List<TransformModelItem>();
+            findModelItems(info, criteria, results);
+            return results;
+        }
+
+        private static void findModelItems(IEnumerable<TransformModelItem> parent, Predicate<TransformModelItem> criteria, List<TransformModelItem> results)
+        {
+            foreach (var i in parent)
+            {
+                if (i.Children != null)
+                {
+                    foreach (var c in i.Children)
+                    {
+                        if (criteria(c))
+                        {
+                            results.Add(c);
+                        }
+                    }
+                    findModelItems(i.Children, criteria, results );
+                }
+            }
+        }
+
+
         public static List<KeyValuePair<TransformModelItem, List<TransformModelItem>>> GroupByType(this IEnumerable<TransformModelItem> info)
         {
             var list = info.ToList();

@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Dynamic;
 using System.Runtime.Serialization;
+using System.IO;
 
 namespace RazorTransform
 {
@@ -18,6 +19,8 @@ namespace RazorTransform
         private ExpandoObject _settings = null;
         private TransformModelItem _configInfo;
         private TransformModelItem _arrayConfigInfo;
+        private string _objectFile;
+        private string _valuesFile;
 
         // object definition for settings is really static since code relies on it
         static string _settingsXml =
@@ -82,20 +85,25 @@ namespace RazorTransform
             get 
             { 
                 var temp = OverrideOutputFolder ?? this["LastPath"]; 
-                if (temp == "..")
-                    temp = System.IO.Path.GetFullPath("..");
-                return temp;
+                return Path.GetFullPath(temp);
             }
             set { this["LastPath"] = value; }
         }
-        public string TemplateFolder { get { return OverrideTemplateFolder ?? this["LastTemplatePath"]; } set { this["LastTemplatePath"] = value; } }
+        public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["LastTemplatePath"]); } set { this["LastTemplatePath"] = value; } }
 
         // temp values
         public bool Test { get; set; }
         public bool NoSave { get; set; }
         public bool Debug { get; set; }
-        public string ObjectFile { get; set; }
-        public string ValuesFile { get; set; }
+
+        // set with GetFullPath since XDocument read does odd things if not a full path
+        public string ObjectFile { get { return _objectFile; } set { _objectFile = Path.GetFullPath(value); } }
+        public string ValuesFile { get { return _valuesFile; } set { _valuesFile = Path.GetFullPath(value); } }
+
+        /// <summary>
+        /// XML content of a RTValues.xml file passed into the app
+        /// </summary>
+        public string ValuesContent { get; set; }
         [IgnoreDataMemberAttribute]
         public string OverrideOutputFolder { get; set; }
         [IgnoreDataMemberAttribute]
@@ -150,7 +158,7 @@ namespace RazorTransform
             }
         }
 
-        public override string ToString()
+        internal string ToString(TransformModel model)
         {
             var sb = new StringBuilder();
             var t = GetType();
@@ -165,7 +173,18 @@ namespace RazorTransform
                 sb.AppendLine("  Overrides:");
                 foreach (var o in Overrides)
                 {
-                    sb.AppendLine(String.Format("    {0}: {1}", o.Key, o.Value));
+                    var m = model.Groups.FindRecursive(p => p.PropertyName == o.Key).FirstOrDefault();
+                    if ( m != null )
+                    {
+                        if ( String.Equals( m.Type, "password", StringComparison.InvariantCultureIgnoreCase) )
+                            sb.AppendLine(String.Format("    {0}: {1}", o.Key, "******"));
+                        else
+                            sb.AppendLine(String.Format("    {0}: {1}", o.Key, o.Value));
+                    }
+                    else
+                    {
+                        // ignore ones not found
+                    }
                 }
             }
             return sb.ToString();

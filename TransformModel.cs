@@ -27,12 +27,16 @@ namespace RazorTransform
             return BuildObject(_info, updateXml, htmlEncode, destinationFolder);
         }
 
-        internal ExpandoObject BuildObject(IEnumerable<TransformModelItem> info, bool updateXml, bool htmlEncode, string destinationFolder = null)
+        internal ExpandoObject BuildObject(IEnumerable<TransformModelItem> info, bool updateXml, bool htmlEncode, string destinationFolder = null, ExpandoObject parent = null )
         {
             var ret = new ExpandoObject();
             if ( destinationFolder != null )
                 (ret as IDictionary<string, object>).Add("DestinationFolder", destinationFolder);
-            (ret as IDictionary<string, object>).Add("CurrentSettings", _settings);
+
+            if ( parent != null )
+                (ret as IDictionary<string, object>).Add("Parent", parent);
+            else
+                (ret as IDictionary<string, object>).Add("CurrentSettings", _settings); // only add to root object
 
             foreach (var i in info)
             {
@@ -45,7 +49,7 @@ namespace RazorTransform
                             throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.MinInt));
                         foreach (var c in i.Children.Skip(1))
                         {
-                            children.Add(BuildObject(c.Children, false, true, destinationFolder));
+                            children.Add(BuildObject(c.Children, false, true, destinationFolder, ret));
                         }
                         (ret as IDictionary<string, object>).Add(i.PropertyName, children);
                     }
@@ -146,20 +150,31 @@ namespace RazorTransform
         public bool LoadValuesFromXml(XElement objectRoot, Settings settings)
         {
             XDocument valueDoc = null;
-            if (File.Exists(settings.ValuesFile))
+            if (!String.IsNullOrEmpty( settings.ValuesContent))
             {
-                using (var fs = new System.IO.FileStream(settings.ValuesFile, System.IO.FileMode.Open))
-                {
-                    valueDoc = XDocument.Load(fs);
-                }
+                valueDoc = XDocument.Parse(settings.ValuesContent);
             }
+            else
+            {
+                if (File.Exists(settings.ValuesFile))
+                {
+                    using (var fs = new System.IO.FileStream(settings.ValuesFile, System.IO.FileMode.Open))
+                    {
+                        valueDoc = XDocument.Load(fs);
+                    }
+                }
 
+            }
             return LoadFromXElement(objectRoot, valueDoc == null ? null : valueDoc.Root, settings.Overrides);
         }
 
         // load both object and values from XML
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
+            _enums.Clear();
+            _info.Clear();
+            Groups.Clear();
+
             foreach (var x in objectRoot.Elements().Where(n => n.Name == "enum"))
             {
                 var name = x.Attribute("name");
@@ -273,7 +288,7 @@ namespace RazorTransform
             }
         }
 
-        internal void Save(string _valueFileName)
+        internal string Save(string _valueFileName)
         {
             var doc = XDocument.Parse("<RtValues/>");
             var root = doc.Root;
@@ -285,6 +300,7 @@ namespace RazorTransform
             }
 
             doc.Save(_valueFileName);
+            return File.ReadAllText(_valueFileName);
         }
 
         private static void saveItem(XElement root, TransformModelItem item)
@@ -317,19 +333,21 @@ namespace RazorTransform
         internal bool Load(Settings settings)
         {
             _settings = settings;
-
+            string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var path = Path.Combine(directoryName, _settings.ValuesFile);
             XElement objectValues = null;
-            if (File.Exists(settings.ValuesFile))
+            if (File.Exists(path))
             {
-                objectValues = XDocument.Load(settings.ValuesFile).Root;
+                objectValues = XDocument.Load(path).Root;
             }
             _info.Add(_settings.ArrayConfigInfo); // add so we can save it when we save
 
             // load the main file
-            if (!File.Exists(_settings.ObjectFile))
+            path = Path.Combine(directoryName, _settings.ObjectFile);
+            if (!File.Exists(path))
                 throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
 
-            var definitionDoc = XDocument.Load(_settings.ObjectFile);
+            var definitionDoc = XDocument.Load(path);
             LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
 
             return true;
