@@ -15,18 +15,23 @@ namespace RazorTransform
         {
 
             Grid grid = new Grid();
+            grid.Margin = new Thickness(5);
             grid.HorizontalAlignment = HorizontalAlignment.Stretch;
             grid.VerticalAlignment = VerticalAlignment.Stretch;
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            Enumerable.Range(0, items.Count()).ToList().ForEach(x =>
+            var controls = items.Where(x => !x.Hidden).ToList();
+            Enumerable.Range(0, controls.Count).ToList().ForEach(x =>
                 {
-                    grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
+                    grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0, GridUnitType.Auto) });
                 });
 
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0, GridUnitType.Star) });
+      
+
             int i = 0;
-            foreach (var ci in items.Where(x=>!x.Hidden))
+            foreach (var ci in controls)
             {
 
                 var l = new Label() { Content = ci.DisplayName };
@@ -88,7 +93,9 @@ namespace RazorTransform
             Action<object, RoutedEventArgs> deleteHandler)
         {
             Grid grid = new Grid();
-
+            grid.Margin = new Thickness(5);
+            grid.HorizontalAlignment = HorizontalAlignment.Stretch;
+            grid.VerticalAlignment = VerticalAlignment.Stretch;
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
        

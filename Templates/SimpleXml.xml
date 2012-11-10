@@ -1,0 +1,12 @@
+﻿@*
+This is a simple XML tranformation showing how to use Razor
+*@
+<root>
+  <Node name="@Model.stringA1" />
+  <Node name="@Model.stringA2" />
+  <SomethingElse>
+    <More>
+      <@Model.enumD1 value="true"/>
+    </More>
+  </SomethingElse>
+</root>
