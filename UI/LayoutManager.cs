@@ -43,7 +43,7 @@ namespace RazorTransform
 
                 var binding = new Binding();
                 binding.Source = ci;
-                binding.Path = new PropertyPath("Value");
+                binding.Path = new PropertyPath(Constants.Value);
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
                 Control t = CreateControl(ci, binding);
@@ -188,13 +188,13 @@ namespace RazorTransform
         {
             switch (info.Type.ToLower())
             {
-                case "folder":
-                case "uncpath": return _Folder(info, binding);
-                case "guid": return _Guid(info, binding);
-                case "bool": return _Bool(info, binding);
-                case "int32": return _Int32(info, binding);
-                case "password": return _Password(info, binding);
-                case "string": return _Default(info, binding);
+                case Constants.Folder:
+                case Constants.UncPath: return _Folder(info, binding);
+                case Constants.Guid: return _Guid(info, binding);
+                case Constants.Bool: return _Bool(info, binding);
+                case Constants.Int32: return _Int32(info, binding);
+                case Constants.Password: return _Password(info, binding);
+                case Constants.String: return _Default(info, binding);
                 default:
                     {
                         // is it an enum?

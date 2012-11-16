@@ -22,8 +22,9 @@
   <group name="ItemA Array" description="Array of itemA objects with min number of 0." arrayValueName="itemA" min="0">
     <item displayName="Name for A" name="nameA" type="string" description="Name of tenant, no spaces" />
     <item displayName="Description for A" name="descriptionA" type="string" description="description of tenant" />
-    <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemAB" min="0">
+    <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemAB" min="0" key="nameB nameB2 nameB">
       <item displayName="Name for B" name="nameB" type="string" description="Name of tenant, no spaces" />
+      <item displayName="Name part 2 for B" name="nameB2" type="string" description="Name of tenant, no spaces" />
       <item displayName="Description for B" name="descriptionB" type="string" description="description of tenant" />
     </group>
   </group>

@@ -26,9 +26,9 @@ namespace RazorTransform
         static string _settingsXml =
 @"<RtObject>
   <group name=""Settings"" description=""Settings that control how Artie works."" arrayValueName=""_settings"" hidden=""True"">
-    <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""String"" defaultValue=""RazorTransform""/>
-    <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""Folder"" defaultValue=""..""/>
-    <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""Folder"" defaultValue=""Templates""/>
+    <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + Constants.String + @""" defaultValue=""RazorTransform""/>
+    <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + Constants.Folder + @""" defaultValue=""..""/>
+    <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + Constants.Folder + @""" defaultValue=""Templates""/>
   </group>
 </RtObject>";
 
@@ -176,7 +176,7 @@ namespace RazorTransform
                     var m = model.Groups.FindRecursive(p => p.PropertyName == o.Key).FirstOrDefault();
                     if ( m != null )
                     {
-                        if ( String.Equals( m.Type, "password", StringComparison.InvariantCultureIgnoreCase) )
+                        if ( String.Equals( m.Type, Constants.Password, StringComparison.InvariantCultureIgnoreCase) )
                             sb.AppendLine(String.Format("    {0}: {1}", o.Key, "******"));
                         else
                             sb.AppendLine(String.Format("    {0}: {1}", o.Key, o.Value));

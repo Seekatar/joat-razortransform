@@ -10,11 +10,11 @@ namespace RazorTransform
     {
         public static void LoadFromXml(this Dictionary<string, string> dict, XElement element)
         {
-            foreach (var n in element.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == "value"; else return false; }))
+            foreach (var n in element.Nodes().Where(n => { if (n is XElement) return (n as XElement).Name == Constants.Value; else return false; }))
             {
                 var x = n as XElement;
-                var key = x.Attribute("key");
-                var value = x.Attribute("value");
+                var key = x.Attribute(Constants.Key);
+                var value = x.Attribute(Constants.Value);
                 if (key == null || value == null)
                     throw new ArgumentNullException("Enums values must have key and value");
                 dict.Add(key.Value, value.Value);
@@ -52,7 +52,7 @@ namespace RazorTransform
             var list = info.ToList();
 
             List<KeyValuePair<TransformModelItem, List<TransformModelItem>>> grouping = new List<KeyValuePair<TransformModelItem, List<TransformModelItem>>>();
-            var types = list.Where(x => x.Type == "Label" || x.Type == "Array");
+            var types = list.Where(x => x.Type == "Label" || x.Type == Constants.Array);
 
             List<int> indexList = new List<int>();
             foreach (var type in types)

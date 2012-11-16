@@ -13,7 +13,7 @@ namespace RazorTransform
     /// </summary>
     public class TransformModelItem
     {
-        private string makeName(string p)
+        protected string makeName(string p)
         {
             p = p.Trim();
             StringBuilder sb = new StringBuilder();
@@ -34,7 +34,7 @@ namespace RazorTransform
             }
             return sb.ToString();
         }
-        private XElement _element;
+        protected XElement _element;
 
         /// <summary>
         /// constructor to load from Xml 
@@ -42,7 +42,7 @@ namespace RazorTransform
         /// <param name="x"></param>
         public TransformModelItem(XElement x, TransformModelItem parent = null)
         {
-            LoadFromXml(x);
+            loadFromXml(x);
             Parent = parent;
         }
 
@@ -50,7 +50,7 @@ namespace RazorTransform
         /// constructor to clone one overriding the value
         /// </summary>
         /// <param name="src"></param>
-        /// <param name="value"></param>
+        /// <param name=Constants.Value></param>
         public TransformModelItem(TransformModelItem src, string value)
         {
             DisplayName = src.DisplayName;
@@ -61,7 +61,6 @@ namespace RazorTransform
             Parent = src.Parent;
             Children = new List<TransformModelItem>();
             Children.AddRange(src.Children.Select(o => { var ret = new TransformModelItem(o); ret.Parent = this; return ret; }));
-            ArrayValueName = src.ArrayValueName;
             Min = src.Min;
             Max = src.Max;
             Expanded = src.Expanded;
@@ -103,8 +102,6 @@ namespace RazorTransform
         public Decimal MaxDecimal { get { Decimal i; return Decimal.TryParse(Max, out i) ? i : Decimal.MaxValue; } }
 
         // mainly for parent-items
-        public string ArrayValueName { get; set; }
-        public bool IsArray { get { return !String.IsNullOrWhiteSpace(ArrayValueName); } }
         public bool Expanded { get; set; }
 
         /// <summary>
@@ -116,73 +113,72 @@ namespace RazorTransform
         {
             return (T)Convert.ChangeType(this.Value, typeof(T));
         }
-        private List<TransformModelItem> _children = new List<TransformModelItem>();
+        protected List<TransformModelItem> _children = new List<TransformModelItem>();
 
         public List<TransformModelItem> Children
         {
             get { return _children; }
-            private set { _children = value; }
+            protected set { _children = value; }
         }
 
 
 
-        public void LoadFromXml(XElement x)
+        protected virtual void loadFromXml(XElement x)
         {
             _element = x;
 
-            PropertyName = (string)x.Attribute("name");
-            Type = (string)x.Attribute("type");
-            if (Type != null && Type.ToLower() == "hidden")
+            PropertyName = (string)x.Attribute(Constants.Name);
+            Type = (string)x.Attribute(Constants.Type);
+            if (Type != null && Type.ToLower() == Constants.Hidden)
             {
-                Type = "string";
+                Type = Constants.String;
                 Hidden = true;
             }
             else
-                Hidden = (bool?)x.Attribute("hidden") ?? false;
+                Hidden = (bool?)x.Attribute(Constants.Hidden) ?? false;
 
             if (PropertyName == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(Constants.Name);
             if (Type == null)
             {
-                if (x.Name == "group")
-                    Type = "group";
+                if (x.Name == Constants.Group)
+                    Type = Constants.Group;
                 else
                     throw new ArgumentNullException("type for property " + PropertyName);
             }
 
             // if no display name, use propertyname
-            DisplayName = (string)x.Attribute("displayName") ?? PropertyName;
-            ArrayValueName = (string)x.Attribute("arrayValueName");
-            PropertyName =  IsArray ? ArrayValueName : makeName(PropertyName);
+            DisplayName = (string)x.Attribute(Constants.DisplayName) ?? PropertyName;
+            PropertyName =  makeName(PropertyName);
 
-            Description = (string)x.Attribute("description") ?? DisplayName;
+            Description = (string)x.Attribute(Constants.Description) ?? DisplayName;
 
-            if (x.Attribute("arguments") != null && !String.IsNullOrEmpty(x.Attribute("arguments").Value))
+            if (x.Attribute(Constants.Arguments) != null && !String.IsNullOrEmpty(x.Attribute(Constants.Arguments).Value))
             {
-                Arguments = x.Attribute("arguments").Value.Split(",".ToCharArray()).Select(y => y.Trim());
+                Arguments = x.Attribute(Constants.Arguments).Value.Split(",".ToCharArray()).Select(y => y.Trim());
             }
             else
             {
                 Arguments = new List<string>();
             }
-            Min = (string)x.Attribute("min") ?? "";
-            Max = (string)x.Attribute("max") ?? "";
-            Expanded = (bool?)x.Attribute("expanded") ?? false;
+            Min = (string)x.Attribute(Constants.Min) ?? "";
+            Max = (string)x.Attribute(Constants.Max) ?? "";
+            Expanded = (bool?)x.Attribute(Constants.Expanded) ?? false;
 
             SetDefaultValue(x);
         }
 
         // grab the default value from the element and set it
-        private void SetDefaultValue(XElement x)
+        protected void SetDefaultValue(XElement x)
         {
-            if (x.Attribute("defaultValue") != null && !String.IsNullOrEmpty(x.Attribute("defaultValue").Value))
+            if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
             {
-                this.Value = x.Attribute("defaultValue").Value;
+                this.Value = x.Attribute(Constants.DefaultValue).Value;
             }
-            else if (x.Attribute("valueProvider") != null)
+            else if (x.Attribute(Constants.ValueProvider) != null)
             {
                 var type = Assembly.GetExecutingAssembly().GetTypes().Where(t => typeof(IValueProvider).IsAssignableFrom(t) &&
-                                                                            t.Name == x.Attribute("valueProvider").Value).FirstOrDefault();
+                                                                            t.Name == x.Attribute(Constants.ValueProvider).Value).FirstOrDefault();
                 var provider = Activator.CreateInstance(type) as IValueProvider;
                 if (provider != null)
                 {
@@ -191,9 +187,9 @@ namespace RazorTransform
                         this.Value = String.Format("{0}", result);
                     else
                     {
-                        if (x.Attribute("defaultValue") != null)
+                        if (x.Attribute(Constants.DefaultValue) != null)
                         {
-                            this.Value = x.Attribute("defaultValue").Value;
+                            this.Value = x.Attribute(Constants.DefaultValue).Value;
                         }
                     }
 
@@ -203,13 +199,13 @@ namespace RazorTransform
 
         public void UpdateXml()
         {
-            _element.SetAttributeValue("defaultValue", Value);
+            _element.SetAttributeValue(Constants.DefaultValue, Value);
 
             // old files didn't have display name, save it off
-            if (_element.Attribute("displayName") == null)
+            if (_element.Attribute(Constants.DisplayName) == null)
             {
-                _element.SetAttributeValue("displayName", DisplayName);
-                _element.SetAttributeValue("name", PropertyName);
+                _element.SetAttributeValue(Constants.DisplayName, DisplayName);
+                _element.SetAttributeValue(Constants.Name, PropertyName);
             }
         }
 
@@ -225,6 +221,35 @@ namespace RazorTransform
                     Children.Add(new TransformModelItem(i));
                 }
             }
+        }
+
+        public virtual void Load(XElement values, IDictionary<string, string> overrides, XElement x)
+        {
+            // add items in the group
+            foreach (var e in x.Elements().Where(n => n.Name == Constants.Item))
+            {
+                TransformModelItem i = null;
+                if (((string)e.Attribute(Constants.Type)) == Constants.Password)
+                    i = new PasswordTransformModelItem(e, this);
+                else
+                    i = new TransformModelItem(e, this);
+                if (overrides.ContainsKey(i.PropertyName))
+                    i.Value = overrides[i.PropertyName];
+                else if (values != null)
+                {
+                    var v = values.Elements(Constants.Value).Where(n => (string)n.Attribute(Constants.Name) == i.PropertyName).Select(n => (string)n.Attribute(Constants.Value)).SingleOrDefault();
+                    if (v != null)
+                        i.Value = v;
+                }
+
+                Children.Add(i);
+            }
+        }
+
+
+        public bool IsArray 
+        {
+            get { return this is TransformModelArray; }
         }
     }
 

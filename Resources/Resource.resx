@@ -164,7 +164,7 @@ Command line options are:
  &lt;objectFile&gt; defaults to .\RtObject.xml
  &lt;valuesFile&gt;defaults to .\RtValues
  &lt;outputFolder&gt; defaults to ..
- &lt;templateFolder&gt; defaults to .\Template
+ &lt;templateFolder&gt; defaults to .\Templates
  &lt;logFile&gt; defaults to RazorTransformTool.log
  &lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
 </value>

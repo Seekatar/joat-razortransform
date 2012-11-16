@@ -25,10 +25,12 @@
         </Style>
     </UserControl.Resources>
 
-    <Border Grid.Row="2" Margin="10,15,10,20" BorderBrush="Black" Background="Black">
+    <Border Grid.Row="2" Margin="10,15,10,20" BorderBrush="Black" Background="White">
         <ScrollViewer  Margin="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="_stackPanel" Margin="0" Background="White">
-            </StackPanel>
+            <TabControl Name="_tabCtrl" Background="White">
+                <TabItem Header="header1">content</TabItem>
+                <TabItem Header="header2">content</TabItem>
+            </TabControl>
         </ScrollViewer>
     </Border>
 

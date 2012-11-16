@@ -73,9 +73,11 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="RazorTransformer.cs" />
+    <Compile Include="TransformModelArray.cs" />
     <Compile Include="TransformModelItem.cs" />
     <Compile Include="TransformResult.cs" />
     <Compile Include="UI\GuiProgress.cs" />

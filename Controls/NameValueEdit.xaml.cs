@@ -11,7 +11,6 @@ namespace RazorTransform
     /// </summary>
     public partial class NameValueEdit : UserControl
     {
-        List<Expander> _expanders = new List<Expander>();
         IEnumerable<TransformModelItem> _groups;
 
         public NameValueEdit()
@@ -45,15 +44,15 @@ namespace RazorTransform
         {
             _groups = groups;
 
-            _expanders.Clear();
-            _stackPanel.Children.Clear();
+            _tabCtrl.Items.Clear();
 
             int i = 0;
             StackPanel lastExpanderStack = null;
 
             foreach (var item in groups)
             {
-                Expander expander = createExpander(item);
+                var expander = createTab(item);
+
                 lastExpanderStack = expander.Content as StackPanel;
 
                 var side = new StackPanel() { Orientation = Orientation.Horizontal };
@@ -75,19 +74,17 @@ namespace RazorTransform
             }
         }
 
-        private Expander createExpander(TransformModelItem ci)
+        private TabItem createTab(TransformModelItem ci)
         {
-            var expander = new Expander();
-            expander.Style = this.Resources["CfgBigLabel"] as Style;
-            expander.IsExpanded = ci.Expanded;
-            expander.Header = ci.DisplayName;
+            var tab = new TabItem();
+            tab.Style = this.Resources["CfgBigLabel"] as Style;
+            tab.Header = ci.DisplayName;
             if (ci.Description != null)
-                expander.ToolTip = ci.Description;
-            _stackPanel.Children.Add(expander);
+                tab.ToolTip = ci.Description;
+            _tabCtrl.Items.Add(tab);
             var lastExpanderStack = new StackPanel();
-            expander.Content = lastExpanderStack;
-            _expanders.Add(expander);
-            return expander;
+            tab.Content = lastExpanderStack;
+            return tab;
         }
 
         void del_Click(object sender, RoutedEventArgs e)
@@ -120,17 +117,7 @@ namespace RazorTransform
 
         private void ReLoad()
         {
-            List<string> expandedOnes = new List<string>();
-            foreach (var c in _expanders)
-            {
-                if (c.IsExpanded)
-                    expandedOnes.Add(c.Header.ToString());
-            }
             Load(_groups);
-            foreach (var exp in _expanders.Where(o => expandedOnes.Contains(o.Header.ToString())))
-            {
-                exp.IsExpanded = true;
-            }
         }
 
         void add_Click(object sender, RoutedEventArgs e)

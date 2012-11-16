@@ -53,7 +53,7 @@ namespace RazorTransform
                         }
                         (ret as IDictionary<string, object>).Add(i.PropertyName, children);
                     }
-                    else if (String.Equals("Bool", i.Type, StringComparison.CurrentCultureIgnoreCase))
+                    else if (String.Equals(Constants.Bool, i.Type, StringComparison.CurrentCultureIgnoreCase))
                     {
                         bool value = false;
                         if (i.Value != null)
@@ -89,12 +89,12 @@ namespace RazorTransform
             return ret;
         }
 
-        private void checkLimits(TransformModelItem i)
+        protected void checkLimits(TransformModelItem i)
         {
             string value = (i.Value ?? String.Empty).Trim();
             switch ( i.Type.ToLower() )
             {
-                case "string":
+                case Constants.String:
                     if (i.MinInt != Int32.MinValue && value.Length < i.MinInt)
                     {
                         throw new Exception(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt));
@@ -105,7 +105,7 @@ namespace RazorTransform
                     }
                     break;
 
-                case "int32":
+                case Constants.Int32:
                     Int32 v;
                     if (Int32.TryParse(i.Value, out v))
                     {
@@ -126,8 +126,8 @@ namespace RazorTransform
             }
         }
 
-        public List<TransformModelItem> Groups { get; private set; }
-        private List<TransformModelItem> _info { get; set; }
+        public List<TransformModelItem> Groups { get; protected set; }
+        protected List<TransformModelItem> _info { get; set; }
 
         public TransformModel()
         {
@@ -175,9 +175,9 @@ namespace RazorTransform
             _info.Clear();
             Groups.Clear();
 
-            foreach (var x in objectRoot.Elements().Where(n => n.Name == "enum"))
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Enum))
             {
-                var name = x.Attribute("name");
+                var name = x.Attribute(Constants.Name);
                 if (name == null)
                     throw new ArgumentNullException("name on enum");
                 var dict = new Dictionary<string, string>();
@@ -185,107 +185,23 @@ namespace RazorTransform
                 _enums.Add(name.Value, dict);
             }
 
-            foreach (var x in objectRoot.Elements().Where(n => n.Name == "group"))
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Group))
             {
-                var g = new TransformModelItem(x);
-                Groups.Add(g);
-
-                if (g.IsArray)
+                TransformModelItem g = null;
+                if (x.Attribute(Constants.ArrayValueName) != null)
                 {
-                    loadArray(g, x, values);
+                    g = new TransformModelArray(x);
                 }
                 else
                 {
-                    // add items in the group
-                    foreach (var e in x.Elements().Where(n => n.Name == "item"))
-                    {
-                        TransformModelItem i = null;
-                        if ( ((string)e.Attribute("type")) == "Password" )
-                            i = new PasswordTransformModelItem(e,g);
-                        else
-                            i = new TransformModelItem(e,g);
-                        if (overrides.ContainsKey(i.PropertyName))
-                            i.Value = overrides[i.PropertyName];
-                        else if (values != null)
-                        {
-                            var v = values.Elements("value").Where(n => (string)n.Attribute("name") == i.PropertyName).Select(n => (string)n.Attribute("value")).SingleOrDefault();
-                            if (v != null)
-                                i.Value = v;
-                        }
-
-                        _info.Add(i);
-                        g.Children.Add(i);
-                    }
+                    g = new TransformModelItem(x);
                 }
+                Groups.Add(g);
+
+                g.Load(values, overrides, x);
+                _info.AddRange(g.Children);
             }
             return true;
-        }
-
-        // load a group that is an array
-        private void loadArray(TransformModelItem array, XElement objectXml, XElement values, bool addToInfo = true )
-        {
-            var newOne = new TransformModelItem() { Parent = array, DisplayName = array.DisplayName, Description = array.Description, Type = "Array" };
-            if ( addToInfo )
-                _info.Add(array);
-            array.Children.Add(newOne);
-
-            // add a 0th one for a template for "New" ones
-            foreach (var y in objectXml.Elements().Where(n => n.Name == "item" ))
-            {
-                var i = new TransformModelItem(y,array);
-                newOne.Children.Add(i);
-            }
-            // nested arrays
-            foreach (var e in objectXml.Elements().Where(n => n.Name == "group"))
-            {
-                var g = new TransformModelItem(e,array.Children[0]);
-                newOne.Children.Add(g);
-                loadArray(g, e, null, false);
-            }
-
-            setArrayValues(array, values, newOne);
-        }
-
-        private static void setArrayValues(TransformModelItem array, XElement values, TransformModelItem arrayItem)
-        {
-            // load the values from the values file, if it exists
-            if (values != null)
-            {
-                var myValues = values.Elements("value").Where(o => o.Attribute("name").Value == array.ArrayValueName);
-                foreach (var mv in myValues)
-                {
-                    var nextOne = new TransformModelItem() { Parent = array, DisplayName = arrayItem.DisplayName };
-                    array.Children.Add(nextOne);
-
-                    foreach (var i in arrayItem.Children)
-                    {
-                        var childValues = mv.Elements().Where(n => n.Attribute("name").Value == i.PropertyName);
-                        if (!i.IsArray)
-                        {
-                            var v = childValues.SingleOrDefault();
-                            if (v != null)
-                            {
-                                nextOne.Children.Add(new TransformModelItem(i, v.Attribute("value").Value));
-                            }
-                            else
-                            {
-                                nextOne.Children.Add(new TransformModelItem(i, i.Value));
-                            }
-                        }
-                        else 
-                        {
-                            // array of items, get the array object off the arrayItem
-                            var arrayNextOne = arrayItem.Children.Where(o => o.ArrayValueName == i.PropertyName).SingleOrDefault();
-                            var nextArray = new TransformModelItem(arrayNextOne) { Parent = nextOne };
-                            nextOne.Children.Add(nextArray);
-//                            foreach (var v in childValues)
-                            {
-                                setArrayValues(nextArray, mv, arrayNextOne.Children[0]);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         internal string Save(string _valueFileName)
@@ -303,13 +219,13 @@ namespace RazorTransform
             return File.ReadAllText(_valueFileName);
         }
 
-        private static void saveItem(XElement root, TransformModelItem item)
+        protected static void saveItem(XElement root, TransformModelItem item)
         {
             if (item.IsArray)
             {
                 foreach (var child in item.Children.Skip(1))
                 {
-                    var x = new XElement("value", new XAttribute("name", item.ArrayValueName));
+                    var x = new XElement(Constants.Value, new XAttribute(Constants.Name, (item as TransformModelArray).ArrayValueName));
 
                     root.Add(x);
                     foreach (var arrayChild in child.Children)
@@ -320,7 +236,7 @@ namespace RazorTransform
             }
             else
             {
-                var x = new XElement("value", new XAttribute("name", item.PropertyName), new XAttribute("value", item.Value ?? ""));
+                var x = new XElement(Constants.Value, new XAttribute(Constants.Name, item.PropertyName), new XAttribute(Constants.Value, item.Value ?? ""));
                 root.Add(x);
             }
         }
@@ -328,7 +244,7 @@ namespace RazorTransform
         /// <summary>
         /// settings object of the current run to allow Razor views to have access to it
         /// </summary>
-        private Settings _settings { get; set; }
+        protected Settings _settings { get; set; }
 
         internal bool Load(Settings settings)
         {

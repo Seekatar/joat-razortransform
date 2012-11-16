@@ -136,6 +136,7 @@ using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
+using RazorTransform;
 
 #if LINQ
 using System.Linq;
@@ -920,7 +921,7 @@ namespace Mono.Options
 		public List<string> Parse (IEnumerable<string> arguments)
 		{
 			if (arguments == null)
-				throw new ArgumentNullException ("arguments");
+				throw new ArgumentNullException (Constants.Arguments);
 			OptionContext c = CreateOptionContext ();
 			c.OptionIndex = -1;
 			bool process = true;
@@ -1017,10 +1018,10 @@ namespace Mono.Options
 				return false;
 			}
 			flag  = m.Groups ["flag"].Value;
-			name  = m.Groups ["name"].Value;
-			if (m.Groups ["sep"].Success && m.Groups ["value"].Success) {
+			name  = m.Groups [Constants.Name].Value;
+			if (m.Groups ["sep"].Success && m.Groups [Constants.Value].Success) {
 				sep   = m.Groups ["sep"].Value;
-				value = m.Groups ["value"].Value;
+				value = m.Groups [Constants.Value].Value;
 			}
 			return true;
 		}
@@ -1267,7 +1268,7 @@ namespace Mono.Options
 		private static string GetArgumentName (int index, int maxIndex, string description)
 		{
 			if (description == null)
-				return maxIndex == 1 ? "VALUE" : "VALUE" + (index + 1);
+				return maxIndex == 1 ? Constants.Value : Constants.Value + (index + 1);
 			string[] nameStart;
 			if (maxIndex == 1)
 				nameStart = new string[]{"{0:", "{"};
@@ -1285,7 +1286,7 @@ namespace Mono.Options
 					continue;
 				return description.Substring (start + nameStart [i].Length, end - start - nameStart [i].Length);
 			}
-			return maxIndex == 1 ? "VALUE" : "VALUE" + (index + 1);
+			return maxIndex == 1 ? Constants.Value : Constants.Value + (index + 1);
 		}
 
 		private static string GetDescription (string description)
