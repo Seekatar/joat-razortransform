@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace RazorTransform
 {
@@ -16,11 +17,18 @@ namespace RazorTransform
         PasswordBox _passwordBox = null;
 
         /// <summary>
+        /// </summary>
+        /// <param name="parent"></param>
+        public PasswordTransformModelItem(TransformModelGroup parent) : base(parent)
+        {
+        }
+
+        /// <summary>
         /// read from Xml
         /// </summary>
         /// <param name="e"></param>
         /// <param name="g"></param>
-        public PasswordTransformModelItem(System.Xml.Linq.XElement e, TransformModelItem g) : base(e,g)
+        public PasswordTransformModelItem(XElement e, TransformModelGroup g) : base(e,g)
         {
         }
 

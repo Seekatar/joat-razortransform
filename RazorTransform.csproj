@@ -78,6 +78,8 @@
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="RazorTransformer.cs" />
     <Compile Include="TransformModelArray.cs" />
+    <Compile Include="TransformModelArrayItem.cs" />
+    <Compile Include="TransformModelGroup.cs" />
     <Compile Include="TransformModelItem.cs" />
     <Compile Include="TransformResult.cs" />
     <Compile Include="UI\GuiProgress.cs" />

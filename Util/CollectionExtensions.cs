@@ -21,14 +21,14 @@ namespace RazorTransform
             }
         }
 
-        public static IEnumerable<TransformModelItem> FindRecursive(this IEnumerable<TransformModelItem> info, Predicate<TransformModelItem> criteria)
+        public static IEnumerable<TransformModelItem> FindRecursive(this IEnumerable<TransformModelGroup> info, Predicate<TransformModelItem> criteria)
         {
             var results = new List<TransformModelItem>();
             findModelItems(info, criteria, results);
             return results;
         }
 
-        private static void findModelItems(IEnumerable<TransformModelItem> parent, Predicate<TransformModelItem> criteria, List<TransformModelItem> results)
+        private static void findModelItems(IEnumerable<TransformModelGroup> parent, Predicate<TransformModelItem> criteria, List<TransformModelItem> results)
         {
             foreach (var i in parent)
             {
@@ -41,7 +41,8 @@ namespace RazorTransform
                             results.Add(c);
                         }
                     }
-                    findModelItems(i.Children, criteria, results );
+                    // TODO
+                    // findModelItems(i.Children, criteria, results );
                 }
             }
         }
@@ -52,7 +53,7 @@ namespace RazorTransform
             var list = info.ToList();
 
             List<KeyValuePair<TransformModelItem, List<TransformModelItem>>> grouping = new List<KeyValuePair<TransformModelItem, List<TransformModelItem>>>();
-            var types = list.Where(x => x.Type == "Label" || x.Type == Constants.Array);
+            var types = list.Where(x => x.Type == RtType.Array);
 
             List<int> indexList = new List<int>();
             foreach (var type in types)
@@ -91,12 +92,31 @@ namespace RazorTransform
             {
                 grouping.Add(new KeyValuePair<TransformModelItem, List<TransformModelItem>>(
 
-                    new TransformModelItem() { DisplayName = "Details", Description = "Details", Type = "Label", Expanded = true },
+                    new TransformModelItem() { DisplayName = "Details", Description = "Details", Type = RtType.String }, // TODO was "Label"
                     new List<TransformModelItem>(info)
 
                     ));
             }
             return grouping;
+        }
+
+        /// <summary>
+        /// deep copy the array
+        /// </summary>
+        /// <param name="groupTo"></param>
+        /// <param name="groupFrom"></param>
+        public static void CopyValueFrom(this IList<TransformModelGroup> groupTo, IList<TransformModelGroup> groupFrom)
+        {
+            if (!Type.ReferenceEquals(groupTo, groupFrom))
+            {
+                groupTo.Clear();
+                foreach (var g in groupFrom)
+                {
+                    TransformModelGroup newOne = (TransformModelGroup)Activator.CreateInstance(g.GetType() );
+                    newOne.CopyFrom(g);
+                    groupTo.Add(newOne);
+                }
+            }
         }
     }
 }

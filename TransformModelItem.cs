@@ -13,34 +13,21 @@ namespace RazorTransform
     /// </summary>
     public class TransformModelItem
     {
-        protected string makeName(string p)
-        {
-            p = p.Trim();
-            StringBuilder sb = new StringBuilder();
-            bool wasSpace = false;
-            foreach (var c in p)
-            {
-                if (c == ' ')
-                {
-                    wasSpace = true;
-                    continue;
-                }
-                if (wasSpace)
-                    sb.Append(c.ToString().ToUpper());
-                else
-                    sb.Append(c);
-                wasSpace = false;
-
-            }
-            return sb.ToString();
-        }
         protected XElement _element;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="parent"></param>
+        public TransformModelItem(TransformModelGroup parent )
+        {
+            Parent = parent;
+        }
 
         /// <summary>
         /// constructor to load from Xml 
         /// </summary>
         /// <param name="x"></param>
-        public TransformModelItem(XElement x, TransformModelItem parent = null)
+        public TransformModelItem(XElement x, TransformModelGroup parent = null)
         {
             loadFromXml(x);
             Parent = parent;
@@ -53,17 +40,7 @@ namespace RazorTransform
         /// <param name=Constants.Value></param>
         public TransformModelItem(TransformModelItem src, string value)
         {
-            DisplayName = src.DisplayName;
-            PropertyName = src.PropertyName;
-            Description = src.Description;
-            Value = value;
-            Type = src.Type;
-            Parent = src.Parent;
-            Children = new List<TransformModelItem>();
-            Children.AddRange(src.Children.Select(o => { var ret = new TransformModelItem(o); ret.Parent = this; return ret; }));
-            Min = src.Min;
-            Max = src.Max;
-            Expanded = src.Expanded;
+            CopyFrom(src, value);
         }
 
         /// <summary>
@@ -75,34 +52,96 @@ namespace RazorTransform
         {
         }
 
+        /// <summary>
+        /// default constructor
+        /// </summary>
         public TransformModelItem() { }
 
-        public IEnumerable<string> Arguments { get; set; }
+        /// <summary>
+        /// copy everything from another
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="value"></param>
+        public void CopyFrom(TransformModelItem src, string value = null)
+        {
+            Value = value ?? src.Value;
+            DisplayName = src.DisplayName;
+            PropertyName = src.PropertyName;
+            Description = src.Description;
+            Type = src.Type;
+            Parent = src.Parent;
+            Min = src.Min;
+            Max = src.Max;
+            EnumName = src.EnumName;
+            Hidden = src.Hidden;
+        }
 
+        /// <summary>
+        /// name to show in the UI
+        /// </summary>
         public string DisplayName { get; set; }
-        public string Description { get; set; }
-        public virtual string Value { get; set; }
 
+        /// <summary>
+        /// tool tip
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// name of property for this item when on ExpandoObject
+        /// </summary>
         public string PropertyName { get; set; }
 
-        public string Type { get; set; }
+        /// <summary>
+        /// type of item see Contants.cs
+        /// </summary>
+        public RtType Type { get; set; }
 
+        /// <summary>
+        /// Is this item to be shown in the UI
+        /// </summary>
         public bool Hidden { get; set; }
 
-        // group or parent if nested, null if group
-        public TransformModelItem Parent { get; set; }
-
         // strings so type can figure out what min and max means.  e.g. int, decimal, date
+
+        /// <summary>
+        /// Min value as string, empty of null if not used
+        /// </summary>
         public string Min { get; set; }
+
+        /// <summary>
+        /// Max value as string, empty of null if not used
+        /// </summary>
         public string Max { get; set; }
 
+        /// <summary>
+        /// Min value as an integer
+        /// </summary>
         public int MinInt { get { int i; return int.TryParse(Min, out i) ? i : int.MinValue; } }
+
+        /// <summary>
+        /// Max value as an integer
+        /// </summary>
         public int MaxInt { get { int i; return int.TryParse(Max, out i) ? i : int.MaxValue; } }
+
+        /// <summary>
+        /// Min value as an Decimal
+        /// </summary>
         public Decimal MinDecimal { get { Decimal i; return Decimal.TryParse(Min, out i) ? i : Decimal.MinValue; } }
+
+        /// <summary>
+        /// Max value as an Decimal
+        /// </summary>
         public Decimal MaxDecimal { get { Decimal i; return Decimal.TryParse(Max, out i) ? i : Decimal.MaxValue; } }
 
-        // mainly for parent-items
-        public bool Expanded { get; set; }
+        /// <summary>
+        /// group we're in 
+        /// </summary>
+        public TransformModelGroup Parent { get; set; }
+
+        /// <summary>
+        /// current value of the item
+        /// </summary>
+        public virtual string Value { get; set; }
 
         /// <summary>
         /// gets the value of Value as Type T
@@ -113,63 +152,91 @@ namespace RazorTransform
         {
             return (T)Convert.ChangeType(this.Value, typeof(T));
         }
-        protected List<TransformModelItem> _children = new List<TransformModelItem>();
 
-        public List<TransformModelItem> Children
+        /// <summary>
+        /// if an enum, this is the name
+        /// </summary>
+        public string EnumName { get; set; }
+
+        /// <summary>
+        /// is this item an array
+        /// </summary>
+        public bool IsArrayItem
         {
-            get { return _children; }
-            protected set { _children = value; }
+            get { return this is TransformModelArrayItem; }
+        }
+
+        /// <summary>
+        /// load this one item from the Xml
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="values"></param>
+        /// <param name="overrides"></param>
+        public virtual void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
+        {
+            loadFromXml(xml);
+
+            if (overrides != null && overrides.ContainsKey(PropertyName))
+                Value = overrides[PropertyName];
+            else if (values != null)
+            {
+                var v = values.Elements(Constants.Value).Where(n => (string)n.Attribute(Constants.Name) == PropertyName).Select(n => (string)n.Attribute(Constants.Value)).SingleOrDefault();
+                if (v != null)
+                    Value = v;
+            }
         }
 
 
-
-        protected virtual void loadFromXml(XElement x)
+        /// <summary>
+        /// load the item from xml
+        /// </summary>
+        /// <param name="itemXml"></param>
+        protected virtual void loadFromXml(XElement itemXml)
         {
-            _element = x;
+            _element = itemXml;
 
-            PropertyName = (string)x.Attribute(Constants.Name);
-            Type = (string)x.Attribute(Constants.Type);
-            if (Type != null && Type.ToLower() == Constants.Hidden)
-            {
-                Type = Constants.String;
-                Hidden = true;
-            }
-            else
-                Hidden = (bool?)x.Attribute(Constants.Hidden) ?? false;
-
+            // attributes
+            PropertyName = (string)itemXml.Attribute(Constants.Name);
             if (PropertyName == null)
                 throw new ArgumentNullException(Constants.Name);
-            if (Type == null)
-            {
-                if (x.Name == Constants.Group)
-                    Type = Constants.Group;
-                else
-                    throw new ArgumentNullException("type for property " + PropertyName);
-            }
 
             // if no display name, use propertyname
-            DisplayName = (string)x.Attribute(Constants.DisplayName) ?? PropertyName;
-            PropertyName =  makeName(PropertyName);
+            DisplayName = (string)itemXml.Attribute(Constants.DisplayName) ?? PropertyName;
+            PropertyName = makeName(PropertyName);
 
-            Description = (string)x.Attribute(Constants.Description) ?? DisplayName;
+            Description = (string)itemXml.Attribute(Constants.Description) ?? DisplayName;
 
-            if (x.Attribute(Constants.Arguments) != null && !String.IsNullOrEmpty(x.Attribute(Constants.Arguments).Value))
+            Type = Constants.GetType(itemXml);
+            if (Type == RtType.HiddenString) // old files have hidden as type to indicate hidden string
             {
-                Arguments = x.Attribute(Constants.Arguments).Value.Split(",".ToCharArray()).Select(y => y.Trim());
+                Type = RtType.String;
+                Hidden = true;
+            }
+            else if (Type == RtType.Enum)
+            {
+                EnumName = Constants.GetEnumName(itemXml);
             }
             else
-            {
-                Arguments = new List<string>();
-            }
-            Min = (string)x.Attribute(Constants.Min) ?? "";
-            Max = (string)x.Attribute(Constants.Max) ?? "";
-            Expanded = (bool?)x.Attribute(Constants.Expanded) ?? false;
+                Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
 
-            SetDefaultValue(x);
+            if (Type == RtType.Invalid)
+            {
+                throw new Exception("Invalid type for property " + PropertyName);
+            }
+
+            Min = (string)itemXml.Attribute(Constants.Min) ?? "";
+            Max = (string)itemXml.Attribute(Constants.Max) ?? "";
+
+            setDefaultValue(itemXml);
+
+            // no sub elements under <item>
         }
 
-        // grab the default value from the element and set it
-        protected void SetDefaultValue(XElement x)
+        /// <summary>
+        /// grab the default value from the element and set it
+        /// </summary>
+        /// <param name="x"></param>
+        protected void setDefaultValue(XElement x)
         {
             if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
             {
@@ -192,7 +259,6 @@ namespace RazorTransform
                             this.Value = x.Attribute(Constants.DefaultValue).Value;
                         }
                     }
-
                 }
             }
         }
@@ -210,46 +276,39 @@ namespace RazorTransform
         }
 
 
-        internal void CopyFrom(TransformModelItem src)
+        internal void CopyValueFrom(TransformModelItem src)
         {
             if (!Object.ReferenceEquals(this, src))
             {
-                Parent = src.Parent;
-                Children.Clear();
-                foreach (var i in src.Children)
-                {
-                    Children.Add(new TransformModelItem(i));
-                }
+                Value = src.Value;
             }
         }
 
-        public virtual void Load(XElement values, IDictionary<string, string> overrides, XElement x)
+        /// <summary>
+        /// create a property name from the display name
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        protected static string makeName(string p)
         {
-            // add items in the group
-            foreach (var e in x.Elements().Where(n => n.Name == Constants.Item))
+            p = p.Trim();
+            StringBuilder sb = new StringBuilder();
+            bool wasSpace = false;
+            foreach (var c in p)
             {
-                TransformModelItem i = null;
-                if (((string)e.Attribute(Constants.Type)) == Constants.Password)
-                    i = new PasswordTransformModelItem(e, this);
-                else
-                    i = new TransformModelItem(e, this);
-                if (overrides.ContainsKey(i.PropertyName))
-                    i.Value = overrides[i.PropertyName];
-                else if (values != null)
+                if (c == ' ')
                 {
-                    var v = values.Elements(Constants.Value).Where(n => (string)n.Attribute(Constants.Name) == i.PropertyName).Select(n => (string)n.Attribute(Constants.Value)).SingleOrDefault();
-                    if (v != null)
-                        i.Value = v;
+                    wasSpace = true;
+                    continue;
                 }
+                if (wasSpace)
+                    sb.Append(c.ToString().ToUpper());
+                else
+                    sb.Append(c);
+                wasSpace = false;
 
-                Children.Add(i);
             }
-        }
-
-
-        public bool IsArray 
-        {
-            get { return this is TransformModelArray; }
+            return sb.ToString();
         }
     }
 

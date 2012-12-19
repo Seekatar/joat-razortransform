@@ -11,7 +11,7 @@ namespace RazorTransform
     /// </summary>
     public partial class NameValueEdit : UserControl
     {
-        IEnumerable<TransformModelItem> _groups;
+        IEnumerable<TransformModelGroup> _groups;
 
         public NameValueEdit()
         {
@@ -20,27 +20,10 @@ namespace RazorTransform
         }
 
         /// <summary>
-        /// load a single configinfo with children
-        /// </summary>
-        /// <param name="parent"></param>
-        public void Load(TransformModelItem parent)
-        {
-            var groups = new List<TransformModelItem>();
-            var copy = new TransformModelItem(parent);
-            copy.Children.Clear();
-            copy.Children.AddRange(parent.Children.Where(o => !o.IsArray));
-            copy.Expanded = true;
-            groups.Add(copy);
-            groups.AddRange(parent.Children.Where(o => o.IsArray)); //.Select( o => new TransformModelItem(o) ));
-
-            Load(groups);
-        }
-
-        /// <summary>
         /// populate the control with items from the groups
         /// </summary>
         /// <param name="groups"></param>
-        public void Load(IEnumerable<TransformModelItem> groups)
+        public void Load(IEnumerable<TransformModelGroup> groups)
         {
             _groups = groups;
 
@@ -49,38 +32,34 @@ namespace RazorTransform
             int i = 0;
             StackPanel lastExpanderStack = null;
 
-            foreach (var item in groups)
+            foreach (var group in groups.Where( o => !o.Hidden))
             {
-                var expander = createTab(item);
+                var expander = createTab(group);
 
                 lastExpanderStack = expander.Content as StackPanel;
 
                 var side = new StackPanel() { Orientation = Orientation.Horizontal };
 
-                if (item.IsArray)
+                if (group is TransformModelArray)
                 {
-                    // add all the children 
-                    if (item.Children.Count > 0 ) // must have 0th for adds at least
-                    {
-                        lastExpanderStack.Children.Add( LayoutManager.BuildGridView(item, add_Click, edit_Click, del_Click));
-                    }
+                    lastExpanderStack.Children.Add( LayoutManager.BuildGridView(group as TransformModelArray, add_Click, edit_Click, del_Click));
                 }
                 else
                 {
-                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(item.Children));
+                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group));
 
                     i++;
                 }
             }
         }
 
-        private TabItem createTab(TransformModelItem ci)
+        private TabItem createTab(TransformModelGroup group)
         {
             var tab = new TabItem();
             tab.Style = this.Resources["CfgBigLabel"] as Style;
-            tab.Header = ci.DisplayName;
-            if (ci.Description != null)
-                tab.ToolTip = ci.Description;
+            tab.Header = group.DisplayName;
+            if (group.Description != null)
+                tab.ToolTip = group.Description;
             _tabCtrl.Items.Add(tab);
             var lastExpanderStack = new StackPanel();
             tab.Content = lastExpanderStack;
@@ -103,7 +82,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="orig"></param>
         /// <returns></returns>
-        bool editArrayItem(TransformModelItem orig)
+        bool editArrayItem(IList<TransformModelGroup> orig)
         {
             var nve = new ArrayItemEdit();
             return nve.ShowDialog(orig);
@@ -111,7 +90,7 @@ namespace RazorTransform
 
         void edit_Click(object sender, RoutedEventArgs e)
         {
-            if ( editArrayItem((sender as Control).Tag as TransformModelItem) )
+            if ( editArrayItem((sender as Control).Tag as IList<TransformModelGroup>) )
                 ReLoad();
         }
 
@@ -122,12 +101,14 @@ namespace RazorTransform
 
         void add_Click(object sender, RoutedEventArgs e)
         {
-            // create a new one from the 0th as a template
-            var newOne = new TransformModelItem((sender as Control).Tag as TransformModelItem);
-            if (editArrayItem(newOne))
+            // create a new one from the prototype, set on the tag
+            var parent = ((sender as Control).Tag as TransformModelArrayItem);
+            var newOne = new TransformModelArrayItem(parent);
+            if (editArrayItem(newOne.Groups))
             {
                 // add it to the parent array
-                newOne.Parent.Children.Add(newOne);
+                parent.ArrayParent.ArrayItems.Add(newOne);
+                newOne.MakeKey();
                 ReLoad();
             }
         }

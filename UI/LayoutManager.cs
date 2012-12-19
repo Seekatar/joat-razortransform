@@ -11,8 +11,9 @@ namespace RazorTransform
 {
     public static class LayoutManager
     {
-        public static FrameworkElement BuildGridView(IEnumerable<TransformModelItem> items)
+        public static FrameworkElement BuildGridView(TransformModelGroup group)
         {
+            var items = group.Items;
 
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
@@ -28,7 +29,7 @@ namespace RazorTransform
                 });
 
             grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0, GridUnitType.Star) });
-      
+
 
             int i = 0;
             foreach (var ci in controls)
@@ -39,11 +40,11 @@ namespace RazorTransform
                 l.ToolTip = ci.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
-                l.Style = Application.Current.Resources["CfgLabel"] as Style; 
+                l.Style = Application.Current.Resources["CfgLabel"] as Style;
 
                 var binding = new Binding();
                 binding.Source = ci;
-                binding.Path = new PropertyPath(Constants.Value);
+                binding.Path = new PropertyPath("Value");
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
                 Control t = CreateControl(ci, binding);
@@ -55,7 +56,7 @@ namespace RazorTransform
                 t.Style = Application.Current.Resources["CfgText"] as Style;
 
                 if ((i & 1) == 0)
-                    l.Background =  new SolidColorBrush(Colors.WhiteSmoke);
+                    l.Background = new SolidColorBrush(Colors.WhiteSmoke);
 
                 l.Padding = t.Padding = new Thickness(5);
 
@@ -66,7 +67,7 @@ namespace RazorTransform
                         {
                             cc.HorizontalAlignment = HorizontalAlignment.Stretch;
                             cc.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-                        
+
                         }
                     };
                 t.LayoutUpdated += (s, e) =>
@@ -74,7 +75,7 @@ namespace RazorTransform
                     var cc = s as Control;
                     if (cc != null)
                     {
-                       // cc.Width = grid.ColumnDefinitions[1].ActualWidth;
+                        // cc.Width = grid.ColumnDefinitions[1].ActualWidth;
                     }
                 };
 
@@ -86,135 +87,129 @@ namespace RazorTransform
             return grid;
 
         }
-        public static FrameworkElement BuildGridView(TransformModelItem parent, 
-            
-            Action<object,RoutedEventArgs> addHandler,
+
+        // add an array type
+        public static FrameworkElement BuildGridView(TransformModelArray parent,
+            Action<object, RoutedEventArgs> addHandler,
             Action<object, RoutedEventArgs> editHandler,
             Action<object, RoutedEventArgs> deleteHandler)
         {
+            var items = parent.Items;
+
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
             grid.HorizontalAlignment = HorizontalAlignment.Stretch;
             grid.VerticalAlignment = VerticalAlignment.Stretch;
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-       
-            Enumerable.Range(0, parent.Children.Count()).ToList().ForEach(x =>
+
+            // add 1 for the "New" button
+            Enumerable.Range(0, items.Count()+1).ToList().ForEach(x =>
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
             });
 
-
-             
-
-
-                // add a New button under the expander
-            var add = new Button() { Content = "New", HorizontalAlignment = System.Windows.HorizontalAlignment.Right, Tag = parent.Children[0] };
-                add.ToolTip = "Add a new item";
-                add.HorizontalAlignment = HorizontalAlignment.Left;
-                add.Click += (sender, args) =>
-                    {
-                        addHandler(sender, args);
-                    };
-
-                add.SetValue(Grid.ColumnSpanProperty, 2);
-                add.SetValue(Grid.RowProperty, 0);
-
-                grid.Children.Add(add);
-                int i = 1;
-
-                bool nameSet = false;
-                foreach (var child in parent.Children.Skip(1))
+            // add a New button under the expander
+            var add = new Button() { Content = "New", HorizontalAlignment = System.Windows.HorizontalAlignment.Right, Tag = parent.Prototype };
+            add.ToolTip = "Add a new item";
+            add.HorizontalAlignment = HorizontalAlignment.Left;
+            add.Click += (sender, args) =>
                 {
-                    var c = child.Children[0];
-                    var l = new Label() { Tag = child };
-                    if (!nameSet)
+                    addHandler(sender, args);
+                };
+
+            add.SetValue(Grid.ColumnSpanProperty, 2);
+            add.SetValue(Grid.RowProperty, 0);
+
+            grid.Children.Add(add);
+            int i = 1;
+
+            bool nameSet = false;
+            foreach (var c in items)
+            {
+                var l = new Label() { Tag = c };
+                if (!nameSet)
+                {
+                    nameSet = true;
+                    l.Content = parent.DisplayName;
+                }
+
+                l.ToolTip = c.Description;
+                l.SetValue(Grid.ColumnProperty, 0);
+                l.SetValue(Grid.RowProperty, i);
+                l.Style = Application.Current.Resources["CfgLabel"] as Style;
+
+
+                var t = new EditItemBox(parent.Children.Count - 1 > parent.Min);
+                t.EditClicked += (sender, args) =>
+                {
+                    editHandler(sender, args);
+                };
+                t.DelClicked += (sender, args) =>
+                {
+                    deleteHandler(sender, args);
+                };
+                t.Loaded += (s, e) =>
+                {
+                    var cc = s as Control;
+                    if (cc != null)
                     {
-                        nameSet = true;
-                        l.Content = c.DisplayName;
+                        cc.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        cc.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+
                     }
-                   
-                    l.ToolTip = c.Description;
-                    l.SetValue(Grid.ColumnProperty, 0);
-                    l.SetValue(Grid.RowProperty, i);
-                    l.Style = Application.Current.Resources["CfgLabel"] as Style;
-
-
-                    var t = new EditItemBox(parent.Children.Count - 1 > parent.MinInt);
-                    t.EditClicked  += (sender, args) =>
-                    {
-                        editHandler(sender, args);
-                    };
-                    t.DelClicked += (sender, args) =>
-                    {
-                        deleteHandler(sender, args);
-                    };
-                    t.Loaded += (s, e) =>
+                };
+                t.SizeChanged += (s, e) =>
                     {
                         var cc = s as Control;
                         if (cc != null)
                         {
-                            cc.HorizontalAlignment = HorizontalAlignment.Stretch;
-                            cc.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-                        
+                            //cc.Width = grid.ColumnDefinitions[1].ActualWidth;
                         }
                     };
-                    t.SizeChanged += (s, e) =>
-                        {
-                            var cc = s as Control;
-                            if (cc != null)
-                            {
-                                //cc.Width = grid.ColumnDefinitions[1].ActualWidth;
-                            }
-                        };
-                  
-                    t.Tag = child;
-                    t.ItemName = c.Value;
-                    t.ToolTip = c.Description;
-                    t.SetValue(Grid.ColumnProperty, 1);
-                    t.SetValue(Grid.RowProperty, i);
 
-                    if ((i & 1) == 0)
-                        l.Background = new SolidColorBrush(Colors.AliceBlue);
+                t.Tag = c;
+                t.ItemName = c.DisplayName;
+                t.ToolTip = ""; // TODO
+                t.SetValue(Grid.ColumnProperty, 1);
+                t.SetValue(Grid.RowProperty, i);
 
-                    i++;
-                    grid.Children.Add(l);
-                    grid.Children.Add(t);
-                
+                if ((i & 1) == 0)
+                    l.Background = new SolidColorBrush(Colors.AliceBlue);
+
+                i++;
+                grid.Children.Add(l);
+                grid.Children.Add(t);
+
             }
-                return grid;
+            return grid;
         }
-        private static Control CreateControl( TransformModelItem info, Binding binding)
+
+        private static Control CreateControl(TransformModelItem info, Binding binding)
         {
-            switch (info.Type.ToLower())
+            switch (info.Type)
             {
-                case Constants.Folder:
-                case Constants.UncPath: return _Folder(info, binding);
-                case Constants.Guid: return _Guid(info, binding);
-                case Constants.Bool: return _Bool(info, binding);
-                case Constants.Int32: return _Int32(info, binding);
-                case Constants.Password: return _Password(info, binding);
-                case Constants.String: return _Default(info, binding);
+                case RtType.Folder:
+                case RtType.UncPath: return _Folder(info, binding);
+                case RtType.Guid: return _Guid(info, binding);
+                case RtType.Bool: return _Bool(info, binding);
+                case RtType.Int32: return _Int32(info, binding);
+                case RtType.Password: return _Password(info, binding);
+                case RtType.String: return _Default(info, binding);
+                case RtType.Enum:
+                    ComboBoxInput ret = _ComboBox(info, binding);
+                    var listBinding = new Binding();
+                    listBinding.Source = TransformModel.Enums[info.EnumName];
+                    listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                    ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
+                    return ret;
                 default:
-                    {
-                        // is it an enum?
-                        if (TransformModel.Enums.ContainsKey(info.Type))
-                        {
-                            ComboBoxInput ret = _ComboBox(info, binding);
-                            var listBinding = new Binding();
-                            listBinding.Source = TransformModel.Enums[info.Type];
-                            listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                            ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
-                            return ret;
-                        }
-                        else
-                            return _Default(info, binding);
-                    }
+                    return _Default(info, binding);
             }
         }
 
-       
- 
+
+
         private static Func<TransformModelItem, Binding, Control> _Folder = (ci, binding) =>
         {
             return _UncPath(ci, binding);

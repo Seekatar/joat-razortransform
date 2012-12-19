@@ -17,8 +17,7 @@ namespace RazorTransform
     public class Settings
     {
         private ExpandoObject _settings = null;
-        private TransformModelItem _configInfo;
-        private TransformModelItem _arrayConfigInfo;
+        private TransformModelGroup _arrayConfigInfo;
         private string _objectFile;
         private string _valuesFile;
 
@@ -26,9 +25,9 @@ namespace RazorTransform
         static string _settingsXml =
 @"<RtObject>
   <group name=""Settings"" description=""Settings that control how Artie works."" arrayValueName=""_settings"" hidden=""True"">
-    <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + Constants.String + @""" defaultValue=""RazorTransform""/>
-    <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + Constants.Folder + @""" defaultValue=""..""/>
-    <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + Constants.Folder + @""" defaultValue=""Templates""/>
+    <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + RtType.String + @""" defaultValue=""RazorTransform""/>
+    <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + RtType.Folder + @""" defaultValue=""..""/>
+    <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + RtType.Folder + @""" defaultValue=""Templates""/>
   </group>
 </RtObject>";
 
@@ -38,27 +37,22 @@ namespace RazorTransform
 
             // load the settings
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
-            TransformModel settings = new TransformModel();
+            var settings = new TransformModel();
             settings.LoadValuesFromXml(settingsDefinition, this);
 
-            // the config info it the [1] value or [0] if first time. (for array 0th is template)
-            _configInfo = settings.Groups[0].Children[settings.Groups[0].Children.Count - 1];
-
-            // get the settings objects which is an array of one item so not in root namespace of values
-            dynamic settingsArray = settings.GetProperties(false, false);
-            if (settingsArray._settings.Count == 0)
+            // if this is first time, create one from the prototype
+            if ((settings.Groups[0] as TransformModelArray).Items.Count() == 0)
             {
-                // create a default one as template
-                _settings = settings.BuildObject(settings.Groups[0].Children[0].Children, false, false);
-
-                var newOne = new TransformModelItem(_configInfo);
-                _configInfo.Parent.Children.Add(newOne);
-                _configInfo = newOne;
+                _arrayConfigInfo = (settings.Groups[0] as TransformModelArray).PrototypeGroups[0];
+                var groups = new TransformModelArrayItem();
+                groups.Groups.AddRange((settings.Groups[0] as TransformModelArray).PrototypeGroups); 
+                (settings.Groups[0] as TransformModelArray).ArrayItems.Add(groups);
+                _settings = settings.BuildObject((settings.Groups[0] as TransformModelArray).PrototypeGroups, false, false);
             }
             else
-                _settings = settingsArray._settings[0];
-
-            _arrayConfigInfo = settings.Groups[0];
+            {
+                _arrayConfigInfo = (settings.Groups[0] as TransformModelArray).ArrayItems[0].Groups[0];
+            }
         }
 
         public Settings()
@@ -73,10 +67,13 @@ namespace RazorTransform
         }
 
         // for saving
-        public TransformModelItem ArrayConfigInfo { get { return _arrayConfigInfo;  } }
+        public TransformModelGroup ArrayConfigInfo { get { return _arrayConfigInfo;  } }
 
         // for editing
-        public TransformModelItem ConfigInfo { get { return _configInfo;  } }
+        public IList<TransformModelGroup> ConfigInfo 
+        {
+            get { return new List<TransformModelGroup>() { _arrayConfigInfo }; } 
+        }
 
         // values saved in values file
         public string Title { get { return this["Title"]; } set { this["Title"] = value; } }
@@ -176,7 +173,7 @@ namespace RazorTransform
                     var m = model.Groups.FindRecursive(p => p.PropertyName == o.Key).FirstOrDefault();
                     if ( m != null )
                     {
-                        if ( String.Equals( m.Type, Constants.Password, StringComparison.InvariantCultureIgnoreCase) )
+                        if ( m.Type == RtType.Password )
                             sb.AppendLine(String.Format("    {0}: {1}", o.Key, "******"));
                         else
                             sb.AppendLine(String.Format("    {0}: {1}", o.Key, o.Value));

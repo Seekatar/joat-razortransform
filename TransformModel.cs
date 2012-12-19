@@ -18,73 +18,121 @@ namespace RazorTransform
     /// </summary>
     class TransformModel
     {
+        /// <summary>
+        /// all the enums loaded from the Xml
+        /// </summary>
         static IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
 
+        /// <summary>
+        /// settings object of the current run to allow Razor views to have access to it
+        /// </summary>
+        protected Settings _settings { get; set; }
+
+        /// <summary>
+        /// all the groups that make up this object
+        /// </summary>
+        public List<TransformModelGroup> Groups { get; protected set; }
+
+        /// <summary>
+        /// all the enums loaded from the Xml
+        /// </summary>
         public static IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
 
+        /// <summary>
+        /// get the object with all the properties set on it
+        /// </summary>
+        /// <param name="updateXml"></param>
+        /// <param name="htmlEncode"></param>
+        /// <param name="destinationFolder"></param>
+        /// <returns></returns>
         public ExpandoObject GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null)
         {
-            return BuildObject(_info, updateXml, htmlEncode, destinationFolder);
+            return BuildObject(Groups, updateXml, htmlEncode, destinationFolder);
         }
 
-        internal ExpandoObject BuildObject(IEnumerable<TransformModelItem> info, bool updateXml, bool htmlEncode, string destinationFolder = null, ExpandoObject parent = null )
+        /// <summary>
+        /// get the object with all the properties set on it
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="updateXml"></param>
+        /// <param name="htmlEncode"></param>
+        /// <param name="destinationFolder"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null, ExpandoObject parent = null)
         {
             var ret = new ExpandoObject();
-            if ( destinationFolder != null )
-                (ret as IDictionary<string, object>).Add("DestinationFolder", destinationFolder);
+            var dict = ret as IDictionary<string, object>;
 
-            if ( parent != null )
-                (ret as IDictionary<string, object>).Add("Parent", parent);
+            // add some of the global values to the object to be available in the transform
+            if (destinationFolder != null)
+                dict.Add("DestinationFolder", destinationFolder);
+
+            if (parent != null)
+                dict.Add("Parent", parent);
             else
-                (ret as IDictionary<string, object>).Add("CurrentSettings", _settings); // only add to root object
+                dict.Add("CurrentSettings", _settings); // only add to root object
 
-            foreach (var i in info)
+            String currentName = "<unknown>";
+
+            try
             {
-                try
+                foreach (var g in groups)
                 {
-                    if (i.IsArray)
+                    currentName = g.DisplayName;
+
+                    if (g is TransformModelArray)
                     {
+                        var i = g as TransformModelArray;
                         var children = new List<ExpandoObject>();
-                        if (i.Children.Count - 1 < i.MinInt)
-                            throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.MinInt));
-                        foreach (var c in i.Children.Skip(1))
+                        if (i.Items.Count() < i.Min)
+                            throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.Min));
+                        foreach (var c in i.Items)
                         {
-                            children.Add(BuildObject(c.Children, false, true, destinationFolder, ret));
+                            children.Add(BuildObject((c as TransformModelArrayItem).Groups, false, true, destinationFolder, ret));
                         }
-                        (ret as IDictionary<string, object>).Add(i.PropertyName, children);
-                    }
-                    else if (String.Equals(Constants.Bool, i.Type, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        bool value = false;
-                        if (i.Value != null)
-                        {
-                            bool result;
-                            if (Boolean.TryParse(i.Value, out result))
-                                value = result;
-                        }
-                        (ret as IDictionary<string, object>).Add(i.PropertyName, value);
+                        dict.Add(i.ArrayValueName, children);
                     }
                     else
                     {
-                        checkLimits(i);
-                        string value = (i.Value ?? String.Empty).Trim();
-                        if (htmlEncode)
-                            (ret as IDictionary<string, object>).Add(i.PropertyName, HttpUtility.HtmlEncode(value));
-                        else
-                            (ret as IDictionary<string, object>).Add(i.PropertyName, value);
-                    }
+                        foreach (var i in g.Children)
+                        {
+                            currentName = i.DisplayName;
 
-                    if (updateXml)
-                    {
-                        i.UpdateXml();
+                            if (i.Type == RtType.Bool)
+                            {
+                                bool value = false;
+                                if (i.Value != null)
+                                {
+                                    bool result;
+                                    if (Boolean.TryParse(i.Value, out result))
+                                        value = result;
+                                }
+                                dict.Add(i.PropertyName, value);
+                            }
+                            else
+                            {
+                                checkLimits(i);
+                                string value = (i.Value ?? String.Empty).Trim();
+                                if (htmlEncode)
+                                    dict.Add(i.PropertyName, HttpUtility.HtmlEncode(value));
+                                else
+                                    dict.Add(i.PropertyName, value);
+                            }
+
+                            if (updateXml)
+                            {
+                                i.UpdateXml();
+                            }
+                        }
                     }
                 }
-                catch (Exception e)
-                {
-                    string msg = String.Format(Resource.ProcessError, i.DisplayName, e.BuildMessage());
-                    throw new Exception(msg);
+            }
+            catch (Exception e)
+            {
+                string msg = String.Format(Resource.ProcessError, currentName, e.BuildMessage());
+                throw new Exception(msg);
 
-                }
             }
             return ret;
         }
@@ -92,9 +140,9 @@ namespace RazorTransform
         protected void checkLimits(TransformModelItem i)
         {
             string value = (i.Value ?? String.Empty).Trim();
-            switch ( i.Type.ToLower() )
+            switch (i.Type)
             {
-                case Constants.String:
+                case RtType.String:
                     if (i.MinInt != Int32.MinValue && value.Length < i.MinInt)
                     {
                         throw new Exception(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt));
@@ -105,7 +153,7 @@ namespace RazorTransform
                     }
                     break;
 
-                case Constants.Int32:
+                case RtType.Int32:
                     Int32 v;
                     if (Int32.TryParse(i.Value, out v))
                     {
@@ -120,19 +168,15 @@ namespace RazorTransform
                     }
                     else
                     {
-                        throw new Exception(String.Format(Resource.BadInteger,i.DisplayName,v));
+                        throw new Exception(String.Format(Resource.BadInteger, i.DisplayName, v));
                     }
                     break;
             }
         }
 
-        public List<TransformModelItem> Groups { get; protected set; }
-        protected List<TransformModelItem> _info { get; set; }
-
         public TransformModel()
         {
-            _info = new List<TransformModelItem>();
-            Groups = new List<TransformModelItem>();
+            Groups = new List<TransformModelGroup>();
         }
 
         // load both object def and values from files
@@ -143,14 +187,14 @@ namespace RazorTransform
             {
                 doc = XDocument.Load(fs);
             }
-            return LoadValuesFromXml(doc.Root,settings);
+            return LoadValuesFromXml(doc.Root, settings);
         }
 
         // load object from xml and values from file (if exists)
         public bool LoadValuesFromXml(XElement objectRoot, Settings settings)
         {
             XDocument valueDoc = null;
-            if (!String.IsNullOrEmpty( settings.ValuesContent))
+            if (!String.IsNullOrEmpty(settings.ValuesContent))
             {
                 valueDoc = XDocument.Parse(settings.ValuesContent);
             }
@@ -172,7 +216,6 @@ namespace RazorTransform
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
             _enums.Clear();
-            _info.Clear();
             Groups.Clear();
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Enum))
@@ -187,19 +230,18 @@ namespace RazorTransform
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Group))
             {
-                TransformModelItem g = null;
+                TransformModelGroup g = null;
                 if (x.Attribute(Constants.ArrayValueName) != null)
                 {
-                    g = new TransformModelArray(x);
+                    g = new TransformModelArray();
                 }
                 else
                 {
-                    g = new TransformModelItem(x);
+                    g = new TransformModelGroup();
                 }
                 Groups.Add(g);
 
-                g.Load(values, overrides, x);
-                _info.AddRange(g.Children);
+                g.LoadFromXml(x, values, overrides);
             }
             return true;
         }
@@ -209,10 +251,13 @@ namespace RazorTransform
             var doc = XDocument.Parse("<RtValues/>");
             var root = doc.Root;
 
-            foreach (var item in _info)
+            foreach (var g in Groups)
             {
-                if ( !(item is PasswordTransformModelItem ))
-                    saveItem(root, item);
+                foreach (var item in g.Items)
+                {
+                    if (!(item is PasswordTransformModelItem))
+                        saveItem(root, item);
+                }
             }
 
             doc.Save(_valueFileName);
@@ -221,18 +266,19 @@ namespace RazorTransform
 
         protected static void saveItem(XElement root, TransformModelItem item)
         {
-            if (item.IsArray)
+            if (item is TransformModelArrayItem)
             {
-                foreach (var child in item.Children.Skip(1))
-                {
-                    var x = new XElement(Constants.Value, new XAttribute(Constants.Name, (item as TransformModelArray).ArrayValueName));
+                // TODO
+                //foreach (var child in item.Children.Skip(1))
+                //{
+                //    var x = new XElement(Constants.Value, new XAttribute(Constants.Name, (item as TransformModelArray).ArrayValueName));
 
-                    root.Add(x);
-                    foreach (var arrayChild in child.Children)
-                    {
-                        saveItem(x, arrayChild);
-                    }
-                }
+                //    root.Add(x);
+                //    foreach (var arrayChild in child.Children)
+                //    {
+                //        saveItem(x, arrayChild);
+                //    }
+                //}
             }
             else
             {
@@ -240,11 +286,6 @@ namespace RazorTransform
                 root.Add(x);
             }
         }
-
-        /// <summary>
-        /// settings object of the current run to allow Razor views to have access to it
-        /// </summary>
-        protected Settings _settings { get; set; }
 
         internal bool Load(Settings settings)
         {
@@ -256,7 +297,7 @@ namespace RazorTransform
             {
                 objectValues = XDocument.Load(path).Root;
             }
-            _info.Add(_settings.ArrayConfigInfo); // add so we can save it when we save
+            Groups.Add(_settings.ArrayConfigInfo); // add so we can save it when we save
 
             // load the main file
             path = Path.Combine(directoryName, _settings.ObjectFile);

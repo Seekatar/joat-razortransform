@@ -38,7 +38,7 @@ namespace RazorTransform
         }
 
         public static readonly DependencyProperty BoolProperty =
-           DependencyProperty.Register(Constants.Bool, typeof(string), typeof(BoolInput));
+           DependencyProperty.Register("Bool", typeof(string), typeof(BoolInput));
 
         public static readonly RoutedEvent BoolChangedEvent =
             EventManager.RegisterRoutedEvent("BoolChanged",

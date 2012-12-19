@@ -32,7 +32,7 @@ namespace RazorTransform
             InitializeComponent();
         }
 
-        internal void Load(List<TransformModelItem> list)
+        internal void Load(List<TransformModelGroup> list)
         {
             editControl.Load(list);
         }

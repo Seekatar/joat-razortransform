@@ -7,91 +7,162 @@ using System.Xml.Linq;
 
 namespace RazorTransform
 {
-    public class TransformModelArray : TransformModelItem
+    public class TransformModelArray : TransformModelGroup
     {
-        private List<string> _keyReplacements;
+        private List<string> _keyReplacements = new List<string>();
+        private List<TransformModelArrayItem> _items = new List<TransformModelArrayItem>();
+        private List<TransformModelGroup> _prototypeGroups = new List<TransformModelGroup>();
+        private XElement _element;
 
-        public TransformModelArray(TransformModelArray src) : this(src, src.Value)
+        /// <summary>
+        /// min items in array
+        /// </summary>
+        public Int32 Min { get; set; }
+
+        /// <summary>
+        /// max items in array
+        /// </summary>
+        public Int32 Max { get; set; }
+
+        /// <summary>
+        /// list of the groups in the array
+        /// </summary>
+        public List<TransformModelGroup> PrototypeGroups
+        {
+            get { return _prototypeGroups; }
+        }
+
+        public TransformModelArrayItem Prototype 
+        {
+            get { return new TransformModelArrayItem(PrototypeGroups) { Parent = this } ; } 
+        }
+
+        // get the items to show in the UI
+        public override IEnumerable<TransformModelItem> Items
+        {
+            get { return _items;  }
+        }
+
+        public IList<TransformModelArrayItem> ArrayItems
+        {
+            get { return _items; }
+        }
+
+        public string ArrayValueName { get; set; }
+
+        public string Key { get; set; }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="parent"></param>
+        public TransformModelArray(TransformModelGroup parent)
+            : base(parent)
         {
         }
 
-        public TransformModelArray(TransformModelArray src, string value ) : base(src,value)
+        public TransformModelArray(TransformModelArray src)
         {
-            KeyReplacements = new List<string>(src.KeyReplacements);
+            _keyReplacements.AddRange(src._keyReplacements);
+            _items.AddRange(src._items);
+        }
+
+        public TransformModelArray(TransformModelArray src, string value)
+            : base(src)
+        {
+            if (src._keyReplacements == null)
+                src._keyReplacements = new List<string>() { Children[0].PropertyName };
+
+            _keyReplacements = new List<string>(src._keyReplacements);
             Key = src.Key;
             ArrayValueName = src.ArrayValueName;
         }
 
-        public TransformModelArray(XElement x, TransformModelItem parent = null)
+        public TransformModelArray(XElement x, TransformModelGroup parent = null)
+            : base(parent)
         {
             loadFromXml(x);
-            Parent = parent;
         }
 
-        protected override void loadFromXml(XElement x)
+        public TransformModelArray()
         {
-            base.loadFromXml(x);
-            ArrayValueName = (string)x.Attribute(Constants.ArrayValueName);
-            PropertyName = ArrayValueName;
         }
 
-        public override void Load(XElement values, IDictionary<string, string> overrides, XElement objectXml)
+        /// <summary>
+        /// load this one item from the Xml
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="values"></param>
+        /// <param name="overrides"></param>
+        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
         {
-            loadArray(objectXml, values );
+            _element = xml;
+
+            // array-specific attributes
+            ArrayValueName = (string)xml.Attribute(Constants.ArrayValueName);
+            Min = (Int32?)xml.Attribute(Constants.Min) ?? 0;
+            Max = (Int32?)xml.Attribute(Constants.Max) ?? Int32.MaxValue;
+
+            // load the items into a new group
+            var g = new TransformModelGroup();
+            g.LoadFromXml(xml, null, null); // loads name, desc, the items that are our prototype
+            PrototypeGroups.Clear();
+            PrototypeGroups.Add(g);
+            Children.Clear();
+
+            // copy prototype group attribute to this
+            DisplayName = g.DisplayName;
+            Description = g.Description;
+            Expanded = g.Expanded;
+
+            // load nested arrays (groups)
+            foreach (var x in xml.Elements(Constants.Group))
+            {
+                TransformModelGroup newOne = null;
+                if (x.Attribute(Constants.ArrayValueName) != null)
+                    newOne = new TransformModelArray();
+                else
+                    newOne = new TransformModelGroup();
+
+                newOne.LoadFromXml(x, null, null);
+                PrototypeGroups.Add(newOne);
+            }
+
+            makeKeyFormat(xml);
+
+            // overrides not used in arrays -- for now
+            loadArray(xml, values);
         }
 
         // load a group that is an array
-        private void loadArray(XElement objectXml, XElement values)
+        private void loadArray(XElement xml, XElement values)
         {
-            var newOne = new TransformModelItem() { Parent = this, DisplayName = DisplayName, Description = Description, Type = Constants.Array };
-            Children.Add(newOne);
-
-            // add a 0th one for a template for "New" ones
-            foreach (var y in objectXml.Elements().Where(n => n.Name == Constants.Item))
+            // find all the values 
+            foreach (var arrayItem in xml.Descendants(ArrayValueName))
             {
-                var i = new TransformModelItem(y, this);
-                newOne.Children.Add(i);
-            }
-            // nested arrays
-            foreach (var e in objectXml.Elements().Where(n => n.Name == Constants.Group))
-            {
-                var g = new TransformModelArray(e, Children[0]);
-                newOne.Children.Add(g);
-                g.loadArray( e, null);
-            }
+                var newOne = new TransformModelArrayItem();
+                // TODO { Parent = this, DisplayName = DisplayName, Description = Description, Type = Constants.Array };
 
-            setArrayValues(values, newOne);
+                newOne.LoadFromXml(_element, values, null);
 
-            // figure out what the "key" is to show as the list
-            makeKey(newOne, objectXml);
-        }
+                _items.Add(newOne);
 
-        protected void makeKey(TransformModelItem newOne, XElement objectXml)
-        {
-            string key = (string)objectXml.Attribute(Constants.Key);
-            var replacements = new List<string>();
-
-            if (key != null)
-            {
-                // scan for each child name starting with the largest
-                foreach (var c in newOne.Children.Select(o => o.PropertyName).OrderByDescending(o => o.Length))
+                // nested arrays
+                foreach (var e in xml.Elements().Where(n => n.Name == Constants.Group))
                 {
-                    if (key.Contains(c))
-                    {
-                        key = key.Replace(c, String.Format("{{{0}}}", replacements.Count));
-                        replacements.Add(c);
-                    }
+                    var g = new TransformModelArray();
+                    g.LoadFromXml(e, values, null);
+                    newOne.Groups.Add(g);
                 }
+
+                setArrayValues(values, newOne);
+
+                // figure out what the "key" is to show as the list
+                newOne.DisplayName = makeKey(newOne);
             }
-            else if (newOne.Children.Count > 0)
-            {
-                key = "{0}";
-                replacements.Add(newOne.Children.First().PropertyName);
-            }
+
         }
 
-
-        protected void setArrayValues( XElement values, TransformModelItem arrayItem)
+        protected void setArrayValues(XElement values, TransformModelArrayItem arrayItem)
         {
             // load the values from the values file, if it exists
             if (values != null)
@@ -102,42 +173,91 @@ namespace RazorTransform
                     var nextOne = new TransformModelItem() { Parent = this, DisplayName = arrayItem.DisplayName };
                     Children.Add(nextOne);
 
-                    foreach (var i in arrayItem.Children)
+                    foreach (var i in arrayItem.Items)
                     {
-                        var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
-                        if (!i.IsArray)
-                        {
-                            var v = childValues.SingleOrDefault();
-                            if (v != null)
-                            {
-                                nextOne.Children.Add(new TransformModelItem(i, v.Attribute(Constants.Value).Value));
-                            }
-                            else
-                            {
-                                nextOne.Children.Add(new TransformModelItem(i, i.Value));
-                            }
-                        }
-                        else
-                        {
-                            // array of items, get the array object off the arrayItem
-                            var arrayNextOne = (arrayItem.Children.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == i.PropertyName).SingleOrDefault()) as TransformModelArray;
-                            var nextArray = new TransformModelArray(arrayNextOne) { Parent = nextOne };
-                            nextOne.Children.Add(nextArray);
-                            nextArray.setArrayValues(mv, arrayNextOne.Children[0]);
-                        }
+                    //    var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
+                    //    if (!i.IsArray)
+                    //    {
+                    //        var v = childValues.SingleOrDefault();
+                    //        if (v != null)
+                    //        {
+                    //            nextOne.Children.Add(new TransformModelItem(i, v.Attribute(Constants.Value).Value));
+                    //        }
+                    //        else
+                    //        {
+                    //            nextOne.Children.Add(new TransformModelItem(i, i.Value));
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        // array of items, get the array object off the arrayItem
+                    //        var arrayNextOne = (arrayItem.Children.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == i.PropertyName).SingleOrDefault()) as TransformModelArray;
+                    //        var nextArray = new TransformModelArray(arrayNextOne) { Parent = nextOne };
+                    //        nextOne.Children.Add(nextArray);
+                    //        nextArray.setArrayValues(mv, arrayNextOne.Children[0]);
+                    //    }
                     }
                 }
             }
         }
 
-        public string ArrayValueName { get; set; }
-        public string Key { get; set; }
-
-        public List<string> KeyReplacements
+        /// <summary>
+        ///  make the display name for each array item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string makeKey(TransformModelArrayItem item)
         {
-            get { return _keyReplacements; }
-            set { _keyReplacements = value; }
+            var s = "<unknown>";
+
+            var values = new string[_keyReplacements.Count];
+            int j = 0;
+            foreach (var k in _keyReplacements)
+            {
+                // find it in the item's values
+                var i = item.Items.Where(o => o.PropertyName == k).SingleOrDefault();
+                if (i == null)
+                    return s;
+                else
+                    values[j++] = i.Value;
+            }
+            s = String.Format(Key, values);
+            
+            return s;
         }
-        
+
+        /// <summary>
+        /// read the Xml to figure out how to build the display name for each array item
+        /// </summary>
+        /// <param name="objectXml"></param>
+        protected void makeKeyFormat(XElement objectXml)
+        {
+            string key = (string)objectXml.Attribute(Constants.Key);
+            _keyReplacements.Clear();
+
+            if (PrototypeGroups.Count > 0)
+            {
+                if (key != null)
+                {
+                    // scan for each child name starting with the largest
+                    foreach (var c in PrototypeGroups.First().Children.Select(o => o.PropertyName).OrderByDescending(o => o.Length))
+                    {
+                        if (key.Contains(c))
+                        {
+                            key = key.Replace(c, String.Format("{{{0}}}", _keyReplacements.Count));
+                            _keyReplacements.Add(c);
+                        }
+                    }
+                }
+                else if (PrototypeGroups.First().Items.Count() > 0)
+                {
+                    key = "{0}";
+                    _keyReplacements.Add(PrototypeGroups.First().Items.First().PropertyName);
+                }
+            }
+        }
+
+
+
     }
 }

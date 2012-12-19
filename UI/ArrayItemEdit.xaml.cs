@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace RazorTransform
 {
@@ -28,28 +18,23 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( TransformModelItem orig )
+        public bool ShowDialog( IList<TransformModelGroup> orig )
         {
-            var temp = new TransformModelItem(orig);
+            var temp = new List<TransformModelGroup>(orig);
             Load(temp);
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (ShowDialog() ?? false)
             {
-                orig.CopyFrom(temp);
+                orig.CopyValueFrom(temp);
                 return true;
             }
             return false;
 
         }
 
-        public void Load(IEnumerable<TransformModelItem> info )
+        public void Load(IEnumerable<TransformModelGroup> info)
         {
             nvEdit.Load(info);
-        }
-
-        public void Load(TransformModelItem parent)
-        {
-            nvEdit.Load(parent);
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
