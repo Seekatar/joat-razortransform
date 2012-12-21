@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Web;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace RazorTransform
 {
@@ -251,7 +248,15 @@ namespace RazorTransform
             var doc = XDocument.Parse("<RtValues/>");
             var root = doc.Root;
 
-            foreach (var g in Groups)
+            saveGroups(root, Groups);
+
+            doc.Save(_valueFileName);
+            return File.ReadAllText(_valueFileName);
+        }
+
+        private void saveGroups(XElement root, List<TransformModelGroup> groups)
+        {
+            foreach (var g in groups)
             {
                 foreach (var item in g.Items)
                 {
@@ -259,26 +264,16 @@ namespace RazorTransform
                         saveItem(root, item);
                 }
             }
-
-            doc.Save(_valueFileName);
-            return File.ReadAllText(_valueFileName);
         }
 
-        protected static void saveItem(XElement root, TransformModelItem item)
+        protected void saveItem(XElement root, TransformModelItem item)
         {
             if (item is TransformModelArrayItem)
             {
-                // TODO
-                //foreach (var child in item.Children.Skip(1))
-                //{
-                //    var x = new XElement(Constants.Value, new XAttribute(Constants.Name, (item as TransformModelArray).ArrayValueName));
-
-                //    root.Add(x);
-                //    foreach (var arrayChild in child.Children)
-                //    {
-                //        saveItem(x, arrayChild);
-                //    }
-                //}
+                var arrayItem = item as TransformModelArrayItem;
+                var x = new XElement(Constants.Value, new XAttribute(Constants.Name, arrayItem.ArrayParent.ArrayValueName));
+                root.Add(x);
+                saveGroups(x, arrayItem.Groups);
             }
             else
             {

@@ -13,8 +13,9 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <Button x:Name="btnDel" DockPanel.Dock="Right" Width="30"  ToolTip="Delete the item from the list" Click="btnDel_Click">Del</Button>
-        <Button x:Name="btnEdit" DockPanel.Dock="Right" Width="30"  ToolTip="Edit the item" Margin="0,0,2,0" Click="btnEdit_Click">Edit</Button>
+        <Button x:Name="btnCopy" DockPanel.Dock="Right" Padding="2" ToolTip="Copy the item" Click="btnCopy_Click">Copy</Button>
+        <Button x:Name="btnDel" DockPanel.Dock="Right" Padding="2" ToolTip="Delete the item from the list" Click="btnDel_Click">Del</Button>
+        <Button x:Name="btnEdit" DockPanel.Dock="Right" Padding="2" ToolTip="Edit the item" Margin="0,0,2,0" Click="btnEdit_Click">Edit</Button>
         <TextBox x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=btnEdit}" Text="{Binding ItemName, ElementName=root}" Margin="0,0,2,0" IsReadOnly="True" />
     </DockPanel>
 </UserControl>

@@ -33,6 +33,12 @@ namespace RazorTransform
             remove { RemoveHandler(DelClickedEvent, value); }
         }
 
+        public event RoutedEventHandler CopyClicked
+        {
+            add { AddHandler(CopyClickedEvent, value); }
+            remove { RemoveHandler(CopyClickedEvent, value); }
+        }
+
         public static readonly DependencyProperty ItemNameProperty =
            DependencyProperty.Register("ItemName", typeof(string), typeof(EditItemBox));
 
@@ -42,6 +48,10 @@ namespace RazorTransform
 
         public static readonly RoutedEvent DelClickedEvent =
             EventManager.RegisterRoutedEvent("DelClicked",
+            RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(EditItemBox));
+
+        public static readonly RoutedEvent CopyClickedEvent =
+            EventManager.RegisterRoutedEvent("CopyClicked",
             RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(EditItemBox));
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
@@ -55,6 +65,13 @@ namespace RazorTransform
         {
             e.Handled = true;
             RoutedEventArgs args = new RoutedEventArgs(DelClickedEvent);
+            RaiseEvent(args);
+        }
+
+        private void btnCopy_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            RoutedEventArgs args = new RoutedEventArgs(CopyClickedEvent);
             RaiseEvent(args);
         }
 

@@ -11,6 +11,11 @@ namespace RazorTransform
 {
     public static class LayoutManager
     {
+        /// <summary>
+        /// build a grid view for a group of simple items
+        /// </summary>
+        /// <param name="group"></param>
+        /// <returns></returns>
         public static FrameworkElement BuildGridView(TransformModelGroup group)
         {
             var items = group.Items;
@@ -88,11 +93,19 @@ namespace RazorTransform
 
         }
 
-        // add an array type
+        /// <summary>
+        /// build a grid view for an array of items
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="addHandler"></param>
+        /// <param name="editHandler"></param>
+        /// <param name="deleteHandler"></param>
+        /// <returns></returns>
         public static FrameworkElement BuildGridView(TransformModelArray parent,
             Action<object, RoutedEventArgs> addHandler,
             Action<object, RoutedEventArgs> editHandler,
-            Action<object, RoutedEventArgs> deleteHandler)
+            Action<object, RoutedEventArgs> deleteHandler,
+            Action<object, RoutedEventArgs> copyHandler)
         {
             var items = parent.Items;
 
@@ -110,8 +123,8 @@ namespace RazorTransform
             });
 
             // add a New button under the expander
-            var add = new Button() { Content = "New", HorizontalAlignment = System.Windows.HorizontalAlignment.Right, Tag = parent.Prototype };
-            add.ToolTip = "Add a new item";
+            var add = new Button() { Content = "New "+parent.DisplayName, HorizontalAlignment = System.Windows.HorizontalAlignment.Right, Tag = parent.CreatePrototype };
+            add.ToolTip = "Add a new item of type "+parent.DisplayName;
             add.HorizontalAlignment = HorizontalAlignment.Left;
             add.Click += (sender, args) =>
                 {
@@ -149,6 +162,10 @@ namespace RazorTransform
                 {
                     deleteHandler(sender, args);
                 };
+                t.CopyClicked += (sender, args) =>
+                {
+                    copyHandler(sender, args);
+                };
                 t.Loaded += (s, e) =>
                 {
                     var cc = s as Control;
@@ -170,7 +187,6 @@ namespace RazorTransform
 
                 t.Tag = c;
                 t.ItemName = c.DisplayName;
-                t.ToolTip = ""; // TODO
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
 

@@ -27,6 +27,7 @@ namespace RazorTransform
         {
             _groups = groups;
 
+            var selectedIndex = _tabCtrl.SelectedIndex;
             _tabCtrl.Items.Clear();
 
             int i = 0;
@@ -42,7 +43,7 @@ namespace RazorTransform
 
                 if (group is TransformModelArray)
                 {
-                    lastExpanderStack.Children.Add( LayoutManager.BuildGridView(group as TransformModelArray, add_Click, edit_Click, del_Click));
+                    lastExpanderStack.Children.Add( LayoutManager.BuildGridView(group as TransformModelArray, add_Click, edit_Click, del_Click, copy_Click));
                 }
                 else
                 {
@@ -51,6 +52,7 @@ namespace RazorTransform
                     i++;
                 }
             }
+            _tabCtrl.SelectedIndex = selectedIndex;
         }
 
         private TabItem createTab(TransformModelGroup group)
@@ -66,17 +68,59 @@ namespace RazorTransform
             return tab;
         }
 
+        #region Array Button Click handlers
+
+        /// <summary>
+        /// delete an item from an array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void del_Click(object sender, RoutedEventArgs e)
         {
             // find it in the list
-            var delMe = (sender as Control).Tag as TransformModelItem;
+            var delMe = (sender as Control).Tag as TransformModelArrayItem;
             if (delMe != null)
             {
                 delMe.Parent.Children.Remove(delMe);
-                ReLoad();
+                Reload();
             }
         }
 
+        /// <summary>
+        /// copy an item in an array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void copy_Click(object sender, RoutedEventArgs e)
+        {
+            // find it in the list
+            var copyMe = (sender as Control).Tag as TransformModelArrayItem;
+            if (copyMe != null)
+            {
+                var copy = new TransformModelArrayItem(copyMe);
+                copy.ArrayParent.ArrayItems.Add(copy);
+                copy.MakeKey();
+                Reload();
+            }
+        }
+
+        /// <summary>
+        /// edit an item in an array
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void edit_Click(object sender, RoutedEventArgs e)
+        {
+            var existingOne = (sender as Control).Tag as TransformModelArrayItem;
+            if (editArrayItem(existingOne.Groups))
+            {
+                existingOne.MakeKey();
+                Reload();
+            }
+        }
+
+        #endregion        
+        
         /// <summary>
         /// edit an array, copying it during the edit in case of cancel
         /// </summary>
@@ -88,13 +132,7 @@ namespace RazorTransform
             return nve.ShowDialog(orig);
         }
 
-        void edit_Click(object sender, RoutedEventArgs e)
-        {
-            if ( editArrayItem((sender as Control).Tag as IList<TransformModelGroup>) )
-                ReLoad();
-        }
-
-        private void ReLoad()
+        private void Reload()
         {
             Load(_groups);
         }
@@ -109,7 +147,7 @@ namespace RazorTransform
                 // add it to the parent array
                 parent.ArrayParent.ArrayItems.Add(newOne);
                 newOne.MakeKey();
-                ReLoad();
+                Reload();
             }
         }
     }

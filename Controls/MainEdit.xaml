@@ -21,12 +21,13 @@
         </Grid.RowDefinitions>
         <local:NameValueEdit Grid.Row="0" x:Name="editControl" />
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0">
-            <Button Content="Settings" x:Name="settingBtn" Click="settingBtn_Click"/>
+            <Button Content="Settings" x:Name="btnSettings" Click="btnSettings_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
             <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch"></Label>
             <Button Content="_Go! &amp; Close" HorizontalAlignment="Left" Margin="5" Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click" IsDefault="True" ToolTip="Run the transforms and if ok, exit."/>
             <Button Content="G_o!" HorizontalAlignment="Left" Margin="5" Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms."/>
+            <Button Content="_Save" HorizontalAlignment="Left" Margin="5" Name="btnSave" VerticalAlignment="Top" ToolTip="Save the current values." Click="btnSave_Click"/>
             <Button Content="_Close" HorizontalAlignment="Right" Margin="5" Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" />
         </StackPanel>
     </Grid>

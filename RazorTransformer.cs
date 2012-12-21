@@ -66,20 +66,12 @@ namespace RazorTransform
             {
                 try
                 {
-                    var d = _model.GetProperties(!_settings.Test, true, _settings.OutputFolder);
-
                     // save right away in case it errors out
-                    if (!_settings.Test && !_settings.NoSave)
-                    {
-                        var body  = _model.Save(_settings.ValuesFile);
-                        if (OnValuesSave != null)
-                        {
-                            OnValuesSave(this, body);
-                        }
-                      
-                    }
+                    Save();
 
-                    RazorFileTransformer rf = new RazorFileTransformer(d);
+                    var modelObject = _model.GetProperties(!_settings.Test, true, _settings.OutputFolder);
+
+                    RazorFileTransformer rf = new RazorFileTransformer(modelObject);
                     _cts = new CancellationTokenSource();
 
                     Stopwatch sw = new Stopwatch();
@@ -111,6 +103,23 @@ namespace RazorTransform
 
             }
             return ret;
+        }
+
+        /// <summary>
+        /// build the model from the values and save it to the file
+        /// </summary>
+        /// <returns></returns>
+        internal void Save()
+        {
+            if (!_settings.Test && !_settings.NoSave)
+            {
+                var body = _model.Save(_settings.ValuesFile);
+                if (OnValuesSave != null)
+                {
+                    OnValuesSave(this, body);
+                }
+
+            }
         }
 
         /// <summary>

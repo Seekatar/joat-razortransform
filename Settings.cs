@@ -24,7 +24,7 @@ namespace RazorTransform
         // object definition for settings is really static since code relies on it
         static string _settingsXml =
 @"<RtObject>
-  <group name=""Settings"" description=""Settings that control how Artie works."" arrayValueName=""_settings"" hidden=""True"">
+  <group name=""Settings"" description=""Settings that control how Artie works."" arrayValueName=""_settings"" hidden=""False"">
     <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + RtType.String + @""" defaultValue=""RazorTransform""/>
     <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + RtType.Folder + @""" defaultValue=""..""/>
     <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + RtType.Folder + @""" defaultValue=""Templates""/>

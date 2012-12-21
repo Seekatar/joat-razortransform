@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RtObject>
-  <group name="Tab A" expanded="true" description="A few strings" hidden="false">
+  <group name="Strings" expanded="true" description="A few strings" hidden="false">
     <item name="stringA1" type="String" description="String with a size range of 10-20" defaultValue="defaultValue" displayName="String #1" min="10" max="20"/>
     <item name="stringA2" type="String" description="String with min size of 10." defaultValue="default" displayName="String #2" min="10" />
     <item name="stringA3" type="String" description="String with max size of 10." defaultValue="default" displayName="String #3" max="10" /> />
   </group>
-  <!--
-  <group name="Tab B" expanded="false" description="A few booleans">
+  
+  <group name="Bools" expanded="false" description="A few booleans">
     <item name="boolA1" displayName="Boolean #1" type="Bool" description="This is a boolean value defaulting to False." defaultValue="False" />
     <item name="boolA2" displayName="Boolean #2" type="Bool" description="This is a boolean value defaulting to True." defaultValue="True" />
   </group>
-  <group name="Tab C" expanded="false" description="Some integers">
-    <item name="intA1" type="Int32" description="Int32 with a range of 10-20" defaultValue="defaultValue" displayName="Int32 #1" min="10" max="20"/>
-    <item name="intA2" type="Int32" description="Int32 with min of 10." defaultValue="default" displayName="Int32 #2" min="10" />
-    <item name="intA3" type="Int32" description="Int32 with max of 10." defaultValue="default" displayName="Int32 #3" max="10" /> />
+  <group name="Ints" expanded="false" description="Some integers">
+    <item name="intA1" type="Int32" description="Int32 with a range of 10-20" defaultValue="1" displayName="Int32 #1" min="10" max="20"/>
+    <item name="intA2" type="Int32" description="Int32 with min of 10." defaultValue="2" displayName="Int32 #2" min="10" />
+    <item name="intA3" type="Int32" description="Int32 with max of 10." defaultValue="3" displayName="Int32 #3" max="10" /> />
   </group>
-  <group name="Tab D" description="Enumerations are fun!">
+  <group name="Enums" description="Enumerations are fun!">
     <item name="enumD1" type="EnumA" description="EnumA description" defaultValue="enumKeyA" displayName="Enumeration A"/>
     <item name="enumD2" type="EnumB" description="EnumB description" defaultValue="enumKeyZ" displayName="Enumeration B" />
     <item name="enumD3" type="EnumC" description="EnumC description" defaultValue="" displayName="Enumeration C" /> />
-  </group>-->
-  <group name="Array Tab B" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3">
-    <item displayName="Name" name="name" type="string" description="Name of tenant, no spaces" />
-    <item displayName="Description" name="description" type="string" description="description of tenant" />
+  </group>
+  <group name="Grouped" description="Array of itemB objects with min number of 3." arrayValueName="itemB" min="3" key="-&gt;description name//">
+    <item displayName="Name" name="name" type="string" description="Name, no spaces" />
+    <item displayName="Description" name="description" type="string" description="description" />
     
     <group name="Nested Tab" description="this is another group">
       <item name="enumD1" type="EnumA" description="EnumA description" defaultValue="enumKeyA" displayName="Enumeration A"/>
@@ -30,17 +30,28 @@
     </group>
   </group>
 
-  <!--<group name="Array Tab A" description="Array of itemA objects nested with ItemBs with min number of 0." arrayValueName="itemA" min="0">
+  <group name="Simple Array" description="Array of itemAS objects with a group." arrayValueName="itemAS" min="0">
+    <group name="Basic" description="this is the basic stuff">
+      <item displayName="Name for A" name="nameA" type="string" description="Name, no spaces" />
+      <item displayName="Description for A" name="descriptionA" type="string" description="description" />
+    </group>
+    <group name="Other" description="this is other stuff">
+      <item displayName="String" name="stringInA" type="string" description="Name, no spaces" />
+      <item displayName="Int" name="intInA" type="Int32" description="an integer" />
+    </group>
+  </group>
+
+  <group name="Nested Array" description="Array of itemA objects nested with ItemBs with min number of 0." arrayValueName="itemA" min="0">
     <group name="A">
-    <item displayName="Name for A" name="nameA" type="string" description="Name of tenant, no spaces" />
-    <item displayName="Description for A" name="descriptionA" type="string" description="description of tenant" />
+      <item displayName="Name for A" name="nameA" type="string" description="Name, no spaces" />
+      <item displayName="Description for A" name="descriptionA" type="string" description="description" />
     </group>
     <group name="ItemB Array" description="Array of itemB objects with min number of 3." arrayValueName="itemAB" min="0" key="nameB nameB2 nameB">
-      <item displayName="Name for B" name="nameB" type="string" description="Name of tenant, no spaces" />
-      <item displayName="Name part 2 for B" name="nameB2" type="string" description="Name of tenant, no spaces" />
-      <item displayName="Description for B" name="descriptionB" type="string" description="description of tenant" />
+      <item displayName="Name for B" name="nameB" type="string" description="Name, no spaces" />
+      <item displayName="Name part 2 for B" name="nameB2" type="string" description="Name, no spaces" />
+      <item displayName="Description for B" name="descriptionB" type="string" description="description" />
     </group>
-  </group>-->
+  </group>
 
   <enum name="EnumA">
     <value key="enumKeyA" value="Enum A" />

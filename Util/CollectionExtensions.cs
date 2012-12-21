@@ -112,8 +112,8 @@ namespace RazorTransform
                 groupTo.Clear();
                 foreach (var g in groupFrom)
                 {
-                    TransformModelGroup newOne = (TransformModelGroup)Activator.CreateInstance(g.GetType() );
-                    newOne.CopyFrom(g);
+                    TransformModelGroup newOne = (TransformModelGroup)Activator.CreateInstance(g.GetType(), g );
+                    //newOne.CopyFrom(g);
                     groupTo.Add(newOne);
                 }
             }

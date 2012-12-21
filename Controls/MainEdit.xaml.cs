@@ -32,11 +32,9 @@ namespace RazorTransform
             InitializeComponent();
         }
 
-        internal void Load(List<TransformModelGroup> list)
-        {
-            editControl.Load(list);
-        }
-
+        /// <summary>
+        /// have we run a tranform successfully
+        /// </summary>
         public bool RanTransformOk { get; set; }
 
         /// <summary>
@@ -48,6 +46,15 @@ namespace RazorTransform
             {
                 return _transformer.Model.TitleSuffix;
             }
+        }
+
+        /// <summary>
+        /// load all the data from the model
+        /// </summary>
+        /// <param name="list"></param>
+        internal void Load(List<TransformModelGroup> list)
+        {
+            editControl.Load(list);
         }
 
         public void Initalize(ITransformParentWindow parent, IDictionary<string, object> parms, IDictionary<string, string> overrides, bool embedded = false)
@@ -91,13 +98,21 @@ namespace RazorTransform
             return transformResult.TranformResult;
         }
 
+        /// <summary>
+        /// monkey with the visibility and enabled states of the buttons
+        /// depending on what's going on
+        /// </summary>
+        /// <param name="currentState"></param>
         private void setButtonStates(ProcessingState currentState)
         {
+            if (_transformer.Settings.NoSave || _transformer.Settings.Test)
+                btnSave.Visibility = System.Windows.Visibility.Collapsed;
+
             _currentState = currentState;
             switch (currentState)
             {
                 case ProcessingState.transforming:
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = false;
+                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = false;
                     btnCancel.IsEnabled = true;
 
                     btnCancel.Content = Resource.Cancel;
@@ -106,7 +121,7 @@ namespace RazorTransform
                     // set buttons, control visibility
                     editControl.Visibility = System.Windows.Visibility.Collapsed;
 
-                    settingBtn.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Hidden;
+                    btnSave.Visibility = btnSettings.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Hidden;
                     btnCancel.Content = Resource.Cancel;
                     break;
                 case ProcessingState.shellExecuted:
@@ -115,17 +130,17 @@ namespace RazorTransform
                     break;
                 case ProcessingState.transformed:
                 case ProcessingState.idle:
-                    btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = settingBtn.IsEnabled = true;
+                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = true;
 
                     if (_embedded)
                     {
-                        btnOkAndClose.Visibility = settingBtn.Visibility = System.Windows.Visibility.Hidden;
+                        btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Hidden;
                         btnCancel.Content = Resource.Cancel;
                         btnCancel.IsEnabled = false;
                     }
                     else
                     {
-                        btnOkAndClose.Visibility = settingBtn.Visibility = System.Windows.Visibility.Visible;
+                        btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Visible;
                         btnCancel.Content = Resource.Close;
                         btnCancel.IsEnabled = true;
                     }
@@ -138,6 +153,11 @@ namespace RazorTransform
             }
         }
 
+        /// <summary>
+        /// cancel a running transform
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             if (!_transformer.Cancel())
@@ -151,18 +171,33 @@ namespace RazorTransform
         }
 
 
+        /// <summary>
+        /// run the transform
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void btnOk_Click(object sender, RoutedEventArgs e)
         {
             await doTransforms(true);
         }
 
+        /// <summary>
+        /// run the transform and close (if ok)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void btnOkAndClose_Click(object sender, RoutedEventArgs e)
         {
             if ( await doTransforms(false) == ProcessingResult.ok )
                 _parent.ProcessingComplete(ProcessingResult.ok);
         }
 
-        private void settingBtn_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// show the settings edit dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSettings_Click(object sender, RoutedEventArgs e)
         {
             var aie = new ArrayItemEdit();
             aie.ShowDialog(_transformer.Settings.ConfigInfo);
@@ -184,9 +219,23 @@ namespace RazorTransform
             }
         }
 
+        /// <summary>
+        /// show a status message
+        /// </summary>
+        /// <param name="value"></param>
         internal void Report(string value)
         {
             lblProgress.Content = "Processing " + value;
+        }
+
+        /// <summary>
+        /// just save the current model out to the values file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            _transformer.Save();
         }
     }
 }

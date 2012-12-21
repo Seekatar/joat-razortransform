@@ -40,7 +40,16 @@ namespace RazorTransform
         /// <param name=Constants.Value></param>
         public TransformModelItem(TransformModelItem src, string value)
         {
-            CopyFrom(src, value);
+            Value = value ?? src.Value;
+            DisplayName = src.DisplayName;
+            PropertyName = src.PropertyName;
+            Description = src.Description;
+            Type = src.Type;
+            Parent = src.Parent;
+            Min = src.Min;
+            Max = src.Max;
+            EnumName = src.EnumName;
+            Hidden = src.Hidden;
         }
 
         /// <summary>
@@ -56,25 +65,6 @@ namespace RazorTransform
         /// default constructor
         /// </summary>
         public TransformModelItem() { }
-
-        /// <summary>
-        /// copy everything from another
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="value"></param>
-        public void CopyFrom(TransformModelItem src, string value = null)
-        {
-            Value = value ?? src.Value;
-            DisplayName = src.DisplayName;
-            PropertyName = src.PropertyName;
-            Description = src.Description;
-            Type = src.Type;
-            Parent = src.Parent;
-            Min = src.Min;
-            Max = src.Max;
-            EnumName = src.EnumName;
-            Hidden = src.Hidden;
-        }
 
         /// <summary>
         /// name to show in the UI
