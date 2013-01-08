@@ -148,7 +148,7 @@ namespace RazorTransform
                 else
                     newOne = new TransformModelGroup();
 
-                newOne.LoadFromXml(x, values, overrides, String.Join("/", valuesXPath, String.Format( "value[@name=\"{0}\"]",ArrayValueName )));
+                newOne.LoadFromXml(x, null, null );  // values, overrides, String.Join("/", valuesXPath, String.Format( "value[@name=\"{0}\"]",ArrayValueName )));
                 PrototypeGroups.Add(newOne);
             }
 
@@ -164,33 +164,53 @@ namespace RazorTransform
             if (values != null)
             {
                 // search for nested value is something like /RtValues/value[@name="itemA"]/value[@name="itemAB"]
-                var myValues = values.XPathSelectElements(String.Join("/", valuesXPath, String.Format("value[@name=\"{0}\"]", ArrayValueName))); // Elements(Constants.Value).Where(o => o.Attribute(Constants.Name).Value == ArrayValueName);
+                valuesXPath = String.Format("./value[@name=\"{0}\"]", ArrayValueName); // String.Join("/", valuesXPath, String.Format("value[@name=\"{0}\"]", ArrayValueName));
+                var myValues = values.XPathSelectElements(valuesXPath); // Elements(Constants.Value).Where(o => o.Attribute(Constants.Name).Value == ArrayValueName);
                 foreach (var mv in myValues)
                 {
                     var nextOne = new TransformModelArrayItem(CreatePrototype);
                     ArrayItems.Add(nextOne);
-
-                    foreach (var i in nextOne.Items)
+                    foreach (var g in nextOne.Groups)
                     {
-                        var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
-
-                        //if (!i.IsArray)
-                        //{
-                        var v = childValues.SingleOrDefault();
-                        if (v != null)
+                        if (g is TransformModelArray)
                         {
-                            i.Value = v.Attribute(Constants.Value).Value;
+                            (g as TransformModelArray).setArrayValues(mv, valuesXPath);
                         }
-                        //}
-                        //else
-                        //{
-                        //    // array of items, get the array object off the arrayItem
-                        //    var arrayNextOne = (Children.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == i.PropertyName).SingleOrDefault()) as TransformModelArray;
-                        //    var nextArray = new TransformModelArray(arrayNextOne) { Parent = nextOne };
-                        //    nextOne.Children.Add(nextArray);
-                        //    nextArray.setArrayValues(mv, arrayNextOne.Children[0]);
-                        //}
+                        else if (g is TransformModelGroup)
+                        {
+                            foreach (var i in nextOne.Items)
+                            {
+                                var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
+
+                                var v = childValues.SingleOrDefault();
+                                if (v != null)
+                                {
+                                    i.Value = v.Attribute(Constants.Value).Value;
+                                }
+                            }
+                        }
                     }
+                    //foreach (var i in nextOne.Items)
+                    //{
+                    //    var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
+
+                    //    //if (!i.IsArray)
+                    //    //{
+                    //    var v = childValues.SingleOrDefault();
+                    //    if (v != null)
+                    //    {
+                    //        i.Value = v.Attribute(Constants.Value).Value;
+                    //    }
+                    //    //}
+                    //    //else
+                    //    //{
+                    //    //    // array of items, get the array object off the arrayItem
+                    //    //    var arrayNextOne = (Children.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == i.PropertyName).SingleOrDefault()) as TransformModelArray;
+                    //    //    var nextArray = new TransformModelArray(arrayNextOne) { Parent = nextOne };
+                    //    //    nextOne.Children.Add(nextArray);
+                    //    //    nextArray.setArrayValues(mv, arrayNextOne.Children[0]);
+                    //    //}
+                    //}
                     nextOne.MakeKey();
                 }
             }
