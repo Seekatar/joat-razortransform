@@ -123,7 +123,13 @@ namespace RazorTransform
             });
 
             // add a New button under the expander
-            var add = new Button() { Content = "New "+parent.DisplayName, HorizontalAlignment = System.Windows.HorizontalAlignment.Right, Tag = parent.CreatePrototype };
+            var add = new Button()
+                { 
+                    Content = String.Format( Resource.NewItem, parent.DisplayName ), 
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
+                    Tag = parent.CreatePrototype,
+                    Style = Application.Current.Resources["ArrayNewButton"] as Style
+                };
             add.ToolTip = "Add a new item of type "+parent.DisplayName;
             add.HorizontalAlignment = HorizontalAlignment.Left;
             add.Click += (sender, args) =>
@@ -140,7 +146,7 @@ namespace RazorTransform
             bool nameSet = false;
             foreach (var c in items)
             {
-                var l = new Label() { Tag = c };
+                var l = new Label() { Tag = c };    
                 if (!nameSet)
                 {
                     nameSet = true;
@@ -153,7 +159,7 @@ namespace RazorTransform
                 l.Style = Application.Current.Resources["CfgLabel"] as Style;
 
 
-                var t = new EditItemBox(parent.Children.Count - 1 > parent.Min);
+                var t = new EditItemBox(parent.ArrayItems.Count > parent.Min);
                 t.EditClicked += (sender, args) =>
                 {
                     editHandler(sender, args);

@@ -106,7 +106,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Destination folder must exist..
+        ///   Looks up a localized string similar to Destination folder must exist. {0}.
         /// </summary>
         internal static string DestMustExist {
             get {
@@ -209,6 +209,15 @@ namespace RazorTransform {
         internal static string MinStrLen {
             get {
                 return ResourceManager.GetString("MinStrLen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        internal static string NewItem {
+            get {
+                return ResourceManager.GetString("NewItem", resourceCulture);
             }
         }
         

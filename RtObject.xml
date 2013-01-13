@@ -11,7 +11,7 @@
     <item name="boolA2" displayName="Boolean #2" type="Bool" description="This is a boolean value defaulting to True." defaultValue="True" />
   </group>
   <group name="Ints" expanded="false" description="Some integers">
-    <item name="intA1" type="Int32" description="Int32 with a range of 10-20" defaultValue="1" displayName="Int32 #1" min="10" max="20"/>
+    <item name="intA1" type="Int32" description="Int32 with a range of 10-20" defaultValue="1" dispblayName="Int32 #1" min="10" max="20"/>
     <item name="intA2" type="Int32" description="Int32 with min of 10." defaultValue="2" displayName="Int32 #2" min="10" />
     <item name="intA3" type="Int32" description="Int32 with max of 10." defaultValue="3" displayName="Int32 #3" max="10" /> />
   </group>
@@ -30,7 +30,7 @@
     </group>
   </group>
 
-  <group name="Simple Array" description="Array of itemAS objects with a group." arrayValueName="itemAS" min="0">
+  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2" arrayValueName="itemAS" min="2">
     <group name="Basic" description="this is the basic stuff">
       <item displayName="Name for A" name="nameA" type="string" description="Name, no spaces" />
       <item displayName="Description for A" name="descriptionA" type="string" description="description" />
@@ -50,6 +50,10 @@
       <item displayName="Name for B" name="nameB" type="string" description="Name, no spaces" />
       <item displayName="Name part 2 for B" name="nameB2" type="string" description="Name, no spaces" />
       <item displayName="Description for B" name="descriptionB" type="string" description="description" />
+      <group name="ItemC Array" description="Array of itemC objects." arrayValueName="itemAB" min="0" key="nameC">
+        <item displayName="Name for B" name="nameC" type="string" description="Name, no spaces" />
+        <item displayName="Name part 2 for B" name="descC" type="Int32" description="Name, no spaces" />
+      </group>
     </group>
   </group>
 

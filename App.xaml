@@ -9,15 +9,28 @@
         <Style x:Key="CfgLabel">
             <Setter Property="Control.FontSize" Value="12"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
+            <Setter Property="Control.FontStyle" Value="Italic"/>
         </Style>
         <Style x:Key="CfgText">
             <Setter Property="Control.FontSize" Value="12"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
+            <Setter Property="Control.Margin" Value="2"/>
         </Style>
         <Style x:Key="CfgButton">
             <Setter Property="Control.FontSize" Value="12"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
             <Setter Property="Control.Margin" Value="5"/>
+        </Style>
+        <Style x:Key="ArrayButton">
+            <Setter Property="Control.FontSize" Value="12"/>
+            <Setter Property="Control.FontWeight" Value="Normal"/>
+            <Setter Property="Control.Margin" Value="2"/>
+        </Style>
+        <Style x:Key="ArrayNewButton">
+            <Setter Property="Control.FontSize" Value="12"/>
+            <Setter Property="Control.FontWeight" Value="Bold"/>
+            <Setter Property="Control.Margin" Value="2"/>
+            <Setter Property="Control.Padding" Value="3"/>
         </Style>
     </Application.Resources>
 </Application>

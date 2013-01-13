@@ -184,6 +184,9 @@ Command line options are:
   <data name="MinStrLen" xml:space="preserve">
     <value>{0} must have at least {1} characters long</value>
   </data>
+  <data name="NewItem" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="NoSave" xml:space="preserve">
     <value>NoSave option specified that prevented saving values.</value>
   </data>

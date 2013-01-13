@@ -116,7 +116,7 @@ namespace RazorTransform
         /// <param name="xml"></param>
         /// <param name="values"></param>
         /// <param name="overrides"></param>
-        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, string valuesXPath = "/RtValues")
+        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
         {
             _element = xml;
 
@@ -148,24 +148,24 @@ namespace RazorTransform
                 else
                     newOne = new TransformModelGroup();
 
-                newOne.LoadFromXml(x, null, null );  // values, overrides, String.Join("/", valuesXPath, String.Format( "value[@name=\"{0}\"]",ArrayValueName )));
+                newOne.LoadFromXml(x, null, null ); 
                 PrototypeGroups.Add(newOne);
             }
 
             makeKeyFormat(xml);
 
             // overrides not used in arrays -- for now
-            setArrayValues(values, valuesXPath);
+            setArrayValues(values);
         }
 
-        protected void setArrayValues(XElement values, string valuesXPath)
+        protected void setArrayValues(XElement values)
         {
             // load the values from the values file, if it exists
             if (values != null)
             {
-                // search for nested value is something like /RtValues/value[@name="itemA"]/value[@name="itemAB"]
-                valuesXPath = String.Format("./value[@name=\"{0}\"]", ArrayValueName); // String.Join("/", valuesXPath, String.Format("value[@name=\"{0}\"]", ArrayValueName));
-                var myValues = values.XPathSelectElements(valuesXPath); // Elements(Constants.Value).Where(o => o.Attribute(Constants.Name).Value == ArrayValueName);
+                // search for nested value is something like ./value[@name="itemA"]
+                string valuesXPath = String.Format("./value[@name=\"{0}\"]", ArrayValueName);
+                var myValues = values.XPathSelectElements(valuesXPath); 
                 foreach (var mv in myValues)
                 {
                     var nextOne = new TransformModelArrayItem(CreatePrototype);
@@ -174,7 +174,7 @@ namespace RazorTransform
                     {
                         if (g is TransformModelArray)
                         {
-                            (g as TransformModelArray).setArrayValues(mv, valuesXPath);
+                            (g as TransformModelArray).setArrayValues(mv);
                         }
                         else if (g is TransformModelGroup)
                         {
@@ -190,27 +190,6 @@ namespace RazorTransform
                             }
                         }
                     }
-                    //foreach (var i in nextOne.Items)
-                    //{
-                    //    var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
-
-                    //    //if (!i.IsArray)
-                    //    //{
-                    //    var v = childValues.SingleOrDefault();
-                    //    if (v != null)
-                    //    {
-                    //        i.Value = v.Attribute(Constants.Value).Value;
-                    //    }
-                    //    //}
-                    //    //else
-                    //    //{
-                    //    //    // array of items, get the array object off the arrayItem
-                    //    //    var arrayNextOne = (Children.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == i.PropertyName).SingleOrDefault()) as TransformModelArray;
-                    //    //    var nextArray = new TransformModelArray(arrayNextOne) { Parent = nextOne };
-                    //    //    nextOne.Children.Add(nextArray);
-                    //    //    nextArray.setArrayValues(mv, arrayNextOne.Children[0]);
-                    //    //}
-                    //}
                     nextOne.MakeKey();
                 }
             }
