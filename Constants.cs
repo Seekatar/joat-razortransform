@@ -20,7 +20,8 @@ namespace RazorTransform
         Array,
         HiddenString, 
         Guid,
-        Enum
+        Enum,
+        Custom
     }
 
     /// <summary>
@@ -46,17 +47,29 @@ namespace RazorTransform
         internal const string Expanded = "expanded";
         internal const string Hidden = "hidden";
         internal const string Arguments = "arguments";
+        internal const string Class = "class";
+        internal const string Custom = "custom";
+        internal const string Parameter = "parameter";
 
         /// <summary>
-        /// extract the type from an XElement
+        /// extract the type from a XElement
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
         public static RtType GetType(XElement x)
         {
             var s = (String)x.Attribute(Constants.Type) ?? String.Empty;
+            return GetType(s);
+        }
 
-            switch (s.ToLower())
+        /// <summary>
+        /// map the type name to an RtType
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static RtType GetType(string typeName)
+        {
+            switch (typeName.ToLower())
             {
                 case "string":
                     return RtType.String;
@@ -77,7 +90,12 @@ namespace RazorTransform
                 case "hidden":
                     return RtType.HiddenString;
                 default:
-                    return TransformModel.Enums.ContainsKey(s) ? RtType.Enum : RtType.Invalid;
+                    if (TransformModel.Enums.ContainsKey(typeName))
+                        return RtType.Enum;
+                    else if (TransformModel.Customs.ContainsKey(typeName))
+                        return RtType.Custom;
+                    else
+                        return RtType.Invalid;
             }
         }
 

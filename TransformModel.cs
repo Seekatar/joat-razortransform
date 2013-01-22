@@ -18,7 +18,12 @@ namespace RazorTransform
         /// <summary>
         /// all the enums loaded from the Xml
         /// </summary>
-        static IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
+        private static IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
+
+        /// <summary>
+        /// all the custom items loaded from the Xml
+        /// </summary>
+        private static IDictionary<string, Custom.ICustomRazorTransformType> _customs = new Dictionary<string, Custom.ICustomRazorTransformType>();
 
         /// <summary>
         /// settings object of the current run to allow Razor views to have access to it
@@ -34,6 +39,11 @@ namespace RazorTransform
         /// all the enums loaded from the Xml
         /// </summary>
         public static IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
+
+        /// <summary>
+        /// all the custom items loaded from the Xml
+        /// </summary>
+        public static IDictionary<string, Custom.ICustomRazorTransformType> Customs { get { return _customs ; } }
 
         /// <summary>
         /// get the object with all the properties set on it
@@ -56,7 +66,21 @@ namespace RazorTransform
         /// <param name="destinationFolder"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null, ExpandoObject parent = null)
+        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null)
+        {
+            return buildObject(groups, updateXml, htmlEncode, destinationFolder, null, null);
+        }
+
+        /// <summary>
+        /// get the object with all the properties set on it
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="updateXml"></param>
+        /// <param name="htmlEncode"></param>
+        /// <param name="destinationFolder"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root )
         {
             var ret = new ExpandoObject();
             var dict = ret as IDictionary<string, object>;
@@ -69,6 +93,11 @@ namespace RazorTransform
                 dict.Add("Parent", parent);
             else
                 dict.Add("CurrentSettings", _settings); // only add to root object
+
+            if (root == null)
+                root = ret;
+            else
+                dict.Add("Root", root);
 
             String currentName = "<unknown>";
 
@@ -86,7 +115,7 @@ namespace RazorTransform
                             throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.Min));
                         foreach (var c in i.Items)
                         {
-                            children.Add(BuildObject((c as TransformModelArrayItem).Groups, false, true, destinationFolder, ret));
+                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, true, destinationFolder, ret, root));
                         }
                         dict.Add(i.ArrayValueName, children);
                     }
@@ -213,6 +242,7 @@ namespace RazorTransform
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
             _enums.Clear();
+            _customs.Clear();
             Groups.Clear();
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Enum))
@@ -223,6 +253,35 @@ namespace RazorTransform
                 var dict = new Dictionary<string, string>();
                 dict.LoadFromXml(x);
                 _enums.Add(name.Value, dict);
+            }
+
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Custom))
+            {
+                var name = (String)x.Attribute(Constants.Name);
+                if (name == null)
+                    throw new ArgumentNullException("name on custom");
+                var className = (String)x.Attribute(Constants.Class);
+                if (className == null)
+                    throw new ArgumentNullException("class on custom named "+name);
+                var constructorParam = (String)x.Attribute(Constants.Parameter);
+                object [] parms = { };
+                if (constructorParam != null)
+                    parms = new object[1] { constructorParam };
+
+                Custom.ICustomRazorTransformType custom = null;
+                Type t = Type.GetType(className);
+                if (t == null)
+                    throw new ArgumentException("Could not create type from " + className);
+
+                if (constructorParam != null)
+                    custom = Activator.CreateInstance(t, parms) as Custom.ICustomRazorTransformType;
+                else
+                    custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
+
+                if (custom == null)
+                    throw new ArgumentException("Failed to create object from " + className);
+
+                _customs.Add(name, custom);
             }
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Group))

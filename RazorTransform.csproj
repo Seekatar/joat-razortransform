@@ -74,6 +74,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Custom\ICustomRazorTransformType.cs" />
+    <Compile Include="Custom\PortInput.xaml.cs">
+      <DependentUpon>PortInput.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Custom\ServerPort.cs" />
+    <Compile Include="Custom\WebPort.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="RazorTransformer.cs" />
@@ -132,6 +138,10 @@
     <Page Include="Controls\MainEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Custom\PortInput.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ArrayItemEdit.xaml">
       <SubType>Designer</SubType>

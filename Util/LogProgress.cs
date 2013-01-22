@@ -9,7 +9,10 @@ using System.Windows;
 
 namespace RazorTransform
 {
-    class LogProgress :  ITranformOutput
+    /// <summary>
+    /// progress class that writes to console, if attached or a file
+    /// </summary>
+    class LogProgress :  ITransformOutput
     {
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         private static extern bool AttachConsole(int processId);
@@ -18,6 +21,10 @@ namespace RazorTransform
         TextWriter _tw;
         bool _consoleAttached;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="fname">name of output file</param>
         public LogProgress(string fname)
         {
             _consoleAttached = AttachConsole((int)-1);
@@ -30,20 +37,39 @@ namespace RazorTransform
             catch
             { }
         }
+
+        /// <summary>
+        /// interaface implmentation of reporting a value
+        /// </summary>
+        /// <param name="t"></param>
         public void Report(string t)
         {
             if (_tw != null)
-                _tw.WriteLine(t);
+            {
+                _tw.WriteLine("{0} {1}", DateTime.Now.ToString("G"), t);
+                _tw.Flush();
+            }
             if (_consoleAttached)
                 Console.WriteLine(t);
         }
 
+        /// <summary>
+        /// interface impl of dispose
+        /// </summary>
         public void Dispose()
         {
             _tw.Dispose();
             _fs.Dispose();
         }
 
+        /// <summary>
+        /// interface impl just calls Report()
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="messageBoxButton"></param>
+        /// <param name="messageBoxImage"></param>
+        /// <param name="secondaryMsg"></param>
+        /// <returns></returns>
         public MessageBoxResult ShowMessage(string msg, MessageBoxButton messageBoxButton = MessageBoxButton.OK, MessageBoxImage messageBoxImage = MessageBoxImage.None, string secondaryMsg = null)
         {
             if (!String.IsNullOrWhiteSpace(secondaryMsg))

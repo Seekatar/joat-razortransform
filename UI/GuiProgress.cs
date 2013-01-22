@@ -11,7 +11,7 @@ namespace RazorTransform
     /// <summary>
     /// implmentation of System.Progress to show progress of transform
     /// </summary>
-    class GuiProgress : ITranformOutput
+    class GuiProgress : ITransformOutput
     {
         private readonly SynchronizationContext syncContext;
         private MainEdit _window;

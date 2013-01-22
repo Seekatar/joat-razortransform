@@ -57,6 +57,8 @@
     </group>
   </group>
 
+  <custom name="ServerPort" assembly="RazorTransform.exe"/>
+  
   <enum name="EnumA">
     <value key="enumKeyA" value="Enum A" />
     <value key="enumKeyB" value="Enum B" />

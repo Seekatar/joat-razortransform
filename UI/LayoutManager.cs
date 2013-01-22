@@ -278,7 +278,9 @@ namespace RazorTransform
         {
             var t = new PasswordBox();
             t.MinWidth = 150;
+            var value = ci.Value;
             (ci as PasswordTransformModelItem).PasswordBox = t;
+            t.Password = value;
             return t;
         };
         private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>

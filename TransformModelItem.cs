@@ -253,7 +253,7 @@ namespace RazorTransform
             }
         }
 
-        public void UpdateXml()
+        public virtual void UpdateXml()
         {
             _element.SetAttributeValue(Constants.DefaultValue, Value);
 
@@ -262,15 +262,6 @@ namespace RazorTransform
             {
                 _element.SetAttributeValue(Constants.DisplayName, DisplayName);
                 _element.SetAttributeValue(Constants.Name, PropertyName);
-            }
-        }
-
-
-        internal void CopyValueFrom(TransformModelItem src)
-        {
-            if (!Object.ReferenceEquals(this, src))
-            {
-                Value = src.Value;
             }
         }
 

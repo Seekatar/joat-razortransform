@@ -74,6 +74,5 @@ namespace RazorTransform
             RoutedEventArgs args = new RoutedEventArgs(CopyClickedEvent);
             RaiseEvent(args);
         }
-
     }
 }

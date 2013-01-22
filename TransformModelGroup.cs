@@ -89,10 +89,13 @@ namespace RazorTransform
                 {
                     TransformModelItem i = null;
 
-                    var type = Constants.GetType(e);
+                    var typeName = (String)e.Attribute(Constants.Type) ?? String.Empty;
+                    var type = Constants.GetType(typeName);
 
                     if (type == RtType.Password)
                         i = new PasswordTransformModelItem(this);
+                    else if (type == RtType.Custom)
+                        i = TransformModel.Customs[typeName].CreateItem(this);
                     else
                         i = new TransformModelItem(this);
 

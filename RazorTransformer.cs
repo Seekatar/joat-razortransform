@@ -22,7 +22,7 @@ namespace RazorTransform
 
         TransformModel _model = new TransformModel();
         Settings _settings = new Settings();
-        ITranformOutput _output = null;
+        ITransformOutput _output = null;
 
         public bool Initialize(IDictionary<string, object> parms, IDictionary<string, string> overrides, MainEdit window = null)
         {
@@ -35,6 +35,7 @@ namespace RazorTransform
                     _output = new GuiProgress(window);
 
                 _settings.Load(overrides);
+                return _model.Load(_settings);
             }
             catch (Exception settingsException)
             {
@@ -48,11 +49,11 @@ namespace RazorTransform
                 _output.ShowMessage(String.Format(Resource.SettingsException, settingsException.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation );
             }
 
-            return _model.Load(_settings);
+            return false;
         }
 
         public TransformModel Model { get { return _model; } }
-        public ITranformOutput Output { get { return _output; } }
+        public ITransformOutput Output { get { return _output; } }
         public Settings Settings { get { return _settings; } }
 
         internal async Task<TransformResult> DoTransformAsync()
