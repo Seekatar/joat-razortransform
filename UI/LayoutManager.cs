@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace RazorTransform
 {
@@ -45,7 +46,7 @@ namespace RazorTransform
                 l.ToolTip = ci.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
-                l.Style = Application.Current.Resources["CfgLabel"] as Style;
+                l.Style = Application.Current.FindResource("CfgLabel") as Style;
 
                 var binding = new Binding();
                 binding.Source = ci;
@@ -58,10 +59,25 @@ namespace RazorTransform
                 t.SetValue(Grid.RowProperty, i);
                 t.HorizontalAlignment = HorizontalAlignment.Left;
                 t.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-                t.Style = Application.Current.Resources["CfgText"] as Style;
+                t.Style = Application.Current.FindResource("CfgText") as Style;
 
                 if ((i & 1) == 0)
-                    l.Background = new SolidColorBrush(Colors.WhiteSmoke);
+                {
+                    /**
+                     *    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#fdd3a8" Offset="0"/>
+                            <GradientStop Color="#fce79f" Offset="1"/>
+                        </LinearGradientBrush>
+                     * */
+                    LinearGradientBrush gb = GetAltGradient();
+
+                    Rectangle re = new Rectangle();
+                    re.Fill = gb;
+                    re.SetValue(Grid.RowProperty, i);
+                    re.SetValue(Grid.ColumnSpanProperty, 2);
+               
+                    grid.Children.Add(re);
+                }
 
                 l.Padding = t.Padding = new Thickness(5);
 
@@ -128,7 +144,7 @@ namespace RazorTransform
                     Content = String.Format( Resource.NewItem, parent.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
                     Tag = parent.CreatePrototype,
-                    Style = Application.Current.Resources["ArrayNewButton"] as Style
+                    Style = Application.Current.FindResource("ArrayNewButton") as Style
                 };
             add.ToolTip = "Add a new item of type "+parent.DisplayName;
             add.HorizontalAlignment = HorizontalAlignment.Left;
@@ -156,7 +172,7 @@ namespace RazorTransform
                 l.ToolTip = c.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
-                l.Style = Application.Current.Resources["CfgLabel"] as Style;
+                l.Style = Application.Current.FindResource("CfgLabel") as Style;
 
 
                 var t = new EditItemBox(parent.ArrayItems.Count > parent.Min);
@@ -197,8 +213,10 @@ namespace RazorTransform
                 t.SetValue(Grid.RowProperty, i);
 
                 if ((i & 1) == 0)
+				{
                     l.Background = new SolidColorBrush(Colors.AliceBlue);
 
+                }
                 i++;
                 grid.Children.Add(l);
                 grid.Children.Add(t);
@@ -207,6 +225,32 @@ namespace RazorTransform
             return grid;
         }
 
+        private static LinearGradientBrush GetAltGradient()
+        {
+            LinearGradientBrush gb = new LinearGradientBrush();
+            gb.StartPoint = new Point(0.5, 0);
+            gb.EndPoint = new Point(0.5, 1);
+
+            Color color1 = (Color)ColorConverter.ConvertFromString("#fdd3a8");
+            Color color2 = (Color)ColorConverter.ConvertFromString("#fce79f");
+            gb.GradientStops.Add(new GradientStop(color1, 0));
+            gb.GradientStops.Add(new GradientStop(color2, 1));
+            return gb;
+        }
+		
+        private static LinearGradientBrush GetButtonRowGradient()
+        {
+            LinearGradientBrush gb = new LinearGradientBrush();
+            gb.StartPoint = new Point(0.5, 0);
+            gb.EndPoint = new Point(0.5, 1);
+
+            Color color1 = (Color)ColorConverter.ConvertFromString("#FF991B27");
+            Color color2 = Colors.Black;
+            gb.GradientStops.Add(new GradientStop(color1, 0));
+            gb.GradientStops.Add(new GradientStop(color2, 1));
+            return gb;
+        }
+		
         private static Control CreateControl(TransformModelItem info, Binding binding)
         {
             switch (info.Type)

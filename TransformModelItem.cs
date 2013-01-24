@@ -226,30 +226,11 @@ namespace RazorTransform
         /// grab the default value from the element and set it
         /// </summary>
         /// <param name="x"></param>
-        protected void setDefaultValue(XElement x)
+        protected virtual void setDefaultValue(XElement x)
         {
             if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
             {
                 this.Value = x.Attribute(Constants.DefaultValue).Value;
-            }
-            else if (x.Attribute(Constants.ValueProvider) != null)
-            {
-                var type = Assembly.GetExecutingAssembly().GetTypes().Where(t => typeof(IValueProvider).IsAssignableFrom(t) &&
-                                                                            t.Name == x.Attribute(Constants.ValueProvider).Value).FirstOrDefault();
-                var provider = Activator.CreateInstance(type) as IValueProvider;
-                if (provider != null)
-                {
-                    var result = provider.GetValue(this);
-                    if (result != null)
-                        this.Value = String.Format("{0}", result);
-                    else
-                    {
-                        if (x.Attribute(Constants.DefaultValue) != null)
-                        {
-                            this.Value = x.Attribute(Constants.DefaultValue).Value;
-                        }
-                    }
-                }
             }
         }
 

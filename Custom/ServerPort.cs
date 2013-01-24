@@ -45,7 +45,7 @@ namespace RazorTransform.Custom
             return t;
         }
 
-        public TransformModelItem CreateItem(TransformModelGroup parent)
+        public TransformModelItem CreateItem(TransformModelGroup parent, XElement e)
         {
             return new ServerPortModelItem();
         }

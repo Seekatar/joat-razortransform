@@ -30,14 +30,13 @@ namespace RazorTransform
             var selectedIndex = _tabCtrl.SelectedIndex;
             _tabCtrl.Items.Clear();
 
-            int i = 0;
             StackPanel lastExpanderStack = null;
 
             foreach (var group in groups.Where( o => !o.Hidden))
             {
-                var expander = createTab(group);
+                var tabItem = createTab(group);
 
-                lastExpanderStack = expander.Content as StackPanel;
+                lastExpanderStack = tabItem.Content as StackPanel;
 
                 var side = new StackPanel() { Orientation = Orientation.Horizontal };
 
@@ -48,8 +47,6 @@ namespace RazorTransform
                 else
                 {
                     lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group));
-
-                    i++;
                 }
             }
             _tabCtrl.SelectedIndex = selectedIndex;
@@ -58,7 +55,7 @@ namespace RazorTransform
         private TabItem createTab(TransformModelGroup group)
         {
             var tab = new TabItem();
-            tab.Style = this.Resources["CfgBigLabel"] as Style;
+            tab.Style = this.FindResource("CfgBigLabel") as Style;
             tab.Header = group.DisplayName;
             if (group.Description != null)
                 tab.ToolTip = group.Description;
@@ -119,6 +116,20 @@ namespace RazorTransform
             }
         }
 
+        void add_Click(object sender, RoutedEventArgs e)
+        {
+            // create a new one from the prototype, set on the tag
+            var parent = ((sender as Control).Tag as TransformModelArrayItem);
+            var newOne = new TransformModelArrayItem(parent);
+            if (editArrayItem(newOne.Groups))
+            {
+                // add it to the parent array
+                parent.ArrayParent.ArrayItems.Add(newOne);
+                newOne.MakeKey();
+                Reload();
+            }
+        }
+		
         #endregion        
         
         /// <summary>
@@ -137,18 +148,5 @@ namespace RazorTransform
             Load(_groups);
         }
 
-        void add_Click(object sender, RoutedEventArgs e)
-        {
-            // create a new one from the prototype, set on the tag
-            var parent = ((sender as Control).Tag as TransformModelArrayItem);
-            var newOne = new TransformModelArrayItem(parent);
-            if (editArrayItem(newOne.Groups))
-            {
-                // add it to the parent array
-                parent.ArrayParent.ArrayItems.Add(newOne);
-                newOne.MakeKey();
-                Reload();
-            }
-        }
     }
 }

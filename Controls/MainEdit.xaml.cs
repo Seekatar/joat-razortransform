@@ -10,7 +10,7 @@ namespace RazorTransform
     /// <summary>
     /// Interaction logic for MainEdit.xaml
     /// </summary>
-    public partial class MainEdit : UserControl
+    public partial class MainEdit : UserControl,  IDisposable
     {
         private RazorTransformer _transformer = new RazorTransformer();
         private IDictionary<string, object> _parms;
@@ -188,8 +188,9 @@ namespace RazorTransform
         /// <param name="e"></param>
         private async void btnOkAndClose_Click(object sender, RoutedEventArgs e)
         {
-            if ( await doTransforms(false) == ProcessingResult.ok )
-                _parent.ProcessingComplete(ProcessingResult.ok);
+            var ret = await doTransforms(false);
+            if ( ret == ProcessingResult.ok )
+                _parent.ProcessingComplete(ret);
         }
 
         /// <summary>
@@ -236,6 +237,12 @@ namespace RazorTransform
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             _transformer.Save();
+        }
+		
+        public void Dispose()
+        {
+            _transformer = null;
+            _parent = null;
         }
     }
 }

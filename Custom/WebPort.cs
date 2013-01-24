@@ -33,7 +33,7 @@ namespace RazorTransform.Custom
             return ServerPort.CreatePortControl(ci, binding);
         }
 
-        public TransformModelItem CreateItem(TransformModelGroup parent)
+        public TransformModelItem CreateItem(TransformModelGroup parent, XElement e)
         {
             return new WebPortModelItem();
         }

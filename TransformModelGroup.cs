@@ -95,7 +95,7 @@ namespace RazorTransform
                     if (type == RtType.Password)
                         i = new PasswordTransformModelItem(this);
                     else if (type == RtType.Custom)
-                        i = TransformModel.Customs[typeName].CreateItem(this);
+                        i = TransformModel.Customs[typeName].CreateItem(this,e);
                     else
                         i = new TransformModelItem(this);
 

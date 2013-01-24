@@ -47,12 +47,12 @@ namespace RazorTransform
                 var groups = new TransformModelArrayItem();
                 groups.Groups.AddRange((settings.Groups[0] as TransformModelArray).PrototypeGroups); 
                 (settings.Groups[0] as TransformModelArray).ArrayItems.Add(groups);
-                _settings = settings.BuildObject((settings.Groups[0] as TransformModelArray).PrototypeGroups, false, false);
             }
             else
             {
                 _arrayConfigInfo = (settings.Groups[0] as TransformModelArray).ArrayItems[0].Groups[0];
             }
+            _settings = settings.BuildObject((settings.Groups[0] as TransformModelArray).PrototypeGroups, false, false);
         }
 
         public Settings()

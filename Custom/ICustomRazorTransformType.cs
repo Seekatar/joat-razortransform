@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace RazorTransform.Custom
 {
@@ -13,8 +14,9 @@ namespace RazorTransform.Custom
         /// via TransformModelItem.LoadFromXml
         /// </summary>
         /// <param name="parent"></param>
+        /// <param name="e">XML for this item being parsed to allow for custom attributes</param>
         /// <returns>an empty object that will load itself</returns>
-        TransformModelItem CreateItem(TransformModelGroup parent);
+        TransformModelItem CreateItem(TransformModelGroup parent, XElement e);
 
         /// <summary>
         /// create the control from the item
