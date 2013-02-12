@@ -17,17 +17,17 @@ namespace RazorTransform
     public class Settings
     {
         private ExpandoObject _settings = null;
-        private TransformModelGroup _arrayConfigInfo;
+        private TransformModelGroup _settingsGroup;
         private string _objectFile;
         private string _valuesFile;
 
         // object definition for settings is really static since code relies on it
         static string _settingsXml =
 @"<RtObject>
-  <group name=""Settings"" description=""Settings that control how Artie works."" arrayValueName=""_settings"" hidden=""False"">
-    <item name=""Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + RtType.String + @""" defaultValue=""RazorTransform""/>
-    <item name=""LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + RtType.Folder + @""" defaultValue=""..""/>
-    <item name=""LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + RtType.Folder + @""" defaultValue=""Templates""/>
+  <group name=""Settings"" description=""Settings that control how Artie works."" hidden=""False"">
+    <item name=""RTSettings_Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + RtType.String + @""" defaultValue=""RazorTransform""/>
+    <item name=""RTSettings_LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + RtType.Folder + @""" defaultValue=""..""/>
+    <item name=""RTSettings_LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + RtType.Folder + @""" defaultValue=""Templates""/>
   </group>
 </RtObject>";
 
@@ -40,19 +40,8 @@ namespace RazorTransform
             var settings = new TransformModel();
             settings.LoadValuesFromXml(settingsDefinition, this);
 
-            // if this is first time, create one from the prototype
-            if ((settings.Groups[0] as TransformModelArray).Items.Count() == 0)
-            {
-                _arrayConfigInfo = (settings.Groups[0] as TransformModelArray).PrototypeGroups[0];
-                var groups = new TransformModelArrayItem();
-                groups.Groups.AddRange((settings.Groups[0] as TransformModelArray).PrototypeGroups); 
-                (settings.Groups[0] as TransformModelArray).ArrayItems.Add(groups);
-            }
-            else
-            {
-                _arrayConfigInfo = (settings.Groups[0] as TransformModelArray).ArrayItems[0].Groups[0];
-            }
-            _settings = settings.BuildObject((settings.Groups[0] as TransformModelArray).PrototypeGroups, false, false);
+            _settingsGroup = settings.Groups[0];
+            _settings = settings.BuildObject(settings.Groups, false, false);
         }
 
         public Settings()
@@ -67,26 +56,26 @@ namespace RazorTransform
         }
 
         // for saving
-        public TransformModelGroup ArrayConfigInfo { get { return _arrayConfigInfo;  } }
+        public TransformModelGroup Group { get { return _settingsGroup;  } }
 
         // for editing
         public IList<TransformModelGroup> ConfigInfo 
         {
-            get { return new List<TransformModelGroup>() { _arrayConfigInfo }; } 
+            get { return new List<TransformModelGroup>() { _settingsGroup }; } 
         }
 
         // values saved in values file
-        public string Title { get { return this["Title"]; } set { this["Title"] = value; } }
+        public string Title { get { return this["RTSettings_Title"]; } set { this["RTSettings_Title"] = value; } }
         public string OutputFolder 
         { 
             get 
             { 
-                var temp = OverrideOutputFolder ?? this["LastPath"]; 
+                var temp = OverrideOutputFolder ?? this["RTSettings_LastPath"]; 
                 return Path.GetFullPath(temp);
             }
-            set { this["LastPath"] = value; }
+            set { this["RTSettings_LastPath"] = value; }
         }
-        public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["LastTemplatePath"]); } set { this["LastTemplatePath"] = value; } }
+        public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["RTSettings_LastTemplatePath"]); } set { this["RTSettings_LastTemplatePath"] = value; } }
 
         // temp values
         public bool Test { get; set; }
@@ -101,12 +90,33 @@ namespace RazorTransform
         /// XML content of a RTValues.xml file passed into the app
         /// </summary>
         public string ValuesContent { get; set; }
+
+        /// <summary>
+        /// override output folder, if passed in from command line
+        /// </summary>
         [IgnoreDataMemberAttribute]
         public string OverrideOutputFolder { get; set; }
+
+        /// <summary>
+        /// override template folder, if passed in from command line
+        /// </summary>
         [IgnoreDataMemberAttribute]
         public string OverrideTemplateFolder { get; set; }
+
+        /// <summary>
+        /// -run switch to indicated not to show UI, and just run transformation
+        /// </summary>
         public bool Run { get; set; }
+
+        /// <summary>
+        /// log file where to write output
+        /// </summary>
         public string LogFile { get; set; }
+
+        /// <summary>
+        /// list of override value passed in from the command line to override
+        /// values in RtValues.xml
+        /// </summary>
         public IDictionary<string, string> Overrides { get; set; }
 
         private void setOverrides(IDictionary<string, string> overrideParms)
@@ -114,6 +124,11 @@ namespace RazorTransform
             Overrides = overrideParms;
         }
 
+        /// <summary>
+        /// helper function to parse overrides passed in from command line 
+        /// </summary>
+        /// <param name="overrideParms"></param>
+        /// <returns></returns>
         static public IDictionary<string, string> SplitCommandLineOverrides(IEnumerable<string> overrideParms)
         {
             var ret = new Dictionary<string, string>();
@@ -137,7 +152,11 @@ namespace RazorTransform
             return ret;
         }
 
-
+        /// <summary>
+        /// indexing override to allow access to setting via string index
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [IgnoreDataMemberAttribute]
         public string this[string key]
         {
@@ -162,8 +181,14 @@ namespace RazorTransform
             sb.AppendLine(t.Name+":");
             foreach ( var p in t.GetProperties() )
             {
-                if ( p.GetCustomAttributes(false).Count() == 0 && (p.PropertyType.IsPrimitive || p.PropertyType == typeof(string)))
-                    sb.AppendLine(String.Format("  {0}: {1}", p.Name, p.GetValue(this,null).ToString() ) );
+                if (p.GetCustomAttributes(false).Count() == 0 && (p.PropertyType.IsPrimitive || p.PropertyType == typeof(string)))
+                {
+                    String value = "<null>";
+                    var v = p.GetValue(this, null);
+                    if ( v != null)
+                        value = v.ToString();
+                    sb.AppendLine(String.Format("  {0}: {1}", p.Name, value));
+                }
             }
             if (Overrides != null && Overrides.Count() > 0)
             {

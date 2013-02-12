@@ -22,7 +22,7 @@ namespace RazorTransform
         {
             var temp = new List<TransformModelGroup>(orig);
             Load(temp);
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if (ShowDialog() ?? false)
             {
                 orig.CopyValueFrom(temp);

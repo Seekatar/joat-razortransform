@@ -38,7 +38,7 @@ namespace RazorTransform
                 var sw = new Stopwatch();
                 sw.Start();
 
-                foreach (var f in Directory.EnumerateFiles(folder, mask))
+                foreach (var f in Directory.EnumerateFiles(folder, mask).OrderBy( o => o))
                 {
                     currentFile = f;
 

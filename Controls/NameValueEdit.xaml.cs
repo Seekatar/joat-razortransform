@@ -76,9 +76,10 @@ namespace RazorTransform
         {
             // find it in the list
             var delMe = (sender as Control).Tag as TransformModelArrayItem;
-            if (delMe != null)
+            if (delMe != null && delMe.Parent is TransformModelArray)
             {
-                delMe.Parent.Children.Remove(delMe);
+                (delMe.Parent as TransformModelArray).ArrayItems.Remove(delMe);
+                TransformModel.Instance.OnItemDeleted(new ItemChangedArgs() { Group = delMe.Parent as TransformModelArray, Item = delMe } );
                 Reload();
             }
         }
@@ -97,6 +98,7 @@ namespace RazorTransform
                 var copy = new TransformModelArrayItem(copyMe);
                 copy.ArrayParent.ArrayItems.Add(copy);
                 copy.MakeKey();
+                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayParent, Item = copy });
                 Reload();
             }
         }
@@ -112,6 +114,7 @@ namespace RazorTransform
             if (editArrayItem(existingOne.Groups))
             {
                 existingOne.MakeKey();
+                TransformModel.Instance.OnItemChanged(new ItemChangedArgs() { Group = existingOne.ArrayParent, Item = existingOne });
                 Reload();
             }
         }
@@ -126,6 +129,7 @@ namespace RazorTransform
                 // add it to the parent array
                 parent.ArrayParent.ArrayItems.Add(newOne);
                 newOne.MakeKey();
+                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayParent, Item = newOne });
                 Reload();
             }
         }
@@ -140,6 +144,7 @@ namespace RazorTransform
         bool editArrayItem(IList<TransformModelGroup> orig)
         {
             var nve = new ArrayItemEdit();
+            nve.Owner = Window.GetWindow(this);
             return nve.ShowDialog(orig);
         }
 

@@ -121,7 +121,7 @@ namespace RazorTransform
                     // set buttons, control visibility
                     editControl.Visibility = System.Windows.Visibility.Collapsed;
 
-                    btnSave.Visibility = btnSettings.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Hidden;
+                    btnSave.Visibility = btnSettings.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Collapsed;
                     btnCancel.Content = Resource.Cancel;
                     break;
                 case ProcessingState.shellExecuted:
@@ -134,13 +134,13 @@ namespace RazorTransform
 
                     if (_embedded)
                     {
-                        btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Hidden;
+                        btnSave.Visibility = btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Collapsed;
                         btnCancel.Content = Resource.Cancel;
                         btnCancel.IsEnabled = false;
                     }
                     else
                     {
-                        btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Visible;
+                        btnSave.Visibility = btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Visible;
                         btnCancel.Content = Resource.Close;
                         btnCancel.IsEnabled = true;
                     }
@@ -201,6 +201,7 @@ namespace RazorTransform
         private void btnSettings_Click(object sender, RoutedEventArgs e)
         {
             var aie = new ArrayItemEdit();
+            aie.Owner = Window.GetWindow(this);
             aie.ShowDialog(_transformer.Settings.ConfigInfo);
         }
 

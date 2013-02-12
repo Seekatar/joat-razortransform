@@ -122,6 +122,8 @@ namespace RazorTransform
 
             // array-specific attributes
             ArrayValueName = (string)xml.Attribute(Constants.ArrayValueName);
+            TransformModel.Instance.Arrays.Add(this);
+
             Min = (Int32?)xml.Attribute(Constants.Min) ?? 0;
             Max = (Int32?)xml.Attribute(Constants.Max) ?? Int32.MaxValue;
 
@@ -148,7 +150,19 @@ namespace RazorTransform
                 else
                     newOne = new TransformModelGroup();
 
-                newOne.LoadFromXml(x, null, null ); 
+                // this allows for recursive definitions
+                var existingOne = TransformModel.Instance.Arrays.FirstOrDefault(o => o.ArrayValueName == (string)x.Attribute(Constants.ArrayValueName));
+
+                newOne.LoadFromXml(x, null, null);
+
+                if (existingOne != null && newOne is TransformModelArray)
+                {
+                    // if reusing same prototype, set it and make the key
+                    var nested = newOne as TransformModelArray;
+                    nested._prototypeGroups = existingOne.PrototypeGroups;
+                    nested.makeKeyFormat(x);
+                }
+
                 PrototypeGroups.Add(newOne);
             }
 
@@ -180,12 +194,23 @@ namespace RazorTransform
                         {
                             foreach (var i in nextOne.Items)
                             {
-                                var childValues = mv.Elements().Where(n => n.Attribute(Constants.Name).Value == i.PropertyName);
+                                var childValues = mv.Elements().Where(n => 
+                                    {   
+                                        var a = n.Attribute(Constants.Name);
+                                        if (a != null)
+                                            return a.Value == i.PropertyName;
+                                        else
+                                            throw new Exception("Missing name on element " + n.ToString());
+                                    });
 
                                 var v = childValues.SingleOrDefault();
                                 if (v != null)
                                 {
-                                    i.Value = v.Attribute(Constants.Value).Value;
+                                    var a = v.Attribute(Constants.Value);
+                                    if ( a != null )
+                                        i.Value = v.Attribute(Constants.Value).Value;
+                                    else
+                                        throw new Exception("Missing value on element " + v.ToString());
                                 }
                             }
                         }

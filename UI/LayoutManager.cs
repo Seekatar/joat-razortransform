@@ -265,7 +265,7 @@ namespace RazorTransform
                 case RtType.Enum:
                     ComboBoxInput ret = _ComboBox(info, binding);
                     var listBinding = new Binding();
-                    listBinding.Source = TransformModel.Enums[info.EnumName];
+                    listBinding.Source = TransformModel.Instance.Enums[info.EnumName];
                     listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                     ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
                     return ret;
