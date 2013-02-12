@@ -9,21 +9,100 @@ using System.Xml.Linq;
 
 namespace RazorTransform
 {
-
     /// <summary>
     /// class to read and contain the settings to be merged with all the other files
     /// </summary>
     class TransformModel
     {
+
+        #region Events
+        public event EventHandler<ItemChangedArgs> ItemChanged;
+        public event EventHandler<ItemChangedArgs> ItemAdded;
+        public event EventHandler<ItemChangedArgs> ItemDeleted;
+        public event EventHandler<ModelChangedArgs> ModelLoaded;
+        public event EventHandler<ModelChangedArgs> ModelValidate;
+        public event EventHandler<ModelChangedArgs> ModelSaved;
+
+        /// <summary>
+        /// Fired when an item is added to an array
+        /// </summary>
+        /// <param name="args"></param>
+        public virtual void OnItemAdded(ItemChangedArgs args)
+        {
+            var temp = ItemAdded;
+            if (temp != null) temp(this, args);
+        }
+
+        /// <summary>
+        /// fired when an item is changed in an array
+        /// </summary>
+        /// <param name="args"></param>
+        public virtual void OnItemChanged(ItemChangedArgs args)
+        {
+            var temp = ItemChanged;
+            if (temp != null) temp(this, args);
+        }
+
+        /// <summary>
+        /// fired when an item is deleted from an array
+        /// </summary>
+        /// <param name="args"></param>
+        public virtual void OnItemDeleted(ItemChangedArgs args)
+        {
+            var temp = ItemDeleted;
+            if (temp != null) temp(this, args);
+        }
+
+        /// <summary>
+        /// fired after all XML is parsed and the model arrays have been loaded
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnModelLoaded()
+        {
+            var temp = ModelLoaded;
+            if (temp != null) temp(this, new ModelChangedArgs());
+        }
+
+        /// <summary>
+        /// called before saving the model
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnModelValidate()
+        {
+            var temp = ModelValidate;
+            if (temp != null) temp(this, new ModelChangedArgs());
+        }
+
+        /// <summary>
+        /// called after the model has been saved
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnModelSaved()
+        {
+            var temp = ModelSaved;
+            if (temp != null) temp(this, new ModelChangedArgs());
+        }
+
+        #endregion
+
+        // ugly for backward compat
+        static IList<Type> _wellKnownCustoms = new List<Type>() { typeof(RazorTransform.Custom.ServerPort), typeof(RazorTransform.Custom.WebPort) };
+        public static IList<Type> WellKnownCustoms { get { return _wellKnownCustoms; } }
+
         /// <summary>
         /// all the enums loaded from the Xml
         /// </summary>
-        private static IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
+        private IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
 
         /// <summary>
         /// all the custom items loaded from the Xml
         /// </summary>
-        private static IDictionary<string, Custom.ICustomRazorTransformType> _customs = new Dictionary<string, Custom.ICustomRazorTransformType>();
+        private IDictionary<string, Custom.ICustomRazorTransformType> _customs = new Dictionary<string, Custom.ICustomRazorTransformType>();
+
+        /// <summary>
+        ///  list of all arrays created so far for recursive use
+        /// </summary>
+        private IList<TransformModelArray> _arrays = new List<TransformModelArray>(); 
 
         /// <summary>
         /// settings object of the current run to allow Razor views to have access to it
@@ -38,13 +117,18 @@ namespace RazorTransform
         /// <summary>
         /// all the enums loaded from the Xml
         /// </summary>
-        public static IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
+        public IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
 
         /// <summary>
         /// all the custom items loaded from the Xml
         /// </summary>
-        public static IDictionary<string, Custom.ICustomRazorTransformType> Customs { get { return _customs ; } }
+        public IDictionary<string, Custom.ICustomRazorTransformType> Customs { get { return _customs; } }
 
+        /// <summary>
+        /// list of all arrays created so far for recursive use
+        /// </summary>
+        public IList<TransformModelArray> Arrays { get { return _arrays; } }
+ 
         /// <summary>
         /// get the object with all the properties set on it
         /// </summary>
@@ -80,7 +164,7 @@ namespace RazorTransform
         /// <param name="destinationFolder"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root )
+        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root)
         {
             var ret = new ExpandoObject();
             var dict = ret as IDictionary<string, object>;
@@ -96,8 +180,8 @@ namespace RazorTransform
 
             if (root == null)
                 root = ret;
-            else
-                dict.Add("Root", root);
+
+            dict.Add("Root", root);
 
             String currentName = "<unknown>";
 
@@ -183,26 +267,30 @@ namespace RazorTransform
                     Int32 v;
                     if (Int32.TryParse(i.Value, out v))
                     {
-                        if (i.MinInt != Int32.MinValue && v < i.MinInt)
+                        if (v < i.MinInt)
                         {
                             throw new Exception(String.Format(Resource.MinInt, i.DisplayName, i.MinInt));
                         }
-                        if (i.MaxInt != Int32.MaxValue && v > i.MaxInt)
+                        if (i.MaxInt != Int32.MaxValue && i.MaxInt != 0 && v > i.MaxInt)
                         {
                             throw new Exception(String.Format(Resource.MaxInt, i.DisplayName, i.MaxInt));
                         }
                     }
                     else
                     {
-                        throw new Exception(String.Format(Resource.BadInteger, i.DisplayName, v));
+                        throw new Exception(String.Format(Resource.BadInteger, i.DisplayName, i.Value));
                     }
                     break;
             }
         }
 
-        public TransformModel()
+        static public TransformModel Instance { get; set; }
+
+        public TransformModel(bool setInstance = false)
         {
             Groups = new List<TransformModelGroup>();
+            if ( setInstance )
+                Instance = this;
         }
 
         // load both object def and values from files
@@ -243,13 +331,14 @@ namespace RazorTransform
         {
             _enums.Clear();
             _customs.Clear();
+            Arrays.Clear();
             Groups.Clear();
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Enum))
             {
                 var name = x.Attribute(Constants.Name);
                 if (name == null)
-                    throw new ArgumentNullException("name on enum");
+                    throw new ArgumentNullException(Resource.ErrorNullEnumName);
                 var dict = new Dictionary<string, string>();
                 dict.LoadFromXml(x);
                 _enums.Add(name.Value, dict);
@@ -259,29 +348,59 @@ namespace RazorTransform
             {
                 var name = (String)x.Attribute(Constants.Name);
                 if (name == null)
-                    throw new ArgumentNullException("name on custom");
+                    throw new ArgumentNullException(Resource.ErrorNullCustomName);
                 var className = (String)x.Attribute(Constants.Class);
                 if (className == null)
-                    throw new ArgumentNullException("class on custom named "+name);
+                    throw new ArgumentNullException(Resource.ErrorNullCustomClassName + name);
                 var constructorParam = (String)x.Attribute(Constants.Parameter);
-                object [] parms = { };
-                if (constructorParam != null)
-                    parms = new object[1] { constructorParam };
 
                 Custom.ICustomRazorTransformType custom = null;
                 Type t = Type.GetType(className);
                 if (t == null)
-                    throw new ArgumentException("Could not create type from " + className);
+                    throw new ArgumentException(Resource.ErrorCustomType + className);
 
-                if (constructorParam != null)
-                    custom = Activator.CreateInstance(t, parms) as Custom.ICustomRazorTransformType;
-                else
-                    custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
+                var constructors = t.GetConstructors();
+                foreach (var c in constructors)
+                {
+                    var ps = c.GetParameters();
+                    switch (ps.Count())
+                    {
+                        case 0:
+                            custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
+                            break;
+                        case 1:
+                            if (ps[0].ParameterType == GetType())
+                                custom = Activator.CreateInstance(t, new object[1] { this }) as Custom.ICustomRazorTransformType;
+                            else if (ps[0].ParameterType == typeof(String))
+                                custom = Activator.CreateInstance(t, new object[1] { constructorParam ?? String.Empty }) as Custom.ICustomRazorTransformType;
+                            break;
+                        case 2:
+                            if (ps[0].ParameterType == GetType() && ps[1].ParameterType == typeof(String))
+                                custom = Activator.CreateInstance(t, new object[2] { this, constructorParam ?? String.Empty }) as Custom.ICustomRazorTransformType;
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 if (custom == null)
-                    throw new ArgumentException("Failed to create object from " + className);
+                    throw new ArgumentException(Resource.ErrorCreatingCustom  + className);
 
                 _customs.Add(name, custom);
+            }
+
+            // get any ones known to us already
+            foreach (var t in _wellKnownCustoms)
+            {
+                if (t.GetInterface(typeof(RazorTransform.Custom.ICustomRazorTransformType).FullName) != null)
+                {
+                    if (!_customs.Any(o => o.Key == t.Name))
+                    {
+                        var custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
+                        if (custom != null)
+                            _customs.Add(t.Name, custom);
+                    }
+                }
             }
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Group))
@@ -304,12 +423,26 @@ namespace RazorTransform
 
         internal string Save(string _valueFileName)
         {
+            try
+            {
+                OnModelValidate();
+            }
+            catch (Exception)
+            {
+                return String.Empty;
+            }
+
             var doc = XDocument.Parse("<RtValues/>");
             var root = doc.Root;
 
-            saveGroups(root, Groups);
+            var groups = new List<TransformModelGroup>(Groups);
+            groups.Insert(0, _settings.Group);
+            saveGroups(root, groups);
 
             doc.Save(_valueFileName);
+
+            OnModelSaved();
+
             return File.ReadAllText(_valueFileName);
         }
 
@@ -351,8 +484,6 @@ namespace RazorTransform
             {
                 objectValues = XDocument.Load(path).Root;
             }
-            Groups.Add(_settings.ArrayConfigInfo); // add so we can save it when we save
-
             // load the main file
             path = Path.Combine(directoryName, _settings.ObjectFile);
             if (!File.Exists(path))
@@ -360,6 +491,8 @@ namespace RazorTransform
 
             var definitionDoc = XDocument.Load(path);
             LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
+
+            OnModelLoaded();
 
             return true;
         }
@@ -372,10 +505,13 @@ namespace RazorTransform
             get
             {
                 string TitleSuffix = String.Empty;
-                if (_settings != null && !String.IsNullOrWhiteSpace(_settings.Title))
-                    TitleSuffix = " " + _settings.Title;
+                if (_settings != null)
+                {
+                    if (!String.IsNullOrWhiteSpace(_settings.Title))
+                        TitleSuffix = " " + _settings.Title;
 
-                TitleSuffix += " -> " + _settings.OutputFolder;
+                    TitleSuffix += " -> " + _settings.OutputFolder;
+                }
 
                 return TitleSuffix;
             }

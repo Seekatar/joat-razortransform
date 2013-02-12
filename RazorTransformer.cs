@@ -20,7 +20,7 @@ namespace RazorTransform
 
        
 
-        TransformModel _model = new TransformModel();
+        TransformModel _model = new TransformModel(true);
         Settings _settings = new Settings();
         ITransformOutput _output = null;
 

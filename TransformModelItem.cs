@@ -111,7 +111,7 @@ namespace RazorTransform
         /// <summary>
         /// Max value as an integer
         /// </summary>
-        public int MaxInt { get { int i; return int.TryParse(Max, out i) ? i : int.MaxValue; } }
+        public int MaxInt { get { int i; return int.TryParse(Max, out i) && i != 0 ? i : int.MaxValue; } }
 
         /// <summary>
         /// Min value as an Decimal
@@ -121,7 +121,7 @@ namespace RazorTransform
         /// <summary>
         /// Max value as an Decimal
         /// </summary>
-        public Decimal MaxDecimal { get { Decimal i; return Decimal.TryParse(Max, out i) ? i : Decimal.MaxValue; } }
+        public Decimal MaxDecimal { get { Decimal i; return Decimal.TryParse(Max, out i) && i != 0 ? i : Decimal.MaxValue; } }
 
         /// <summary>
         /// group we're in 

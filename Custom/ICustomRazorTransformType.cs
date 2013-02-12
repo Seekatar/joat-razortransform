@@ -24,6 +24,6 @@ namespace RazorTransform.Custom
         /// <param name="info">an item created earlier when CreateItem was called</param>
         /// <param name="binding">the binding object for the control</param>
         /// <returns>the control to show on the screen</returns>
-        Control CreateControl( TransformModelItem info, Binding binding);
+        Control CreateControl(TransformModelItem info, Binding binding);
     }
 }

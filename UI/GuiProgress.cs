@@ -35,7 +35,10 @@ namespace RazorTransform
             if (!String.IsNullOrWhiteSpace(secondaryMsg))
                 msg += Environment.NewLine + secondaryMsg;
 
-            return MessageBox.Show(msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+            if ( App.Current != null && App.Current.MainWindow != null )
+                return MessageBox.Show(App.Current.MainWindow, msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+            else
+                return MessageBox.Show(msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
         }
 
         public void Dispose()

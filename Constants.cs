@@ -47,7 +47,7 @@ namespace RazorTransform
         internal const string Expanded = "expanded";
         internal const string Hidden = "hidden";
         internal const string Arguments = "arguments";
-        internal const string Class = "class";
+        internal const string Class = "classname";
         internal const string Custom = "custom";
         internal const string Parameter = "parameter";
 
@@ -90,9 +90,9 @@ namespace RazorTransform
                 case "hidden":
                     return RtType.HiddenString;
                 default:
-                    if (TransformModel.Enums.ContainsKey(typeName))
+                    if (TransformModel.Instance.Enums.ContainsKey(typeName))
                         return RtType.Enum;
-                    else if (TransformModel.Customs.ContainsKey(typeName))
+                    else if (TransformModel.Instance.Customs.ContainsKey(typeName))
                         return RtType.Custom;
                     else
                         return RtType.Invalid;
@@ -108,7 +108,7 @@ namespace RazorTransform
         public static string GetEnumName(XElement x)
         {
             var s = (String)x.Attribute(Constants.Type) ?? String.Empty;
-            if (TransformModel.Enums.ContainsKey(s))
+            if (TransformModel.Instance.Enums.ContainsKey(s))
                 return s;
             else
                 return null;

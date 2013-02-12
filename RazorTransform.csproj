@@ -78,8 +78,10 @@
     <Compile Include="Custom\PortInput.xaml.cs">
       <DependentUpon>PortInput.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Custom\RtThySelfType.cs" />
     <Compile Include="Custom\ServerPort.cs" />
     <Compile Include="Custom\WebPort.cs" />
+    <Compile Include="EventArgs.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="RazorTransformer.cs" />
