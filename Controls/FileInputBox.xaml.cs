@@ -34,7 +34,13 @@ namespace RazorTransform
             RoutedEventArgs args = new RoutedEventArgs(FileNameChangedEvent);
             RaiseEvent(args);
         }
-        
+
+        public bool IsReadOnly
+        {
+            get { return theTextBox.IsReadOnly; }
+            set { theTextBox.IsReadOnly = value; theButton.IsEnabled = !value; }
+        }
+
         public event RoutedEventHandler FileNameChanged
         {
             add { AddHandler(FileNameChangedEvent, value); }

@@ -6,6 +6,9 @@ using System.ComponentModel;
 
 namespace RazorTransform
 {
+    /// <summary>
+    /// control for showing an array item
+    /// </summary>
     [System.Windows.Markup.ContentProperty("ItemName")]
     public partial class EditItemBox : UserControl
     {

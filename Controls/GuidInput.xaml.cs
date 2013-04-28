@@ -31,6 +31,12 @@ namespace RazorTransform
             RaiseEvent(args);
         }
 
+        public bool IsReadOnly 
+        {
+            get { return theTextBox.IsReadOnly;  }
+            set { theTextBox.IsReadOnly = value; theButton.IsEnabled = !value; } 
+        }
+
         public event RoutedEventHandler GuidStrChanged
         {
             add { AddHandler(GuidStrChangedEvent, value); }

@@ -22,7 +22,7 @@ namespace RazorTransform
             _window = w;
         }
 
-        public void Report(string value)
+        public void Report(ProgressInfo value)
         {
             syncContext.Post(_ =>
             {

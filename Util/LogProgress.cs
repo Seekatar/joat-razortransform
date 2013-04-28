@@ -25,7 +25,7 @@ namespace RazorTransform
         /// constructor
         /// </summary>
         /// <param name="fname">name of output file</param>
-        public LogProgress(string fname)
+        public LogProgress(ProgressInfo fname)
         {
             _consoleAttached = AttachConsole((int)-1);
 
@@ -42,7 +42,7 @@ namespace RazorTransform
         /// interaface implmentation of reporting a value
         /// </summary>
         /// <param name="t"></param>
-        public void Report(string t)
+        public void Report(ProgressInfo t)
         {
             if (_tw != null)
             {
@@ -75,7 +75,7 @@ namespace RazorTransform
             if (!String.IsNullOrWhiteSpace(secondaryMsg))
                 msg += Environment.NewLine + secondaryMsg;
 
-            Report(msg);
+            Report(new ProgressInfo(msg));
 
             return MessageBoxResult.None;
         }

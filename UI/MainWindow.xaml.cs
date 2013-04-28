@@ -32,5 +32,8 @@ namespace RazorTransform
         {
             Close();
         }
+        public void SendData(Dictionary<string, string> data)
+        {
+        }
     }
 }

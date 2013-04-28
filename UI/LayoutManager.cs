@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using RazorTransform.Controls;
 
 namespace RazorTransform
 {
@@ -41,7 +42,7 @@ namespace RazorTransform
             foreach (var ci in controls)
             {
 
-                var l = new Label() { Content = ci.DisplayName };
+                var l = new MyLabel() { Content = ci.DisplayName };
 
                 l.ToolTip = ci.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
@@ -75,7 +76,7 @@ namespace RazorTransform
                     re.Fill = gb;
                     re.SetValue(Grid.RowProperty, i);
                     re.SetValue(Grid.ColumnSpanProperty, 2);
-               
+
                     grid.Children.Add(re);
                 }
 
@@ -133,13 +134,16 @@ namespace RazorTransform
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
             // add 1 for the "New" button
-            Enumerable.Range(0, items.Count()+1).ToList().ForEach(x =>
+            Enumerable.Range(0, items.Count() + 1).ToList().ForEach(x =>
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) });
             });
 
+            StackPanel p = new StackPanel();
+            p.Background = GetButtonRowGradient();
+
             // add a New button under the expander
-            var add = new Button()
+            var add = new MyButton()
                 { 
                     Content = String.Format( Resource.NewItem, parent.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
@@ -153,16 +157,17 @@ namespace RazorTransform
                     addHandler(sender, args);
                 };
 
-            add.SetValue(Grid.ColumnSpanProperty, 2);
-            add.SetValue(Grid.RowProperty, 0);
+            p.SetValue(Grid.ColumnSpanProperty, 2);
+            p.SetValue(Grid.RowProperty, 0);
 
-            grid.Children.Add(add);
+            p.Children.Add(add);
+            grid.Children.Add(p);
             int i = 1;
 
             bool nameSet = false;
             foreach (var c in items)
             {
-                var l = new Label() { Tag = c };    
+                var l = new MyLabel() { Tag = c };
                 if (!nameSet)
                 {
                     nameSet = true;
@@ -209,13 +214,22 @@ namespace RazorTransform
 
                 t.Tag = c;
                 t.ItemName = c.DisplayName;
+                t.ToolTip = c.Description;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
+                t.Style = Application.Current.FindResource("CfgText") as Style;
+				
 
                 if ((i & 1) == 0)
 				{
-                    l.Background = new SolidColorBrush(Colors.AliceBlue);
 
+                    LinearGradientBrush gb = GetAltGradient();
+
+                    Rectangle re = new Rectangle();
+                    re.Fill = gb;
+                    re.SetValue(Grid.RowProperty, i);
+                    re.SetValue(Grid.ColumnSpanProperty, 2);
+                    grid.Children.Add(re);
                 }
                 i++;
                 grid.Children.Add(l);
@@ -237,7 +251,7 @@ namespace RazorTransform
             gb.GradientStops.Add(new GradientStop(color2, 1));
             return gb;
         }
-		
+
         private static LinearGradientBrush GetButtonRowGradient()
         {
             LinearGradientBrush gb = new LinearGradientBrush();
@@ -250,7 +264,7 @@ namespace RazorTransform
             gb.GradientStops.Add(new GradientStop(color2, 1));
             return gb;
         }
-		
+
         private static Control CreateControl(TransformModelItem info, Binding binding)
         {
             switch (info.Type)
@@ -280,9 +294,12 @@ namespace RazorTransform
         {
             return _UncPath(ci, binding);
         };
+
         private static Func<TransformModelItem, Binding, Control> _UncPath = (ci, binding) =>
         {
             var t = new FolderInputBox(ci.DisplayName, true);
+            if (ci.ReadOnly)
+                t.IsReadOnly = true;
 
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
@@ -291,42 +308,59 @@ namespace RazorTransform
         private static Func<TransformModelItem, Binding, Control> _Guid = (ci, binding) =>
         {
             var t = new GuidInput();
+            if (ci.ReadOnly)
+                t.IsReadOnly = true;
+
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(GuidInput.GuidStrProperty, binding);
             return t;
         };
         private static Func<TransformModelItem, Binding, Control> _Bool = (ci, binding) =>
-            {
-                var bib = new BoolInput();
+        {
+            var bib = new BoolInput();
+            if (ci.ReadOnly)
+                bib.IsEnabled = false;
 
-                binding.Mode = BindingMode.TwoWay;
-                bib.SetBinding(BoolInput.BoolProperty, binding);
-                return bib;
-            };
+            binding.Mode = BindingMode.TwoWay;
+            bib.SetBinding(BoolInput.BoolProperty, binding);
+            return bib;
+        };
+
         private static Func<TransformModelItem, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
         {
             var bib = new ComboBoxInput();
+            if (ci.ReadOnly)
+                bib.IsEnabled = false;
 
             binding.Mode = BindingMode.TwoWay;
             bib.SetBinding(ComboBoxInput.ComboBoxProperty, binding);
             return bib;
         };
+
         private static Func<TransformModelItem, Binding, Control> _Default = (ci, binding) =>
         {
             var t = new TextBox();
+            if (ci.ReadOnly)
+                t.IsReadOnly = true;
+
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
             return t;
         };
+
         private static Func<TransformModelItem, Binding, Control> _Password = (ci, binding) =>
         {
             var t = new PasswordBox();
+            if (ci.ReadOnly)
+                t.IsEnabled = false;
+
             t.MinWidth = 150;
             var value = ci.Value;
             (ci as PasswordTransformModelItem).PasswordBox = t;
             t.Password = value;
             return t;
         };
+
         private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
         {
             return _Default(ci, binding);

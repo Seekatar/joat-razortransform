@@ -30,5 +30,11 @@ namespace RazorTransform
         /// Parent should close on canceld
         /// <param name="results"></param>
         void ProcessingComplete(ProcessingResult results);
+		
+        /// <summary>
+        /// send data to parent
+        /// </summary>
+        /// <param name="data"></param>
+        void SendData(Dictionary<string, string> data);
     }
 }

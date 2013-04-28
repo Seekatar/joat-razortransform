@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
+using RazorTransform;
 
 namespace RazorTransform
 {
@@ -18,7 +19,7 @@ namespace RazorTransform
     {
         dynamic _model;
 
-        private int transformFiles(string inputMask, string outputFolder, bool saveFiles, bool recursive, CancellationToken cancel, IProgress<string> progress)
+        private int transformFiles(string inputMask, string outputFolder, bool saveFiles, bool recursive, CancellationToken cancel, IProgress<ProgressInfo> progress)
         {
             string currentFile = String.Empty;
             int count = 0;
@@ -33,18 +34,22 @@ namespace RazorTransform
                     mask = Path.GetFileName(inputMask);
                 }
 
-                if (progress != null) progress.Report("Starting transforms");
+                if (progress != null) progress.Report(new ProgressInfo("Starting transforms"));
 
+                var fileList = Directory.EnumerateFiles(folder, mask).OrderBy(o => o).ToList();
+                
                 var sw = new Stopwatch();
                 sw.Start();
 
-                foreach (var f in Directory.EnumerateFiles(folder, mask).OrderBy( o => o))
+                int i = 0;
+                foreach (var f in fileList )
                 {
+                    i++;
                     currentFile = f;
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(f);
+                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...",currentOperation:f,percentComplete:100*i/fileList.Count));
 
                     string template = File.ReadAllText(f);
                     string content = RazorEngine.Razor.Parse(template, _model);
@@ -61,7 +66,7 @@ namespace RazorTransform
                     count++;
                 }
                 sw.Stop();
-                if (progress != null) progress.Report(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds ));
+                if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds ),percentComplete:100));
 
             }
             catch (RazorEngine.Templating.TemplateCompilationException e)
@@ -72,7 +77,7 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
-                if (progress != null) progress.Report(sb.ToString());
+                if (progress != null) progress.Report(new ProgressInfo(sb.ToString()));
 
                 throw new Exception(sb.ToString());
             }
@@ -84,7 +89,8 @@ namespace RazorTransform
             {
                 var sb = new StringBuilder();
                 sb.AppendFormat("Error processing file {0}", Path.GetFileName(currentFile));
-                if (progress != null) progress.Report(sb.ToString()+ee.BuildMessage());
+                if (progress != null) 
+                    progress.Report(new ProgressInfo(sb.ToString()+ee.BuildMessage()));
 
                 throw new Exception(sb.ToString(),ee);
             }
@@ -103,12 +109,12 @@ namespace RazorTransform
         /// <param name="outputFolder"></param>
         /// <param name="recursive"></param>
         /// <param name="progress"></param>
-        public int TransformFiles(string inputMask, string outputFolder, bool saveFiles = true, bool recursive = false, IProgress<string> progress = null)
+        public int TransformFiles(string inputMask, string outputFolder, bool saveFiles = true, bool recursive = false, IProgress<ProgressInfo> progress = null)
         {
             return transformFiles(inputMask, outputFolder, saveFiles, recursive, CancellationToken.None, progress);
         }
 
-        public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<string> progress = null )
+        public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<ProgressInfo> progress = null )
         {
             return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);  });
         }

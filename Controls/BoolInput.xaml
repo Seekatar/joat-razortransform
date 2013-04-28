@@ -3,6 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="root">
     <DockPanel>
-        <CheckBox x:Name="theCheckBox"  IsChecked="{Binding Bool, ElementName=root}" Margin="0,0,2,0" VerticalAlignment="Center"/>
+        <CheckBox x:Name="theCheckBox"  IsChecked="{Binding Bool, ElementName=root}"  VerticalAlignment="Center"/>
     </DockPanel>
 </UserControl>

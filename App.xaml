@@ -1,20 +1,22 @@
 ﻿<Application x:Class="RazorTransform.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"      >
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"     
+             xmlns:my="clr-namespace:RazorTransform.Controls">
     <Application.Resources>
         <Style x:Key="CfgBigLabel" >
             <Setter Property="Control.FontSize" Value="16"/>
             <Setter Property="Control.FontWeight" Value="Bold"/>
         </Style>
         <Style x:Key="CfgLabel">
-            <Setter Property="Control.FontSize" Value="12"/>
-            <Setter Property="Control.FontWeight" Value="Normal"/>
-            <Setter Property="Control.FontStyle" Value="Italic"/>
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.FontWeight" Value="Bold"/>
+            <Setter Property="Control.Margin" Value="5,5,5,5"/>
         </Style>
         <Style x:Key="CfgText">
-            <Setter Property="Control.FontSize" Value="12"/>
-            <Setter Property="Control.FontWeight" Value="Normal"/>
-            <Setter Property="Control.Margin" Value="2"/>
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.Margin" Value="5,5,5,5"/>
         </Style>
         <Style x:Key="CfgButton">
             <Setter Property="Control.FontSize" Value="12"/>
@@ -22,15 +24,87 @@
             <Setter Property="Control.Margin" Value="5"/>
         </Style>
         <Style x:Key="ArrayButton">
-            <Setter Property="Control.FontSize" Value="12"/>
+            <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
-            <Setter Property="Control.Margin" Value="2"/>
+            <Setter Property="Control.Padding" Value="5"/>
         </Style>
         <Style x:Key="ArrayNewButton">
-            <Setter Property="Control.FontSize" Value="12"/>
-            <Setter Property="Control.FontWeight" Value="Bold"/>
-            <Setter Property="Control.Margin" Value="2"/>
-            <Setter Property="Control.Padding" Value="3"/>
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.Margin" Value="5"/>
+            <Setter Property="Control.Padding" Value="5"/>
+        </Style>
+        <Style TargetType="my:MyTabControl" x:Key="tabControlStyle">
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style TargetType="my:MyTabItem" x:Key="tabStyle">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#fdd3a8" Offset="0"/>
+                        <GradientStop Color="#fce79f" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="2,0,2,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+        </Style>
+        <Style x:Key="tabHeader">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="16"/>
+            <Setter Property="Control.Margin" Value="5"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="comboTxtBox">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+        <Style x:Key="txtBox">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.Padding" Value="5"/>
+        </Style>
+        <Style TargetType="my:MyButton" x:Key="txtButton">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+        <Style TargetType="my:MyButton" x:Key="mainButton">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style x:Key="progressTitle">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.Margin" Value="5"/>
+        </Style>
+        <Style x:Key="progressText">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.Margin" Value="15,5,5,5"/>
+        </Style>
+        <Style TargetType="ProgressBar" x:Key="progressBar">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#fdd3a8" Offset="0"/>
+                        <GradientStop Color="#fce79f" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#FF991B27" Offset="0"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Application.Resources>
 </Application>

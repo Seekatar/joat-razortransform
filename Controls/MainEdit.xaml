@@ -3,32 +3,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:my="clr-namespace:RazorTransform.Controls"
              xmlns:local="clr-namespace:RazorTransform"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Loaded="OnLoaded">
     <Grid >
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
-                <GradientStop Color="AliceBlue"  Offset="0"/>
-                <GradientStop Color="#FFFFFFFF" Offset="0.667"/>
-            </LinearGradientBrush>
-
-        </Grid.Background>
+       
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <local:NameValueEdit Grid.Row="0" x:Name="editControl" />
-        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Margin="5,5,0,0">
-            <Button Content="Settings" x:Name="btnSettings" Click="btnSettings_Click"/>
-        </StackPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch" Foreground="LightGray"></Label>
-            <Button Content="_Go! &amp; Close" HorizontalAlignment="Left" Margin="5" Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click" IsDefault="True" ToolTip="Run the transforms and if ok, exit."/>
-            <Button Content="G_o!" HorizontalAlignment="Left" Margin="5" Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms."/>
-            <Button Content="_Save" HorizontalAlignment="Left" Margin="5" Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click"/>
-            <Button Content="_Close" HorizontalAlignment="Right" Margin="5" Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" />
-        </StackPanel>
+        <local:NameValueEdit Grid.Row="0" x:Name="editControl"  />
+        <local:Progress x:Name="progress" Visibility="Collapsed" Grid.Row="1" />
+        <Border Grid.Row="2" BorderThickness="0,2,0,0" BorderBrush="Black">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Color="Black" Direction="90" Opacity=".3"/>
+            </Border.Effect>
+            <DockPanel >
+                <DockPanel.Background>
+
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#FF991B27" Offset="0"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+
+                </DockPanel.Background>
+                <StackPanel HorizontalAlignment="Left" Margin="5,5,0,0">
+                    <my:MyButton Content="Settings" x:Name="btnSettings" Click="btnSettings_Click" Style="{StaticResource mainButton}" Visibility="Hidden"></my:MyButton>
+                </StackPanel>
+                <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" >
+                    <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch" Foreground="LightGray"></Label>
+                    <my:MyButton Style="{StaticResource mainButton}" Content="_Go! &amp; Close" HorizontalAlignment="Left" x:Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click"  ToolTip="Run the transforms and if ok, exit." Visibility="Hidden"/>
+                    <my:MyButton Style="{StaticResource mainButton}" Content="G_o!" HorizontalAlignment="Left"  x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms." IsEnabled="False"/>
+                    <my:MyButton Style="{StaticResource mainButton}" Content="_Save" HorizontalAlignment="Left"  x:Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click"/>
+                    <my:MyButton Style="{StaticResource mainButton}"  Content="_Cancel" HorizontalAlignment="Right" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" IsEnabled="False"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
     </Grid>
 </UserControl>

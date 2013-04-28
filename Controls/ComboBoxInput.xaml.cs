@@ -45,6 +45,12 @@ namespace RazorTransform
             remove { RemoveHandler(ComboBoxChangedEvent, value); }
         }
 
+        public bool IsReadOnly
+        {
+            get { return theComboBox.IsReadOnly; }
+            set { theComboBox.IsReadOnly = value; }
+        }
+
         public static readonly DependencyProperty ComboBoxProperty =
            DependencyProperty.Register("ComboBoxStr", typeof(string), typeof(ComboBoxInput));
 

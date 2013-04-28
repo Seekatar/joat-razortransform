@@ -30,7 +30,7 @@ namespace RazorTransform
             {
                 _settings.SetParameters(parms);
                 if (_settings.Run)
-                    _output = new LogProgress(_settings.LogFile);
+                    _output = new LogProgress(new ProgressInfo(_settings.LogFile));
                 else
                     _output = new GuiProgress(window);
 

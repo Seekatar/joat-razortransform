@@ -2,26 +2,34 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:RazorTransform"
+        xmlns:my="clr-namespace:RazorTransform.Controls"
         Title="Item Edit" Height="450" Width="784" WindowStyle="SingleBorderWindow" 
         ShowInTaskbar="False"
         MinHeight="100" MinWidth="300">
     <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
-                <GradientStop Color="AliceBlue"  Offset="0"/>
-                <GradientStop Color="#FFFFFFFF" Offset="0.667"/>
-            </LinearGradientBrush>
-        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <local:NameValueEdit Grid.Row="0" x:Name="nvEdit"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Button Content="_OK" Height="23" HorizontalAlignment="Left" Margin="5" Name="btnOk" VerticalAlignment="Top" Width="75" Click="btnOk_Click"  IsDefault="True" />
-            <Button Content="_Cancel" Height="23" HorizontalAlignment="Right" Margin="5" Name="btnCancel" VerticalAlignment="Top" Width="75" IsCancel="True" Click="btnCancel_Click" />
-        </StackPanel>
+        <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="Black">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Color="Black" Direction="90" Opacity=".3"/>
+            </Border.Effect>
+            <StackPanel Grid.Row="1">
+                <StackPanel.Background>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#FF991B27" Offset="0"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+                </StackPanel.Background>
+                <DockPanel  HorizontalAlignment="Right" >
 
+                    <my:MyButton Style="{StaticResource txtButton}" Content="_OK"  HorizontalAlignment="Left" Margin="5" x:Name="btnOk" VerticalAlignment="Top" Width="75" Click="btnOk_Click"  IsDefault="True" />
+                    <my:MyButton Style="{StaticResource txtButton}" Content="_Cancel" HorizontalAlignment="Right" Margin="5" x:Name="btnCancel" VerticalAlignment="Top" Width="75" IsCancel="True" Click="btnCancel_Click" />
+                </DockPanel>
+            </StackPanel>
 
+        </Border>
     </Grid>
 </Window>

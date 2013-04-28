@@ -2,71 +2,82 @@
 <RtObject>
 
   <group name="Sampler" description="One of each" hidden="false">
-			<item name="stringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
-			<item name="boolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
-			<item name="intS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="1" type="Int32" hidden="false" min="10" max="20" />
-			<item name="enumS2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
-			<item name="uncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="c:\" type="UncPath" hidden="false" />
-			<item name="folderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
-			<item name="passwordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
-			<item name="guidS1" displayName="Guid" description="enter a password" defaultValue="" type="Guid" hidden="false" />
+    <item name="stringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValueasdf" type="String" hidden="false" min="10" max="20" />
+    <item name="boolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
+    <item name="intS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
+    <item name="enumS2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
+    <item name="uncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="c:\" type="UncPath" hidden="false" />
+    <item name="folderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
+    <item name="passwordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
+    <item name="guidS1" displayName="Guid" description="enter a password" defaultValue="" type="Guid" hidden="false" />
   </group>
 
   <group name="Strings" description="A few strings" hidden="false">
-			<item name="stringA1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
-			<item name="stringA2" displayName="String #2" description="String with min size of 10." defaultValue="default" type="String" hidden="false" min="10" />
-			<item name="stringA3" displayName="String #3" description="String with max size of 10." defaultValue="default" type="String" hidden="false" max="10" />
+    <item name="stringA1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValuasdfsadfe" type="String" hidden="false" min="10" max="20" />
+    <item name="stringA2" displayName="String #2" description="String with min size of 10." defaultValue="defaultasdf asdf" type="String" hidden="false" min="10" />
+    <item name="stringA3" displayName="String #3" description="String with max size of 10." defaultValue="defaultasdfasdf" type="String" hidden="false" max="10" />
   </group>
-  
-		<group name="Bools" description="A few booleans" hidden="false" >
-			<item name="boolA1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
-			<item name="boolA2" displayName="Boolean #2" description="This is a boolean value defaulting to True." defaultValue="True" type="Bool" hidden="false" />
+
+  <group name="Bools" description="A few booleans" hidden="false" >
+    <item name="boolA1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
+    <item name="boolA2" displayName="Boolean #2" description="This is a boolean value defaulting to True." defaultValue="True" type="Bool" hidden="false" />
   </group>
-		<group name="Ints" description="Some integers" hidden="false" >
-			<item name="intA1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="1" type="Int32" hidden="false" min="10" max="20" />
-			<item name="intA2" displayName="Int32 #2" description="Int32 with min of 10." defaultValue="2" type="Int32" hidden="false" min="10" />
-			<item name="intA3" displayName="Int32 #3" description="Int32 with max of 10." defaultValue="3" type="Int32" hidden="false" max="10" />
+  <group name="Ints" description="Some integers" hidden="false" >
+    <item name="intA1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
+    <item name="intA2" displayName="Int32 #2" description="Int32 with min of 10." defaultValue="12" type="Int32" hidden="false" min="10" />
+    <item name="intA3" displayName="Int32 #3" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" />
   </group>
-		<group name="Enums" description="Enumerations are fun!" hidden="false" >
-			<item name="enumD1" displayName="Enumeration A" description="EnumA description" defaultValue="enumKeyA" type="EnumA" hidden="false" />
-			<item name="enumD2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
-			<item name="enumD3" displayName="Enumeration C" description="EnumC description" defaultValue="" type="EnumC" hidden="false" />
+  <group name="Enums" description="Enumerations are fun!" hidden="false" >
+    <item name="enumD1" displayName="Enumeration A" description="EnumA description" defaultValue="enumKeyA" type="EnumA" hidden="false" />
+    <item name="enumD2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
+    <item name="enumD3" displayName="Enumeration C" description="EnumC description" defaultValue="" type="EnumC" hidden="false" />
   </group>
-		<group name="Grouped" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemB" min="3"key="-&gt;description name//" >
-			<item name="name" displayName="Name" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="description" displayName="Description" description="description" defaultValue="" type="string" hidden="false" />
-    
-		<group name="Nested Tab" description="this is another group" hidden="false" >
-			<item name="enumD1" displayName="Enumeration A" description="EnumA description" defaultValue="enumKeyA" type="EnumA" hidden="false" />
-			<item name="enumD2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
+  <group name="Grouped" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemB" min="3" key="-&gt;description name//" >
+    <item name="name" displayName="Name" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+    <item name="description" displayName="Description" description="description" defaultValue="" type="string" hidden="false" />
+
+    <group name="Nested Tab" description="this is another group" hidden="false" >
+      <item name="enumD1" displayName="Enumeration A" description="EnumA description" defaultValue="enumKeyA" type="EnumA" hidden="false" />
+      <item name="enumD2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
     </group>
   </group>
 
-		<group name="Simple Array" description="Array of itemAS objects with a group.  Min 2" hidden="false" arrayValueName="itemAS" min="2">
-		<group name="Basic" description="this is the basic stuff" hidden="false" >
-			<item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
+  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2" hidden="false" arrayValueName="itemAS" min="2">
+    <group name="Basic" description="this is the basic stuff" hidden="false" >
+      <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
     </group>
-		<group name="Other" description="this is other stuff" hidden="false" >
-			<item name="stringInA" displayName="String" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="intInA" displayName="Int" description="an integer" defaultValue="" type="Int32" hidden="false" />
+    <group name="Other" description="this is other stuff" hidden="false" >
+      <item name="stringInA" displayName="String" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="intInA" displayName="Int" description="an integer" defaultValue="" type="Int32" hidden="false" />
     </group>
   </group>
 
-		<group name="Nested Array" description="Array of itemA objects nested with ItemBs with min number of 0." hidden="false" arrayValueName="itemA" key="&gt;nameA" >
-		<group name="A" description="" hidden="false" >
-			<item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
+  <group name="Nested Array" description="Array of itemA objects nested with ItemBs with min number of 0." hidden="false" arrayValueName="itemA" key="&gt;nameA" >
+    <group name="A" description="" hidden="false" >
+      <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
     </group>
-		<group name="ItemB Array" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemAB" key="Key = nameB nameB2" >
-			<item name="nameB" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="nameB2" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="descriptionB" displayName="Description for B" description="description" defaultValue="" type="string" hidden="false" />
-		<group name="ItemC Array" description="Array of itemC objects." hidden="false" arrayValueName="itemAB" key="nameC" >
-			<item name="nameC" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-			<item name="descC" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="Int32" hidden="false" />
+    <group name="ItemB Array" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemAB" key="Key = nameB nameB2" >
+      <item name="nameB" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="nameB2" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="descriptionB" displayName="Description for B" description="description" defaultValue="" type="string" hidden="false" />
+      <group name="ItemC Array" description="Array of itemC objects." hidden="false" arrayValueName="itemAB" key="nameC" >
+        <item name="nameC" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+        <item name="descC" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="Int32" hidden="false" />
       </group>
     </group>
+  </group>
+
+  <group name="RO" description="One of each read only " hidden="false">
+    <item readOnly="true" name="RostringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
+    <item readOnly="true" name="RoboolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
+    <item readOnly="true" name="RointS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
+    <item readOnly="true" name="RoenumS2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
+    <item readOnly="true" name="RouncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="c:\" type="UncPath" hidden="false" />
+    <item readOnly="true" name="RofolderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
+    <item readOnly="true" name="RopasswordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
+    <item readOnly="true" name="RoguidS1" displayName="Guid" description="enter a password" defaultValue="" type="Guid" hidden="false" />
   </group>
 
   <custom name="ServerPort" classname="RazorTransform.Custom.ServerPort,RazorTransform"/>

@@ -30,6 +30,7 @@ namespace RazorTransform
         public MainEdit()
         {
             InitializeComponent();
+            _transformer.OnValuesSave += _transformer_OnValuesSave;
         }
 
         /// <summary>
@@ -64,13 +65,35 @@ namespace RazorTransform
             _parms = parms;
             _overrides = overrides;
         }
-
+        /// <summary>
+        /// handler for whem the transformer saves the RTValues.xml file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void _transformer_OnValuesSave(object sender, string e)
+        {
+            Dispatcher.Invoke(new Action(() =>
+                {
+                    _parent.SendData(new Dictionary<string, string>
+                    {
+                         {"ValuesContent", e}
+                    });
+                }));
+        }
+		
         private async Task<ProcessingResult> doTransforms(bool sentFromOk)
         {
             setButtonStates(ProcessingState.transforming);
 
             RanTransformOk = false;
-            var transformResult = await _transformer.DoTransformAsync();
+            TransformResult transformResult = new TransformResult();
+            transformResult.TranformResult = ProcessingResult.ok;
+
+            if (!_overrides.ContainsKey("PsSkipTransform"))
+            {
+                transformResult = await _transformer.DoTransformAsync();
+               
+            }
 
             if (transformResult.TranformResult == ProcessingResult.ok )
             {
@@ -227,8 +250,18 @@ namespace RazorTransform
         /// show a status message
         /// </summary>
         /// <param name="value"></param>
-        internal void Report(string value)
+        internal void Report(ProgressInfo value)
         {
+            if (value.PercentComplete == 100)
+            {
+                progress.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                if (progress.Visibility != System.Windows.Visibility.Visible)
+                    progress.Visibility = System.Windows.Visibility.Visible;
+                progress.Report(value);
+            }
             lblProgress.Content = "Processing " + value;
         }
 
@@ -244,8 +277,11 @@ namespace RazorTransform
 		
         public void Dispose()
         {
+            _transformer.OnValuesSave -= _transformer_OnValuesSave;
             _transformer = null;
             _parent = null;
+          
+           this.Dispatcher.InvokeShutdown();
         }
     }
 }

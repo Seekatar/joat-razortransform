@@ -1,9 +1,10 @@
 ﻿<UserControl x:Class="RazorTransform.GuidInput"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:my="clr-namespace:RazorTransform.Controls"
     x:Name="root">
     <DockPanel>
-        <Button x:Name="theButton" DockPanel.Dock="Right" Width="30"  Click="theButton_Click">New</Button>
-        <TextBox x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding GuidStr, ElementName=root}" Margin="0,0,2,0"/>
+        <my:MyButton Style="{StaticResource txtButton}" x:Name="theButton" DockPanel.Dock="Right"  Click="theButton_Click">New</my:MyButton>
+        <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding GuidStr, ElementName=root}"/>
     </DockPanel>
 </UserControl>

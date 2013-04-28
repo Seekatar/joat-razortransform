@@ -46,6 +46,7 @@ namespace RazorTransform
         internal const string ValueProvider = "valueProvider";
         internal const string Expanded = "expanded";
         internal const string Hidden = "hidden";
+        internal const string ReadOnly  = "readOnly";
         internal const string Arguments = "arguments";
         internal const string Class = "classname";
         internal const string Custom = "custom";

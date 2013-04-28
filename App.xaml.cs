@@ -59,10 +59,10 @@ namespace RazorTransform
                     {
                         transformer.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
 
-                        transformer.Output.Report(transformer.Settings.ToString(transformer.Model));
+                        transformer.Output.Report(new ProgressInfo( transformer.Settings.ToString(transformer.Model)));
                         if (transformer.Settings.Test)
                         {
-                            transformer.Output.Report(Resource.TestModeLogStart);
+                            transformer.Output.Report(new ProgressInfo(Resource.TestModeLogStart));
                         }
 
                         var result = transformer.DoTransformAsync();
@@ -73,23 +73,25 @@ namespace RazorTransform
                             ret = EXIT_NO_ERROR; // ok
                             if (transformer.Settings.Test)
                             {
-                                transformer.Output.Report(Resource.TestModeComplete);
+                                transformer.Output.Report(new ProgressInfo(Resource.TestModeComplete));
                             }
                             else if (transformer.Settings.NoSave)
                             {
-                                transformer.Output.Report(Resource.NoSave);
+                                transformer.Output.Report(new ProgressInfo(Resource.NoSave));
                             }
                         }
                     }
                     catch (Exception e)
                     {
-                        transformer.Output.Report(String.Format(Resource.ExceptionFormat, e.BuildMessage()));
+                        transformer.Output.Report(new ProgressInfo(String.Format(Resource.ExceptionFormat, e.BuildMessage())));
                     }
                 }
                 else // show gui
                 {
                     var app = new App();
+#if !TELERIK
                     app.InitializeComponent();
+#endif
                     var mw = new MainWindow();
                     try
                     {

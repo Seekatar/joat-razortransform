@@ -3,6 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="root">
     <DockPanel>
-        <ComboBox x:Name="theComboBox"  SelectedValue="{Binding ComboBoxStr, ElementName=root}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding ComboBoxList, ElementName=root}" Margin="0,0,2,0" VerticalAlignment="Center"/>
+        <ComboBox x:Name="theComboBox" Style="{StaticResource comboTxtBox}"  SelectedValue="{Binding ComboBoxStr, ElementName=root}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding ComboBoxList, ElementName=root}"  VerticalAlignment="Center"/>
     </DockPanel>
 </UserControl>

@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using RazorTransform.Controls;
 
 namespace RazorTransform
 {
@@ -11,13 +14,17 @@ namespace RazorTransform
     /// </summary>
     public partial class NameValueEdit : UserControl
     {
+        MyTabControl _tabCtrl;
         IEnumerable<TransformModelGroup> _groups;
 
         public NameValueEdit()
         {
             InitializeComponent();
             DataContext = this;
+            SearchVisibility = System.Windows.Visibility.Collapsed;
         }
+
+        public System.Windows.Visibility SearchVisibility { get; set; }
 
         /// <summary>
         /// populate the control with items from the groups
@@ -27,10 +34,19 @@ namespace RazorTransform
         {
             _groups = groups;
 
-            var selectedIndex = _tabCtrl.SelectedIndex;
-            _tabCtrl.Items.Clear();
+            stackPanel.Children.Clear();
+
+            var selectedIndex = -1;
+            if (_tabCtrl != null)
+            {
+                selectedIndex = _tabCtrl.SelectedIndex;
+                _tabCtrl.Items.Clear();
+            }
 
             StackPanel lastExpanderStack = null;
+            _tabCtrl = new MyTabControl();
+            _tabCtrl.Style = (Style)this.FindResource("tabControlStyle");
+            _tabCtrl.Background = Brushes.White;
 
             foreach (var group in groups.Where( o => !o.Hidden))
             {
@@ -49,14 +65,15 @@ namespace RazorTransform
                     lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group));
                 }
             }
+            stackPanel.Children.Add(_tabCtrl);
             _tabCtrl.SelectedIndex = selectedIndex;
         }
 
-        private TabItem createTab(TransformModelGroup group)
+        private MyTabItem createTab(TransformModelGroup group)
         {
-            var tab = new TabItem();
-            tab.Style = this.FindResource("CfgBigLabel") as Style;
-            tab.Header = group.DisplayName;
+            var tab = new MyTabItem();
+            tab.Style = this.FindResource("tabStyle") as Style;
+            tab.Header = CreateTabHeader(group.DisplayName);
             if (group.Description != null)
                 tab.ToolTip = group.Description;
             _tabCtrl.Items.Add(tab);
@@ -153,5 +170,29 @@ namespace RazorTransform
             Load(_groups);
         }
 
+
+        private FrameworkElement CreateTabHeader(string text)
+        {
+            TextBlock block = new TextBlock();
+            block.Text = text;
+			block.Style = (Style)this.FindResource("tabHeader");
+          
+            return block;
+        }
+
+        private bool CompareTabHeader(object left, object right)
+        {
+            if (left is TextBlock && right is TextBlock)
+            {
+                TextBlock t1 = left as TextBlock;
+                TextBlock t2 = right as TextBlock;
+
+                return String.Compare(t1.Text, t2.Text, true) == 0;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

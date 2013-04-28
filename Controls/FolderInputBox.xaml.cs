@@ -54,7 +54,13 @@ namespace RazorTransform
             add { AddHandler(FolderNameChangedEvent, value); }
             remove { RemoveHandler(FolderNameChangedEvent, value); }
         }
-        
+
+        public bool IsReadOnly
+        {
+            get { return theTextBox.IsReadOnly; }
+            set { theTextBox.IsReadOnly = value; theButton.IsEnabled = !value; }
+        }
+
         public static readonly DependencyProperty FolderNameProperty =
            DependencyProperty.Register("FolderName", typeof(string), typeof(FolderInputBox));
         

@@ -91,6 +91,11 @@ namespace RazorTransform
         /// </summary>
         public bool Hidden { get; set; }
 
+        /// <summary>
+        /// Is this item readOnly in the UI
+        /// </summary>
+        public bool ReadOnly { get; set; }
+
         // strings so type can figure out what min and max means.  e.g. int, decimal, date
 
         /// <summary>
@@ -213,6 +218,8 @@ namespace RazorTransform
             {
                 throw new Exception("Invalid type for property " + PropertyName);
             }
+
+            ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
 
             Min = (string)itemXml.Attribute(Constants.Min) ?? "";
             Max = (string)itemXml.Attribute(Constants.Max) ?? "";
