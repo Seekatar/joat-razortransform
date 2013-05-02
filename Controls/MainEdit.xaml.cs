@@ -114,8 +114,6 @@ namespace RazorTransform
                 }
             }
 
-            lblProgress.Content = String.Empty;
-
             setButtonStates(ProcessingState.transformed);
 
             return transformResult.TranformResult;
@@ -262,7 +260,6 @@ namespace RazorTransform
                     progress.Visibility = System.Windows.Visibility.Visible;
                 progress.Report(value);
             }
-            lblProgress.Content = "Processing " + value;
         }
 
         /// <summary>

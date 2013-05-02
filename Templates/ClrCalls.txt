@@ -1,0 +1,1 @@
+﻿The version is @Model.version and short version is @Model.versionShort

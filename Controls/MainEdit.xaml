@@ -33,7 +33,6 @@
                     <my:MyButton Content="Settings" x:Name="btnSettings" Click="btnSettings_Click" Style="{StaticResource mainButton}" Visibility="Hidden"></my:MyButton>
                 </StackPanel>
                 <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" >
-                    <Label Name="lblProgress" Width="Auto" HorizontalAlignment="Stretch" Foreground="LightGray"></Label>
                     <my:MyButton Style="{StaticResource mainButton}" Content="_Go! &amp; Close" HorizontalAlignment="Left" x:Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click"  ToolTip="Run the transforms and if ok, exit." Visibility="Hidden"/>
                     <my:MyButton Style="{StaticResource mainButton}" Content="G_o!" HorizontalAlignment="Left"  x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms." IsEnabled="False"/>
                     <my:MyButton Style="{StaticResource mainButton}" Content="_Save" HorizontalAlignment="Left"  x:Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click"/>

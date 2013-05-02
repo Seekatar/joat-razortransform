@@ -87,6 +87,11 @@
             <Setter Property="Control.FontFamily" Value="Arial"/>
             <Setter Property="Control.Margin" Value="15,5,5,5"/>
         </Style>
+        <Style TargetType="Border" x:Key="progressBorder">
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
         <Style TargetType="ProgressBar" x:Key="progressBar">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Background">

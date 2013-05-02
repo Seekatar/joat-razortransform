@@ -89,9 +89,9 @@ namespace RazorTransform
                 else // show gui
                 {
                     var app = new App();
-#if !TELERIK
+
                     app.InitializeComponent();
-#endif
+
                     var mw = new MainWindow();
                     try
                     {

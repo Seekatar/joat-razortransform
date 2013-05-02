@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using RazorTransform;
+using System.Web;
 
 namespace RazorTransform
 {
@@ -58,7 +59,7 @@ namespace RazorTransform
                         throw new Exception("Transform returned no content");
 
                     if (content.Contains("@Model.") || content.Contains("@(")) // allow one level of nesting of @Model. or @(
-                        content = RazorEngine.Razor.Parse(content, _model);
+                        content = RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(content), _model);
 
                     if (saveFiles)
                         File.WriteAllText(Path.Combine(outputFolder, Path.GetFileName(f)), content);
@@ -77,7 +78,7 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
-                if (progress != null) progress.Report(new ProgressInfo(sb.ToString()));
+                if (progress != null) progress.Report(new ProgressInfo(sb.ToString(), percentComplete:100));
 
                 throw new Exception(sb.ToString());
             }
@@ -90,7 +91,7 @@ namespace RazorTransform
                 var sb = new StringBuilder();
                 sb.AppendFormat("Error processing file {0}", Path.GetFileName(currentFile));
                 if (progress != null) 
-                    progress.Report(new ProgressInfo(sb.ToString()+ee.BuildMessage()));
+                    progress.Report(new ProgressInfo(sb.ToString()+ee.BuildMessage(),percentComplete:100));
 
                 throw new Exception(sb.ToString(),ee);
             }

@@ -216,6 +216,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Resource Include="Templates\ClrCalls.txt" />
     <Content Include="Templates\ItemBTranforms.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
