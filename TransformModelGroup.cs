@@ -90,7 +90,7 @@ namespace RazorTransform
                     TransformModelItem i = null;
 
                     var typeName = (String)e.Attribute(Constants.Type) ?? String.Empty;
-                    var type = Constants.GetType(typeName);
+                    var type = Constants.MapType(typeName);
 
                     if (type == RtType.Password)
                         i = new PasswordTransformModelItem(this);

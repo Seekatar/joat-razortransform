@@ -2,6 +2,7 @@
 <RtObject>
 
   <group name="Sampler" description="One of each" hidden="false">
+    <item name="colorS1" displayName="Color" description="pick a color" defaultValue="Blue" type="ColorType" />
     <item name="stringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValueasdf" type="String" hidden="false" min="10" max="20" />
     <item name="boolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
     <item name="intS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
@@ -82,6 +83,7 @@
     <item readOnly="true" name="RoguidS1" displayName="Guid" description="enter a password" defaultValue="" type="Guid" hidden="false" />
   </group>
 
+  <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
   <custom name="ServerPort" classname="RazorTransform.Custom.ServerPort,RazorTransform"/>
   <custom name="WebPort" classname="RazorTransform.Custom.WebPort,RazorTransform"/>
 

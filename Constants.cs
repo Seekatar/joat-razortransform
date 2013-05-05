@@ -53,22 +53,11 @@ namespace RazorTransform
         internal const string Parameter = "parameter";
 
         /// <summary>
-        /// extract the type from a XElement
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public static RtType GetType(XElement x)
-        {
-            var s = (String)x.Attribute(Constants.Type) ?? String.Empty;
-            return GetType(s);
-        }
-
-        /// <summary>
         /// map the type name to an RtType
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static RtType GetType(string typeName)
+        public static RtType MapType(string typeName)
         {
             switch (typeName.ToLower())
             {
@@ -86,8 +75,6 @@ namespace RazorTransform
                     return RtType.Guid;
                 case "bool":
                     return RtType.Bool;
-                case "Array":
-                    return RtType.Array;
                 case "hidden":
                     return RtType.HiddenString;
                 default:

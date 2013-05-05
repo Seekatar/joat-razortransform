@@ -284,7 +284,10 @@ namespace RazorTransform
                     ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
                     return ret;
                 default:
-                    return _Default(info, binding);
+                    if (info.Type == RtType.Custom)
+                        return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding);
+                    else
+                        return _Default(info, binding);
             }
         }
 
@@ -363,7 +366,19 @@ namespace RazorTransform
 
         private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
         {
-            return _Default(ci, binding);
+            var t = new Xceed.Wpf.Toolkit.IntegerUpDown();
+            if (ci.ReadOnly)
+                t.IsEnabled = false;
+
+            t.Minimum = ci.MinInt;
+            t.Maximum = ci.MaxInt;
+
+            t.TextAlignment = TextAlignment.Left;
+            t.Value = Int32.Parse(ci.Value);
+
+            t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
+
+            return t;
         };
     }
 }

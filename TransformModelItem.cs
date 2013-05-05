@@ -87,6 +87,11 @@ namespace RazorTransform
         public RtType Type { get; set; }
 
         /// <summary>
+        /// raw type from Xml
+        /// </summary>
+        public string OriginalType { get; set; }
+
+        /// <summary>
         /// Is this item to be shown in the UI
         /// </summary>
         public bool Hidden { get; set; }
@@ -201,7 +206,10 @@ namespace RazorTransform
 
             Description = (string)itemXml.Attribute(Constants.Description) ?? DisplayName;
 
-            Type = Constants.GetType(itemXml);
+            OriginalType = (String)itemXml.Attribute(Constants.Type) ?? String.Empty;
+
+            Type = Constants.MapType(OriginalType);
+
             if (Type == RtType.HiddenString) // old files have hidden as type to indicate hidden string
             {
                 Type = RtType.String;
