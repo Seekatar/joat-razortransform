@@ -44,7 +44,7 @@ namespace RazorTransform
         /// <summary>
         /// get the items to show in the UI 
         /// </summary>
-        public override IEnumerable<TransformModelItem> Items
+        public override IEnumerable<ITransformModelItem> Items
         {
             get { return _items;  }
         }

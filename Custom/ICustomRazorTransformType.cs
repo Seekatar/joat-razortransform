@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Xml.Linq;
 
@@ -16,7 +17,7 @@ namespace RazorTransform.Custom
         /// <param name="parent"></param>
         /// <param name="e">XML for this item being parsed to allow for custom attributes</param>
         /// <returns>an empty object that will load itself</returns>
-        TransformModelItem CreateItem(TransformModelGroup parent, XElement e);
+        TransformModelItem CreateItem(ITransformModelGroup parent, XElement e);
 
         /// <summary>
         /// create the control from the item
@@ -24,6 +25,13 @@ namespace RazorTransform.Custom
         /// <param name="info">an item created earlier when CreateItem was called</param>
         /// <param name="binding">the binding object for the control</param>
         /// <returns>the control to show on the screen</returns>
-        Control CreateControl(TransformModelItem info, Binding binding);
+        Control CreateControl(ITransformModelItem info, Binding binding);
+
+        /// <summary>
+        /// called after the object is constructed
+        /// </summary>
+        /// <param name="model">the model that you're being constructed for</param>
+        /// <param name="parms">any parameters from your XML</param>
+        void Initialize(ITransformModel model, IDictionary<string, string> parms);
     }
 }

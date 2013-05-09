@@ -265,7 +265,7 @@ namespace RazorTransform
             return gb;
         }
 
-        private static Control CreateControl(TransformModelItem info, Binding binding)
+        private static Control CreateControl(ITransformModelItem info, Binding binding)
         {
             switch (info.Type)
             {
@@ -293,12 +293,12 @@ namespace RazorTransform
 
 
 
-        private static Func<TransformModelItem, Binding, Control> _Folder = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Folder = (ci, binding) =>
         {
             return _UncPath(ci, binding);
         };
 
-        private static Func<TransformModelItem, Binding, Control> _UncPath = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _UncPath = (ci, binding) =>
         {
             var t = new FolderInputBox(ci.DisplayName, true);
             if (ci.ReadOnly)
@@ -308,7 +308,7 @@ namespace RazorTransform
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
             return t;
         };
-        private static Func<TransformModelItem, Binding, Control> _Guid = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Guid = (ci, binding) =>
         {
             var t = new GuidInput();
             if (ci.ReadOnly)
@@ -318,7 +318,7 @@ namespace RazorTransform
             t.SetBinding(GuidInput.GuidStrProperty, binding);
             return t;
         };
-        private static Func<TransformModelItem, Binding, Control> _Bool = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Bool = (ci, binding) =>
         {
             var bib = new BoolInput();
             if (ci.ReadOnly)
@@ -329,7 +329,7 @@ namespace RazorTransform
             return bib;
         };
 
-        private static Func<TransformModelItem, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
         {
             var bib = new ComboBoxInput();
             if (ci.ReadOnly)
@@ -340,7 +340,7 @@ namespace RazorTransform
             return bib;
         };
 
-        private static Func<TransformModelItem, Binding, Control> _Default = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Default = (ci, binding) =>
         {
             var t = new TextBox();
             if (ci.ReadOnly)
@@ -351,7 +351,7 @@ namespace RazorTransform
             return t;
         };
 
-        private static Func<TransformModelItem, Binding, Control> _Password = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Password = (ci, binding) =>
         {
             var t = new PasswordBox();
             if (ci.ReadOnly)
@@ -364,7 +364,7 @@ namespace RazorTransform
             return t;
         };
 
-        private static Func<TransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
         {
             var t = new Xceed.Wpf.Toolkit.IntegerUpDown();
             if (ci.ReadOnly)

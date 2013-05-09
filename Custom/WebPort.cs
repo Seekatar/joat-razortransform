@@ -28,14 +28,18 @@ namespace RazorTransform.Custom
 
     public class WebPort : ICustomRazorTransformType
     {
-        public Control CreateControl(TransformModelItem ci, System.Windows.Data.Binding binding)
+        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding)
         {
             return ServerPort.CreatePortControl(ci, binding);
         }
 
-        public TransformModelItem CreateItem(TransformModelGroup parent, XElement e)
+        public TransformModelItem CreateItem(ITransformModelGroup parent, XElement e)
         {
             return new WebPortModelItem();
+        }
+
+        public void Initialize(ITransformModel model, IDictionary<string, string> parms)
+        {
         }
     }
 }

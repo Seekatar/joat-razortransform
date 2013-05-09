@@ -4,7 +4,7 @@ namespace RazorTransform
     /// <summary>
     /// event args for something changing, adding, deleting
     /// </summary>
-    class ItemChangedArgs : System.EventArgs
+    public class ItemChangedArgs : System.EventArgs
     {
         /// <summary>
         /// the group of the item in question
@@ -20,7 +20,7 @@ namespace RazorTransform
     /// <summary>
     /// event args for global changes, load, validate, save, etc.
     /// </summary>
-    class ModelChangedArgs : System.EventArgs
+    public class ModelChangedArgs : System.EventArgs
     {
     }
 

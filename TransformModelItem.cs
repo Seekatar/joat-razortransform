@@ -11,7 +11,7 @@ namespace RazorTransform
     /// <summary>
     /// one piece of config info meta data
     /// </summary>
-    public class TransformModelItem
+    public class TransformModelItem : ITransformModelItem
     {
         protected XElement _element;
 
@@ -136,7 +136,7 @@ namespace RazorTransform
         /// <summary>
         /// group we're in 
         /// </summary>
-        public TransformModelGroup Parent { get; set; }
+        public ITransformModelGroup Parent { get; set; }
 
         /// <summary>
         /// current value of the item

@@ -7,9 +7,9 @@ using System.Xml.Linq;
 
 namespace RazorTransform
 {
-    public class TransformModelGroup
+    public class TransformModelGroup : RazorTransform.ITransformModelGroup
     {
-        protected List<TransformModelItem> _children = new List<TransformModelItem>();
+        protected List<ITransformModelItem> _children = new List<ITransformModelItem>();
 
         /// <summary>
         /// name to show in the UI
@@ -31,13 +31,13 @@ namespace RazorTransform
         /// </summary>
         public bool Hidden { get; set; }
 
-        public List<TransformModelItem> Children
+        public List<ITransformModelItem> Children
         {
             get { return _children; }
             protected set { _children = value; }
         }
 
-        public virtual IEnumerable<TransformModelItem> Items
+        public virtual IEnumerable<ITransformModelItem> Items
         {
             get { return _children; }
         }
@@ -50,7 +50,7 @@ namespace RazorTransform
         {
             DisplayName = src.DisplayName;
             Description = src.Description;
-            Children = new List<TransformModelItem>();
+            Children = new List<ITransformModelItem>();
             Expanded = src.Expanded;
             Children.AddRange(src.Children.Select(o => 
                             { 

@@ -11,8 +11,8 @@ namespace RazorTransform
     [System.Windows.Markup.ContentProperty("Port")]
     public partial class PortInput : UserControl
     {
-        private TransformModelItem info;
-        public PortInput(TransformModelItem info)
+        private ITransformModelItem info;
+        public PortInput(ITransformModelItem info)
         {
 
             this.info = info;
@@ -84,8 +84,8 @@ namespace RazorTransform
 
     public class PortValidation : ValidationRule
     {
-        private TransformModelItem info;
-        public PortValidation(TransformModelItem info)
+        private ITransformModelItem info;
+        public PortValidation(ITransformModelItem info)
         {
             this.info = info;
         }

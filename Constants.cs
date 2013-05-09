@@ -51,6 +51,7 @@ namespace RazorTransform
         internal const string Class = "classname";
         internal const string Custom = "custom";
         internal const string Parameter = "parameter";
+        internal const string Model = "model";
 
         /// <summary>
         /// map the type name to an RtType

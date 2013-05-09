@@ -34,8 +34,9 @@ namespace RazorTransform
             {
                 if (i.Children != null)
                 {
-                    foreach (var c in i.Children)
+                    foreach (var cc in i.Children)
                     {
+                        var c = cc as TransformModelItem;
                         if (criteria(c))
                         {
                             results.Add(c);

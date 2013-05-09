@@ -74,7 +74,23 @@ namespace RazorTransform.Custom
         }
 
         #endregion
-        public RtThySelfType(TransformModel _model)
+        public RtThySelfType()
+        { }
+
+        public TransformModelItem CreateItem(ITransformModelGroup parent, System.Xml.Linq.XElement e)
+        {
+            // never needed to be called
+            throw new NotImplementedException();
+        }
+
+        public System.Windows.Controls.Control CreateControl(ITransformModelItem info, System.Windows.Data.Binding binding)
+        {
+            // never needed to be called
+            throw new NotImplementedException();
+        }
+
+
+        public void Initialize(ITransformModel _model, IDictionary<string, string> parms)
         {
             _model.ItemAdded += OnItemChanged;
             _model.ItemDeleted += OnItemChanged;
@@ -82,16 +98,5 @@ namespace RazorTransform.Custom
             _model.ModelLoaded += OnModelLoaded;
         }
 
-        public TransformModelItem CreateItem(TransformModelGroup parent, System.Xml.Linq.XElement e)
-        {
-            // never needed to be called
-            throw new NotImplementedException();
-        }
-
-        public System.Windows.Controls.Control CreateControl(TransformModelItem info, System.Windows.Data.Binding binding)
-        {
-            // never needed to be called
-            throw new NotImplementedException();
-        }
     }
 }

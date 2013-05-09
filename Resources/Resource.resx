@@ -140,6 +140,12 @@
   <data name="ErrorCreatingCustom" xml:space="preserve">
     <value>Failed to create object from </value>
   </data>
+  <data name="ErrorCreatingCustomAmbiguous" xml:space="preserve">
+    <value>Two one-parameter constructors, one with Model, one with string are ambiguous in custom type: </value>
+  </data>
+  <data name="ErrorCreatingCustomConstructor" xml:space="preserve">
+    <value>No matching constructor found for custom class: </value>
+  </data>
   <data name="ErrorCustomType" xml:space="preserve">
     <value>Could not create custom type from</value>
   </data>

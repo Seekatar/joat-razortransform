@@ -12,7 +12,7 @@ namespace RazorTransform
     /// <summary>
     /// class to read and contain the settings to be merged with all the other files
     /// </summary>
-    class TransformModel
+    class TransformModel : RazorTransform.ITransformModel
     {
 
         #region Events
@@ -232,7 +232,7 @@ namespace RazorTransform
 
                             if (updateXml)
                             {
-                                i.UpdateXml();
+                                (i as TransformModelItem).UpdateXml();
                             }
                         }
                     }
@@ -247,7 +247,7 @@ namespace RazorTransform
             return ret;
         }
 
-        protected void checkLimits(TransformModelItem i)
+        protected void checkLimits(ITransformModelItem i)
         {
             string value = (i.Value ?? String.Empty).Trim();
             switch (i.Type)
@@ -330,7 +330,7 @@ namespace RazorTransform
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
             _enums.Clear();
-            _customs.Clear();
+            TransformModel.Instance.Customs.Clear();
             Arrays.Clear();
             Groups.Clear();
 
@@ -346,47 +346,37 @@ namespace RazorTransform
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Custom))
             {
-                var name = (String)x.Attribute(Constants.Name);
+                var parms = new Dictionary<string, string>();
+                string name = null;
+
+                string className = null;
+                foreach (var a in x.Attributes())
+                {
+                    if (a.Name == Constants.Name)
+                        name = a.Value;
+                    else if (a.Name == Constants.Class)
+                        className = a.Value;
+                    else
+                        parms[a.Name.LocalName] = a.Value;
+                }
                 if (name == null)
                     throw new ArgumentNullException(Resource.ErrorNullCustomName);
-                var className = (String)x.Attribute(Constants.Class);
                 if (className == null)
                     throw new ArgumentNullException(Resource.ErrorNullCustomClassName + name);
-                var constructorParam = (String)x.Attribute(Constants.Parameter);
 
                 Custom.ICustomRazorTransformType custom = null;
                 Type t = Type.GetType(className);
                 if (t == null)
                     throw new ArgumentException(Resource.ErrorCustomType + className);
 
-                var constructors = t.GetConstructors();
-                foreach (var c in constructors)
-                {
-                    var ps = c.GetParameters();
-                    switch (ps.Count())
-                    {
-                        case 0:
-                            custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
-                            break;
-                        case 1:
-                            if (ps[0].ParameterType == GetType())
-                                custom = Activator.CreateInstance(t, new object[1] { this }) as Custom.ICustomRazorTransformType;
-                            else if (ps[0].ParameterType == typeof(String))
-                                custom = Activator.CreateInstance(t, new object[1] { constructorParam ?? String.Empty }) as Custom.ICustomRazorTransformType;
-                            break;
-                        case 2:
-                            if (ps[0].ParameterType == GetType() && ps[1].ParameterType == typeof(String))
-                                custom = Activator.CreateInstance(t, new object[2] { this, constructorParam ?? String.Empty }) as Custom.ICustomRazorTransformType;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
 
                 if (custom == null)
-                    throw new ArgumentException(Resource.ErrorCreatingCustom  + className);
+                    throw new ArgumentException(Resource.ErrorCreatingCustom + className);
+                else
+                    custom.Initialize(this, parms);
 
-                _customs.Add(name, custom);
+                TransformModel.Instance.Customs.Add(name, custom);
             }
 
             // get any ones known to us already
@@ -394,11 +384,11 @@ namespace RazorTransform
             {
                 if (t.GetInterface(typeof(RazorTransform.Custom.ICustomRazorTransformType).FullName) != null)
                 {
-                    if (!_customs.Any(o => o.Key == t.Name))
+                    if (!TransformModel.Instance.Customs.Any(o => o.Key == t.Name))
                     {
                         var custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
                         if (custom != null)
-                            _customs.Add(t.Name, custom);
+                            TransformModel.Instance.Customs.Add(t.Name, custom);
                     }
                 }
             }
@@ -453,7 +443,7 @@ namespace RazorTransform
                 foreach (var item in g.Items)
                 {
                     if (!(item is PasswordTransformModelItem))
-                        saveItem(root, item);
+                        saveItem(root, item as TransformModelItem);
                 }
             }
         }

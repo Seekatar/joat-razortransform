@@ -41,11 +41,11 @@ namespace RazorTransform
         /// all the items in the groups, flattened out to make it 
         /// easier to get to them 
         /// </summary>
-        public IEnumerable<TransformModelItem> Items 
+        public IEnumerable<ITransformModelItem> Items 
         { 
             get 
             {
-                var ret = new List<TransformModelItem>();
+                var ret = new List<ITransformModelItem>();
                 foreach (var g in _groups)
                 {
                     ret.AddRange(g.Items);
