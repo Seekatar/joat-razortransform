@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -140,6 +138,7 @@ namespace RazorTransform
             });
 
             StackPanel p = new StackPanel();
+            p.Orientation = Orientation.Horizontal;
             p.Background = GetButtonRowGradient();
 
             // add a New button under the expander
@@ -161,6 +160,12 @@ namespace RazorTransform
             p.SetValue(Grid.RowProperty, 0);
 
             p.Children.Add(add);
+            var description = new TextBlock()
+            {
+                Text = parent.Description,
+                Style = Application.Current.FindResource("addDescText") as Style
+            };
+            p.Children.Add(description);
             grid.Children.Add(p);
             int i = 1;
 
@@ -284,7 +289,7 @@ namespace RazorTransform
                     ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
                     return ret;
                 default:
-                    if (info.Type == RtType.Custom)
+                    if (info.Type == RtType.Custom && TransformModel.Instance.Customs.ContainsKey(info.OriginalType))
                         return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding);
                     else
                         return _Default(info, binding);

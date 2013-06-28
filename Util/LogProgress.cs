@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using RtPsHost;
 
 namespace RazorTransform
 {
@@ -46,11 +43,11 @@ namespace RazorTransform
         {
             if (_tw != null)
             {
-                _tw.WriteLine("{0} {1}", DateTime.Now.ToString("G"), t);
+                _tw.WriteLine("{0} {1}", DateTime.Now.ToString("G"), t.ToString());
                 _tw.Flush();
             }
             if (_consoleAttached)
-                Console.WriteLine(t);
+                Console.WriteLine(t.ToString());
         }
 
         /// <summary>

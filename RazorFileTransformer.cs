@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Dynamic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Diagnostics;
-using RazorTransform;
+using System.Threading.Tasks;
 using System.Web;
+using RtPsHost;
 
 namespace RazorTransform
 {
@@ -38,19 +36,19 @@ namespace RazorTransform
                 if (progress != null) progress.Report(new ProgressInfo("Starting transforms"));
 
                 var fileList = Directory.EnumerateFiles(folder, mask).OrderBy(o => o).ToList();
-                
+
                 var sw = new Stopwatch();
                 sw.Start();
 
                 int i = 0;
-                foreach (var f in fileList )
+                foreach (var f in fileList)
                 {
                     i++;
                     currentFile = f;
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...",currentOperation:f,percentComplete:100*i/fileList.Count));
+                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...", currentOperation: f, percentComplete: 100 * i / fileList.Count));
 
                     string template = File.ReadAllText(f);
                     string content = RazorEngine.Razor.Parse(template, _model);
@@ -67,7 +65,7 @@ namespace RazorTransform
                     count++;
                 }
                 sw.Stop();
-                if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds ),percentComplete:100));
+                if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds), percentComplete: 100));
 
             }
             catch (RazorEngine.Templating.TemplateCompilationException e)
@@ -78,8 +76,6 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
-                if (progress != null) progress.Report(new ProgressInfo(sb.ToString(), percentComplete:100));
-
                 throw new Exception(sb.ToString());
             }
             catch (OperationCanceledException)
@@ -90,18 +86,57 @@ namespace RazorTransform
             {
                 var sb = new StringBuilder();
                 sb.AppendFormat("Error processing file {0}", Path.GetFileName(currentFile));
+                throw new Exception(sb.ToString(), ee);
+            }
+            finally
+            {
                 if (progress != null) 
-                    progress.Report(new ProgressInfo(sb.ToString()+ee.BuildMessage(),percentComplete:100));
-
-                throw new Exception(sb.ToString(),ee);
+                    progress.Report(new ProgressInfo(String.Empty, percentComplete: 100));
             }
             return count;
         }
 
         // constructor 
+        // make nested substitutions first to avoid problems with transforming them
         public RazorFileTransformer(dynamic model)
         {
             _model = model;
+            for (int i = 0; i < 5; i++) // allow 5 levels of nesting
+            {
+                if (substituteValues(model) == 0)
+                    break;
+            }
+        }
+
+        private int substituteValues(dynamic model)
+        {
+            var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
+
+            int changeCount = 0;
+            var changes = new System.Collections.Generic.Dictionary<string, object>();
+            foreach (var kv in ex)
+            {
+                if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
+                {
+                    foreach (var e in kv.Value as System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
+                    {
+                        changeCount += substituteValues(e);
+                    }
+                }
+                else if (kv.Value.ToString().Contains("@Model.") || kv.Value.ToString().Contains("@(")) // allow one level of nesting of @Model. or @(
+                {
+                    changes.Add(kv.Key, RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(kv.Value.ToString()), model));
+                }
+            }
+            if (changes.Count > 0)
+            {
+                foreach (var c in changes)
+                {
+                    ex[c.Key] = c.Value;
+                }
+                changeCount += changes.Count;
+            }
+            return changeCount;
         }
 
         /// <summary>

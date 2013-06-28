@@ -1,5 +1,4 @@
-﻿using System;
-namespace RazorTransform
+﻿namespace RazorTransform
 {
     public interface ITransformModelItem
     {

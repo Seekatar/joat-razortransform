@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System.Linq;
-using System.Reflection;
 
 namespace RazorTransform
 {
@@ -45,6 +44,7 @@ namespace RazorTransform
             PropertyName = src.PropertyName;
             Description = src.Description;
             Type = src.Type;
+            OriginalType = src.OriginalType;
             Parent = src.Parent;
             Min = src.Min;
             Max = src.Max;
