@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace RazorTransform
@@ -52,6 +50,7 @@ namespace RazorTransform
             Description = src.Description;
             Children = new List<ITransformModelItem>();
             Expanded = src.Expanded;
+            Hidden = src.Hidden;
             Children.AddRange(src.Children.Select(o => 
                             { 
                                 var ret = (TransformModelItem)Activator.CreateInstance(o.GetType(), o); 

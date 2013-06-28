@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -141,10 +139,11 @@ namespace RazorTransform
             if ( g.Children.Count > 0 )
                 PrototypeGroups.Add(g);
 
-            // copy prototype group attribute to this
+            // copy prototype group attributes to this
             DisplayName = g.DisplayName;
             Description = g.Description;
             Expanded = g.Expanded;
+            Hidden = g.Hidden;
 
             // load nested arrays (groups)
             foreach (var x in xml.Elements(Constants.Group))

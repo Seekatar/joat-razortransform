@@ -184,11 +184,13 @@ namespace RazorTransform
             dict.Add("Root", root);
 
             String currentName = "<unknown>";
+            ITransformModelGroup currentGroup = null;
 
             try
             {
                 foreach (var g in groups)
                 {
+                    currentGroup = g;
                     currentName = g.DisplayName;
 
                     if (g is TransformModelArray)
@@ -196,9 +198,10 @@ namespace RazorTransform
                         var i = g as TransformModelArray;
                         var children = new List<ExpandoObject>();
                         if (i.Items.Count() < i.Min)
-                            throw new Exception(String.Format(Resource.MinCount, i.DisplayName, i.Min));
+                            throw new ValidationException(String.Format(Resource.MinCount, i.DisplayName, i.Min), g);
                         foreach (var c in i.Items)
                         {
+                            currentName = (c as TransformModelArrayItem).DisplayName;
                             children.Add(buildObject((c as TransformModelArrayItem).Groups, false, true, destinationFolder, ret, root));
                         }
                         dict.Add(i.ArrayValueName, children);
@@ -238,6 +241,12 @@ namespace RazorTransform
                     }
                 }
             }
+            catch (ValidationException ve)
+            {
+                if (ve.Group.Count() == 0 || ve.Group.Last().Item1 != currentGroup)
+                    ve.AddGroup(currentGroup,currentName);
+                throw ve;
+            }
             catch (Exception e)
             {
                 string msg = String.Format(Resource.ProcessError, currentName, e.BuildMessage());
@@ -255,11 +264,11 @@ namespace RazorTransform
                 case RtType.String:
                     if (i.MinInt != Int32.MinValue && value.Length < i.MinInt)
                     {
-                        throw new Exception(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt));
+                        throw new ValidationException(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt),i);
                     }
                     if (i.MaxInt != Int32.MaxValue && value.Length > i.MaxInt)
                     {
-                        throw new Exception(String.Format(Resource.MaxStrLen, i.DisplayName, i.MaxInt));
+                        throw new ValidationException(String.Format(Resource.MaxStrLen, i.DisplayName, i.MaxInt),i);
                     }
                     break;
 
@@ -269,16 +278,16 @@ namespace RazorTransform
                     {
                         if (v < i.MinInt)
                         {
-                            throw new Exception(String.Format(Resource.MinInt, i.DisplayName, i.MinInt));
+                            throw new ValidationException(String.Format(Resource.MinInt, i.DisplayName, i.MinInt),i);
                         }
                         if (i.MaxInt != Int32.MaxValue && i.MaxInt != 0 && v > i.MaxInt)
                         {
-                            throw new Exception(String.Format(Resource.MaxInt, i.DisplayName, i.MaxInt));
+                            throw new ValidationException(String.Format(Resource.MaxInt, i.DisplayName, i.MaxInt),i);
                         }
                     }
                     else
                     {
-                        throw new Exception(String.Format(Resource.BadInteger, i.DisplayName, i.Value));
+                        throw new ValidationException(String.Format(Resource.BadInteger, i.DisplayName, i.Value),i);
                     }
                     break;
             }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
-using System.ComponentModel;
 
 namespace RazorTransform
 {

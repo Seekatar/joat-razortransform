@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using RtPsHost;
 
 namespace RazorTransform
 {
-    public enum ProcessingResult
-    {
-        ok,         // completed ok
-        canceled,   // completed, user-canceled
-        failed,     // errored out
-        close       // ok and Go & Close used or Cancel clicked
-    }
-
     /// <summary>
     /// passed into control to let it talk to parent
     /// </summary>

@@ -97,6 +97,8 @@
     <Compile Include="ITransformModelItem.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
+    <Compile Include="ProcessingResult.cs" />
+    <Compile Include="ProgressInfo.cs" />
     <Compile Include="RazorTransformer.cs" />
     <Compile Include="TransformModelArray.cs" />
     <Compile Include="TransformModelArrayItem.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="UI\LayoutManager.cs" />
     <Compile Include="Util\ExceptionExtension.cs" />
+    <Compile Include="ValidationException.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Xml.Linq;
+using RtPsHost;
 
 namespace RazorTransform
 {
@@ -89,6 +86,11 @@ namespace RazorTransform
                 catch (OperationCanceledException)
                 {
                     _output.ShowMessage(Resource.Canceled, MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (ValidationException ve)
+                {
+                    _output.ShowMessage(ve.ToString(), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
                 }
                 catch (Exception ee)
                 {

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Dynamic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Diagnostics;
-using RazorTransform;
+using System.Threading.Tasks;
 using System.Web;
+using RtPsHost;
 
 namespace RazorTransform
 {
@@ -38,19 +36,19 @@ namespace RazorTransform
                 if (progress != null) progress.Report(new ProgressInfo("Starting transforms"));
 
                 var fileList = Directory.EnumerateFiles(folder, mask).OrderBy(o => o).ToList();
-                
+
                 var sw = new Stopwatch();
                 sw.Start();
 
                 int i = 0;
-                foreach (var f in fileList )
+                foreach (var f in fileList)
                 {
                     i++;
                     currentFile = f;
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...",currentOperation:f,percentComplete:100*i/fileList.Count));
+                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...", currentOperation: f, percentComplete: 100 * i / fileList.Count));
 
                     string template = File.ReadAllText(f);
                     string content = RazorEngine.Razor.Parse(template, _model);
@@ -67,7 +65,7 @@ namespace RazorTransform
                     count++;
                 }
                 sw.Stop();
-                if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds ),percentComplete:100));
+                if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds), percentComplete: 100));
 
             }
             catch (RazorEngine.Templating.TemplateCompilationException e)
@@ -78,8 +76,6 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
-                if (progress != null) progress.Report(new ProgressInfo(sb.ToString(), percentComplete:100));
-
                 throw new Exception(sb.ToString());
             }
             catch (OperationCanceledException)
@@ -90,10 +86,12 @@ namespace RazorTransform
             {
                 var sb = new StringBuilder();
                 sb.AppendFormat("Error processing file {0}", Path.GetFileName(currentFile));
+                throw new Exception(sb.ToString(), ee);
+            }
+            finally
+            {
                 if (progress != null) 
-                    progress.Report(new ProgressInfo(sb.ToString()+ee.BuildMessage(),percentComplete:100));
-
-                throw new Exception(sb.ToString(),ee);
+                    progress.Report(new ProgressInfo(String.Empty, percentComplete: 100));
             }
             return count;
         }
