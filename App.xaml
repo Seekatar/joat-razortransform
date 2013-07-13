@@ -3,6 +3,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"     
              xmlns:my="clr-namespace:RazorTransform.Controls">
     <Application.Resources>
+        <LinearGradientBrush x:Key="ButtonBackground" StartPoint="0.5,0" EndPoint="0.5,1">
+            <GradientStop Color="#f0f0f0" Offset="0"/>
+            <GradientStop Color="LightGray" Offset=".5"/>
+            <GradientStop Color="DarkGray" Offset=".6"/>
+            <GradientStop Color="DarkGray" Offset=".75"/>
+            <GradientStop Color="LightGray" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="MouseOverButtonBackground" StartPoint="0.5,0" EndPoint="0.5,1">
+            <GradientStop Color="#f0f0f0" Offset="0"/>
+            <GradientStop Color="#fce79f" Offset=".5"/>
+            <GradientStop Color="LightGoldenrodYellow" Offset=".6"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="IsPressedButtonBackground" StartPoint="0.5,0" EndPoint="0.5,1">
+            <GradientStop Color="#f0f0f0" Offset="0"/>
+            <GradientStop Color="#fce79f" Offset=".5"/>
+            <GradientStop Color="Goldenrod" Offset=".6"/>
+        </LinearGradientBrush>
+        <ControlTemplate x:Key="ButtonTemplate" TargetType="{x:Type Button}">
+            <Border Name="customBorder" Padding="5" Background="{StaticResource ButtonBackground}" BorderBrush="DarkGray" BorderThickness="1">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" TargetName="customBorder" Value="{StaticResource MouseOverButtonBackground}"/>
+                </Trigger>
+                <Trigger Property="IsPressed"  Value="True">
+                    <Setter Property="Background" TargetName="customBorder" Value="{StaticResource IsPressedButtonBackground}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX=".95" ScaleY=".95"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransformOrigin" Value=".5,.5"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
         <Style x:Key="CfgBigLabel" >
             <Setter Property="Control.FontSize" Value="16"/>
             <Setter Property="Control.FontWeight" Value="Bold"/>
@@ -22,17 +58,18 @@
             <Setter Property="Control.FontSize" Value="12"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
             <Setter Property="Control.Margin" Value="5"/>
+            <Setter Property="Control.Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
         <Style x:Key="ArrayButton">
             <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.FontWeight" Value="Normal"/>
-            <Setter Property="Control.Padding" Value="5"/>
+            <Setter Property="Control.Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
         <Style x:Key="ArrayNewButton">
             <Setter Property="Control.FontFamily" Value="Arial"/>
             <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.Margin" Value="5"/>
-            <Setter Property="Control.Padding" Value="5"/>
+            <Setter Property="Control.Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
         <Style TargetType="my:MyTabControl" x:Key="tabControlStyle">
             <Setter Property="BorderThickness" Value="0"/>
@@ -60,7 +97,8 @@
         <Style TargetType="ComboBox" x:Key="comboTxtBox">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="0"/>
         </Style>
         <Style x:Key="txtBox">
             <Setter Property="Control.FontFamily" Value="Arial"/>
@@ -70,13 +108,14 @@
         <Style TargetType="my:MyButton" x:Key="txtButton">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
         <Style TargetType="my:MyButton" x:Key="mainButton">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Padding" Value="5"/>
             <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
         <Style x:Key="progressTitle">
             <Setter Property="Control.FontFamily" Value="Arial"/>
@@ -86,6 +125,12 @@
         <Style x:Key="progressText">
             <Setter Property="Control.FontFamily" Value="Arial"/>
             <Setter Property="Control.Margin" Value="15,5,5,5"/>
+        </Style>
+        <Style x:Key="addDescText">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.Foreground" Value="White"/>
+            <Setter Property="Control.Background" Value="Transparent"/>
+            <Setter Property="Control.VerticalAlignment" Value="Center"/>
         </Style>
         <Style TargetType="Border" x:Key="progressBorder">
             <Setter Property="CornerRadius" Value="3"/>
