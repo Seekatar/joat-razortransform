@@ -107,6 +107,7 @@ namespace RazorTransform
         /// <summary>
         /// settings object of the current run to allow Razor views to have access to it
         /// </summary>
+        public Settings Settings { get { return _settings;  } }
         protected Settings _settings { get; set; }
 
         /// <summary>
@@ -168,10 +169,6 @@ namespace RazorTransform
         {
             var ret = new ExpandoObject();
             var dict = ret as IDictionary<string, object>;
-
-            // add some of the global values to the object to be available in the transform
-            if (destinationFolder != null)
-                dict.Add("DestinationFolder", destinationFolder);
 
             if (parent != null)
                 dict.Add("Parent", parent);
@@ -310,6 +307,7 @@ namespace RazorTransform
             {
                 doc = XDocument.Load(fs);
             }
+            checkDestinationFolder(doc, settings.OutputFolder);
             return LoadValuesFromXml(doc.Root, settings);
         }
 
@@ -489,11 +487,26 @@ namespace RazorTransform
                 throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
 
             var definitionDoc = XDocument.Load(path);
+            checkDestinationFolder(definitionDoc, _settings.OutputFolder);
             LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
 
             OnModelLoaded();
 
             return true;
+        }
+
+        private void checkDestinationFolder(XDocument doc, string p)
+        {
+            if (doc.Root.Elements().Count() > 0 && 
+                doc.Root.Elements().First().Elements("item").Where(o => o.Attribute("name").Value == "DestinationFolder").SingleOrDefault() == null)
+            {
+                doc.Root.Elements().First().Add(new XElement("item", new XAttribute("name", "DestinationFolder"),
+                                                   new XAttribute("hidden", "true"),
+                                                   new XAttribute("displayName", "Do not use"),
+                                                   new XAttribute("description", "do not use"),
+                                                   new XAttribute("type", "String"),
+                                                   new XAttribute("defaultValue",p)));
+            }
         }
 
         /// <summary>

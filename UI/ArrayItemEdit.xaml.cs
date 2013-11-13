@@ -18,10 +18,10 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( IList<TransformModelGroup> orig )
+        public bool ShowDialog( IList<TransformModelGroup> orig, bool showHidden )
         {
             var temp = new List<TransformModelGroup>(orig);
-            Load(temp);
+            Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if (ShowDialog() ?? false)
             {
@@ -32,9 +32,9 @@ namespace RazorTransform
 
         }
 
-        public void Load(IEnumerable<TransformModelGroup> info)
+        public void Load(IEnumerable<TransformModelGroup> info, bool showHidden)
         {
-            nvEdit.Load(info);
+            nvEdit.Load(info, showHidden);
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)

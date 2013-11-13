@@ -55,7 +55,7 @@ namespace RazorTransform
         /// <param name="list"></param>
         internal void Load(List<TransformModelGroup> list)
         {
-            editControl.Load(list);
+            editControl.Load(list, _transformer.Settings.ShowHidden );
         }
 
         public void Initalize(ITransformParentWindow parent, IDictionary<string, object> parms, IDictionary<string, string> overrides, bool embedded = false)
@@ -225,7 +225,7 @@ namespace RazorTransform
         {
             var aie = new ArrayItemEdit();
             aie.Owner = Window.GetWindow(this);
-            aie.ShowDialog(_transformer.Settings.ConfigInfo);
+            aie.ShowDialog(_transformer.Settings.ConfigInfo,_transformer.Settings.ShowHidden);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace RazorTransform
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 _transformer.Initialize(_parms, _overrides, this);
-                editControl.Load(_transformer.Model.Groups);
+                editControl.Load(_transformer.Model.Groups, _transformer.Settings.ShowHidden );
                 setButtonStates(ProcessingState.idle);
                 _parent.SetTitle(TitleSuffix);
             }

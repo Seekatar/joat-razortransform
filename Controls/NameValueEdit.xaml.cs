@@ -29,7 +29,7 @@ namespace RazorTransform
         /// populate the control with items from the groups
         /// </summary>
         /// <param name="groups"></param>
-        public void Load(IEnumerable<TransformModelGroup> groups)
+        public void Load(IEnumerable<TransformModelGroup> groups, bool showHidden )
         {
             _groups = groups;
 
@@ -47,7 +47,7 @@ namespace RazorTransform
             _tabCtrl.Style = (Style)this.FindResource("tabControlStyle");
             _tabCtrl.Background = Brushes.White;
 
-            foreach (var group in groups.Where( o => !o.Hidden))
+            foreach (var group in groups.Where( o => showHidden || !o.Hidden))
             {
                 var tabItem = createTab(group);
 
@@ -61,7 +61,7 @@ namespace RazorTransform
                 }
                 else
                 {
-                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group));
+                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group, showHidden ));
                 }
             }
             stackPanel.Children.Add(_tabCtrl);
@@ -160,13 +160,14 @@ namespace RazorTransform
         bool editArrayItem(IList<TransformModelGroup> orig)
         {
             var nve = new ArrayItemEdit();
-            nve.Owner = Window.GetWindow(this);
-            return nve.ShowDialog(orig);
+            nve.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            nve.TrySetOwner(Window.GetWindow(this));
+            return nve.ShowDialog(orig, TransformModel.Instance.Settings.ShowHidden);
         }
 
         private void Reload()
         {
-            Load(_groups);
+            Load(_groups, TransformModel.Instance.Settings.ShowHidden);
         }
 
 

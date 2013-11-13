@@ -53,6 +53,7 @@ namespace RazorTransform
             ObjectFile = "RtObject.xml";
             ValuesFile = "RtValues.xml";
             Test = false;
+            ShowHidden = false;
             OverrideOutputFolder = null;
             OverrideTemplateFolder = null;
             LogFile = "RazorTransform.log";
@@ -80,10 +81,11 @@ namespace RazorTransform
         }
         public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["RTSettings_LastTemplatePath"]); } set { this["RTSettings_LastTemplatePath"] = value; } }
 
-        // temp values
-        public bool Test { get; set; }
-        public bool NoSave { get; set; }
-        public bool Debug { get; set; }
+        // temp values passed in on command line, set from dict passed in via reflection, see SetParameters
+        public bool ShowHidden { get; private set; }
+        public bool Test { get; private set; }
+        public bool NoSave { get; private set; }
+        public bool Debug { get; private set; }
 
         // set with GetFullPath since XDocument read does odd things if not a full path
         public string ObjectFile { get { return _objectFile; } set { _objectFile = Path.GetFullPath(value); } }

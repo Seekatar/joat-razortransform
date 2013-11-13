@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using RtPsHost;
+using System.Linq;
 
 namespace RazorTransform
 {
@@ -116,7 +117,14 @@ namespace RazorTransform
         {
             if (!_settings.Test && !_settings.NoSave)
             {
+                // add this to the model since we sneak it in for transforms.  That way if someone needs it
+                // after the transform, it's there.
+                var dest = _model.Groups[0].Children.Where( o => o.PropertyName == "DestinationFolder" ).SingleOrDefault();
+                if ( dest != null )
+                    dest.Value = _settings.OutputFolder;
+
                 var body = _model.Save(_settings.ValuesFile);
+
                 if (OnValuesSave != null)
                 {
                     OnValuesSave(this, body);

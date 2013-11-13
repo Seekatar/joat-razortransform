@@ -28,7 +28,7 @@ namespace RazorTransform
 
             try
             {
-                _fs = new FileStream(fname, FileMode.Create);
+                _fs = new FileStream(fname, FileMode.Append);
                 _tw = new StreamWriter(_fs);
             }
             catch

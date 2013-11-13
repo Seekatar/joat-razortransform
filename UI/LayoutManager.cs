@@ -16,7 +16,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="group"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(TransformModelGroup group)
+        public static FrameworkElement BuildGridView(TransformModelGroup group, bool showHidden )
         {
             var items = group.Items;
 
@@ -27,7 +27,7 @@ namespace RazorTransform
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            var controls = items.Where(x => !x.Hidden).ToList();
+            var controls = items.Where(x => showHidden || !x.Hidden).ToList();
             Enumerable.Range(0, controls.Count).ToList().ForEach(x =>
                 {
                     grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0, GridUnitType.Auto) });
@@ -379,7 +379,7 @@ namespace RazorTransform
             t.Maximum = ci.MaxInt;
 
             t.TextAlignment = TextAlignment.Left;
-            t.Value = Int32.Parse(ci.Value);
+            t.Value = Int32.Parse(ci.Value ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
 

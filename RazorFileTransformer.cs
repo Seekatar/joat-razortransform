@@ -101,11 +101,6 @@ namespace RazorTransform
         public RazorFileTransformer(dynamic model)
         {
             _model = model;
-            for (int i = 0; i < 5; i++) // allow 5 levels of nesting
-            {
-                if (substituteValues(model) == 0)
-                    break;
-            }
         }
 
         private int substituteValues(dynamic model)
@@ -152,7 +147,13 @@ namespace RazorTransform
 
         public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<ProgressInfo> progress = null )
         {
-            return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);  });
+            // first do any values that have @Model in them
+            for (int i = 0; i < 5; i++) // allow 5 levels of nesting
+            {
+                if (substituteValues(_model) == 0)
+                    break;
+            }
+            return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress); });
         }
     }
 }
