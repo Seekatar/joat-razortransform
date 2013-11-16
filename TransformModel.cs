@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace RazorTransform
 {
@@ -95,6 +96,11 @@ namespace RazorTransform
         private IDictionary<string, Dictionary<string, string>> _enums = new Dictionary<string, Dictionary<string, string>>();
 
         /// <summary>
+        /// all the enums loaded from the Xml
+        /// </summary>
+        private IDictionary<string, string> _regexes = new Dictionary<string,string>();
+
+        /// <summary>
         /// all the custom items loaded from the Xml
         /// </summary>
         private IDictionary<string, Custom.ICustomRazorTransformType> _customs = new Dictionary<string, Custom.ICustomRazorTransformType>();
@@ -119,6 +125,11 @@ namespace RazorTransform
         /// all the enums loaded from the Xml
         /// </summary>
         public IDictionary<string, Dictionary<string, string>> Enums { get { return _enums; } }
+
+        /// <summary>
+        /// all the regular expressions load from the Xml
+        /// </summary>
+        public IDictionary<string, string> RegExes { get { return _regexes; } }
 
         /// <summary>
         /// all the custom items loaded from the Xml
@@ -196,6 +207,16 @@ namespace RazorTransform
                         var children = new List<ExpandoObject>();
                         if (i.Items.Count() < i.Min)
                             throw new ValidationException(String.Format(Resource.MinCount, i.DisplayName, i.Min), g);
+                        if ( i.Unique )
+                        {
+                            for ( int j = 0; j < (i.Items.Count() -1); j++ )
+                            {
+                                if ( i.Items.Skip(j+1).Any( o => o.DisplayName.Equals(i.Items.ElementAt(j).DisplayName)))
+                                {
+                                    throw new ValidationException( String.Format( Resource.UniqueViolation, i.Items.ElementAt(j).DisplayName), g);
+                                }
+                            }
+                        }
                         foreach (var c in i.Items)
                         {
                             currentName = (c as TransformModelArrayItem).DisplayName;
@@ -259,6 +280,10 @@ namespace RazorTransform
             switch (i.Type)
             {
                 case RtType.String:
+                    if (!String.IsNullOrWhiteSpace(i.RegEx) && !Regex.IsMatch( value, TransformModel.Instance.RegExes[i.RegEx] ))
+                    {
+                        throw new ValidationException(String.Format(Resource.RegExViolation, i.DisplayName, i.RegEx), i);
+                    }
                     if (i.MinInt != Int32.MinValue && value.Length < i.MinInt)
                     {
                         throw new ValidationException(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt),i);
@@ -349,6 +374,16 @@ namespace RazorTransform
                 var dict = new Dictionary<string, string>();
                 dict.LoadFromXml(x);
                 _enums.Add(name.Value, dict);
+            }
+
+            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.RegEx))
+            {
+                var name = x.Attribute(Constants.Name);
+                var value = x.Attribute(Constants.Value);
+
+                if (name == null || value == null )
+                    throw new ArgumentNullException(Resource.ErrorNullRegEx);
+                _regexes.Add(name.Value, value.Value);
             }
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Custom))

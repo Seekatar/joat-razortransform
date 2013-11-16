@@ -29,6 +29,16 @@ namespace RazorTransform
         /// </summary>
         public bool Hidden { get; set; }
 
+        /// <summary>
+        /// Current sort state for group
+        /// </summary>
+        public bool Sort { get; set; }
+
+        /// <summary>
+        /// Should display names be unique
+        /// </summary>
+        public bool Unique { get; set; }
+
         public List<ITransformModelItem> Children
         {
             get { return _children; }
@@ -79,7 +89,9 @@ namespace RazorTransform
             Description = (String)xml.Attribute(Constants.Description) ?? String.Empty;
             Expanded = (bool?)xml.Attribute(Constants.Expanded) ?? false;
             Hidden = (bool?)xml.Attribute(Constants.Hidden) ?? false;
-
+            Sort = (bool?)xml.Attribute(Constants.Sort) ?? false;
+            Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
+            
             // elements
             // regular group can only have items
             foreach (var e in xml.Elements())

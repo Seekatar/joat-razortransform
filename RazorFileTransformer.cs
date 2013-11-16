@@ -33,7 +33,7 @@ namespace RazorTransform
                     mask = Path.GetFileName(inputMask);
                 }
 
-                if (progress != null) progress.Report(new ProgressInfo("Starting transforms"));
+                if (progress != null) progress.Report(new ProgressInfo(Resource.StartingTransforms));
 
                 var fileList = Directory.EnumerateFiles(folder, mask).OrderBy(o => o).ToList();
 
@@ -41,6 +41,7 @@ namespace RazorTransform
                 sw.Start();
 
                 int i = 0;
+                var processing = Resource.ProcessingTransforms;
                 foreach (var f in fileList)
                 {
                     i++;
@@ -48,13 +49,13 @@ namespace RazorTransform
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(new ProgressInfo("Processing transforms...", currentOperation: f, percentComplete: 100 * i / fileList.Count));
+                    if (progress != null) progress.Report(new ProgressInfo(processing, currentOperation: f, percentComplete: 100 * i / fileList.Count));
 
                     string template = File.ReadAllText(f);
                     string content = RazorEngine.Razor.Parse(template, _model);
 
                     if (content == null)
-                        throw new Exception("Transform returned no content");
+                        throw new Exception(String.Format(Resource.TransformNoContent, currentFile));
 
                     if (content.Contains("@Model.") || content.Contains("@(")) // allow one level of nesting of @Model. or @(
                         content = RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(content), _model);
@@ -103,19 +104,27 @@ namespace RazorTransform
             _model = model;
         }
 
-        private int substituteValues(dynamic model)
+        private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null )
         {
             var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
 
             int changeCount = 0;
             var changes = new System.Collections.Generic.Dictionary<string, object>();
+            int max = Math.Max(1,ex.Count);
+            int count = 0;
+            var scanning = Resource.ScanningDependents;
+            if (progress != null)
+                progress.Report(new ProgressInfo(scanning));
             foreach (var kv in ex)
             {
+                if (progress != null)
+                    progress.Report(new ProgressInfo(scanning,  currentOperation: kv.Key,  percentComplete: (++count * 100 / max)));
+
                 if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
                 {
                     foreach (var e in kv.Value as System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
                     {
-                        changeCount += substituteValues(e);
+                        changeCount += substituteValues(e, cancel );
                     }
                 }
                 else if (kv.Value.ToString().Contains("@Model.") || kv.Value.ToString().Contains("@(")) // allow one level of nesting of @Model. or @(
@@ -123,6 +132,9 @@ namespace RazorTransform
                     changes.Add(kv.Key, RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(kv.Value.ToString()), model));
                 }
             }
+            if ( progress != null )
+                progress.Report(new ProgressInfo(scanning, percentComplete: 100));
+
             if (changes.Count > 0)
             {
                 foreach (var c in changes)
@@ -147,13 +159,16 @@ namespace RazorTransform
 
         public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<ProgressInfo> progress = null )
         {
-            // first do any values that have @Model in them
-            for (int i = 0; i < 5; i++) // allow 5 levels of nesting
-            {
-                if (substituteValues(_model) == 0)
-                    break;
-            }
-            return Task.Run(() => { return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress); });
+            return Task.Run(() =>
+            {             
+                // first do any values that have @Model in them
+                for (int i = 0; i < 5; i++) // allow 5 levels of nesting
+                {
+                    if (substituteValues(_model, cancel, progress) == 0)
+                        break;
+                }
+                return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);
+            });
         }
     }
 }

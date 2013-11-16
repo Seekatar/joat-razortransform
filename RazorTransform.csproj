@@ -97,8 +97,8 @@
     <Compile Include="ITransformModelItem.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
-    <Compile Include="ProcessingResult.cs" />
-    <Compile Include="ProgressInfo.cs" />
+    <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
+    <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTransformer.cs" />
     <Compile Include="TransformModelArray.cs" />
     <Compile Include="TransformModelArrayItem.cs" />
@@ -118,6 +118,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="UI\LayoutManager.cs" />
     <Compile Include="Util\ExceptionExtension.cs" />
+    <Compile Include="Util\WindowExtensions.cs" />
     <Compile Include="ValidationException.cs" />
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -166,6 +167,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Custom\PortInput.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PowerShell\UI\Prompt.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PowerShell\UI\PsConsole.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -267,7 +276,12 @@
   <ItemGroup>
     <Resource Include="Resources\favicon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\joat-rtpshost\RtPsHost.csproj">
+      <Project>{412dc3ea-c4b8-4010-b9cd-7dbb5650ddb3}</Project>
+      <Name>RtPsHost</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

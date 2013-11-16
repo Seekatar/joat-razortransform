@@ -134,6 +134,11 @@ namespace RazorTransform
         public Decimal MaxDecimal { get { Decimal i; return Decimal.TryParse(Max, out i) && i != 0 ? i : Decimal.MaxValue; } }
 
         /// <summary>
+        /// RegEx validation
+        /// </summary>
+        public string RegEx { get; set; }
+
+        /// <summary>
         /// group we're in 
         /// </summary>
         public ITransformModelGroup Parent { get; set; }
@@ -229,8 +234,13 @@ namespace RazorTransform
 
             ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
 
-            Min = (string)itemXml.Attribute(Constants.Min) ?? "";
-            Max = (string)itemXml.Attribute(Constants.Max) ?? "";
+            RegEx = (string)itemXml.Attribute(Constants.RegEx) ?? String.Empty;
+            if (!String.IsNullOrWhiteSpace(RegEx) && !TransformModel.Instance.RegExes.ContainsKey(RegEx))
+            {
+                throw new Exception(String.Format(Resource.RegExNotFound, RegEx));
+            }
+            Min = (string)itemXml.Attribute(Constants.Min) ?? String.Empty;
+            Max = (string)itemXml.Attribute(Constants.Max) ?? String.Empty;
 
             setDefaultValue(itemXml);
 

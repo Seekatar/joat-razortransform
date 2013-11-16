@@ -161,6 +161,9 @@
   <data name="ErrorNullEnumName" xml:space="preserve">
     <value>name on enum</value>
   </data>
+  <data name="ErrorNullRegEx" xml:space="preserve">
+    <value>RegEx configuration must have name and value</value>
+  </data>
   <data name="ExceptionFormat" xml:space="preserve">
     <value>Exception!
 {0}</value>
@@ -215,11 +218,26 @@ Command line options are:
     <value>ErrorProcessing {0}:
 {1}</value>
   </data>
+  <data name="ProcessingTransforms" xml:space="preserve">
+    <value>Processing transforms...</value>
+  </data>
+  <data name="RegExNotFound" xml:space="preserve">
+    <value>Regular expression "{0}" not found in configuration</value>
+  </data>
+  <data name="RegExViolation" xml:space="preserve">
+    <value>String "{0}" does not match pattern "{1}"</value>
+  </data>
   <data name="RunningPowerShell" xml:space="preserve">
     <value>Starting PowerShell processing...</value>
   </data>
+  <data name="ScanningDependents" xml:space="preserve">
+    <value>Scanning dependents</value>
+  </data>
   <data name="SettingsException" xml:space="preserve">
     <value>Continuing after exception loading settings: {0}</value>
+  </data>
+  <data name="StartingTransforms" xml:space="preserve">
+    <value>Starting transforms</value>
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success! Processed {0} files in {2:f2} secs to {1}</value>
@@ -232,5 +250,11 @@ Command line options are:
   </data>
   <data name="Title" xml:space="preserve">
     <value>Razor Transform Tool</value>
+  </data>
+  <data name="TransformNoContent" xml:space="preserve">
+    <value>Transform of "{0}" returned no content</value>
+  </data>
+  <data name="UniqueViolation" xml:space="preserve">
+    <value>Non unique name : "{0}"</value>
   </data>
 </root>

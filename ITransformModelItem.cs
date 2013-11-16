@@ -13,6 +13,7 @@
         string Min { get; set; }
         decimal MinDecimal { get; }
         int MinInt { get; }
+        string RegEx { get; }
         string OriginalType { get; set; }
         ITransformModelGroup Parent { get; set; }
         string PropertyName { get; set; }

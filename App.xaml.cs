@@ -37,7 +37,9 @@ namespace RazorTransform
                 .Add("test", v => parms.Add("Test", true))
                 .Add("nosave", v => parms.Add("NoSave", true))
                 .Add("debug", v => { parms.Add("Debug", true); ExceptionExtension.ShowStack = true; })
-                .Add("template=", v => parms.Add("OverrideTemplateFolder", v));
+                .Add("powerShell", v => { parms.Add("PowerShell", true); })
+                .Add("template=", v => parms.Add("OverrideTemplateFolder", v))
+                .Add("showHidden", v => parms.Add("ShowHidden", true));
 
             List<string> overrides = options.Parse(args);
 

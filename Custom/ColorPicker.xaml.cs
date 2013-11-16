@@ -68,9 +68,9 @@ namespace RazorTransform.Custom
             colorPicker.SelectedColorChanged += OnColorChanged;
             if (psColors)
             {
-                //colorPicker.AvailableColors = new System.Collections.ObjectModel.ObservableCollection<Xceed.Wpf.Toolkit.ColorItem>(
-                //        PSHostGui.PsConsole.ColorMap.Select(o => new Xceed.Wpf.Toolkit.ColorItem(o.Value.Color, o.Key.ToString()))
-                //    );
+                colorPicker.AvailableColors = new System.Collections.ObjectModel.ObservableCollection<Xceed.Wpf.Toolkit.ColorItem>(
+                        PSHostGui.PsConsole.ColorMap.Select(o => new Xceed.Wpf.Toolkit.ColorItem(o.Value.Color, o.Key.ToString()))
+                    );
                 colorPicker.ShowAdvancedButton = false;
                 colorPicker.ShowStandardColors = false;
             }

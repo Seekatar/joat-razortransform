@@ -112,7 +112,7 @@ namespace RazorTransform
             if (copyMe != null)
             {
                 var copy = new TransformModelArrayItem(copyMe);
-                copy.ArrayParent.ArrayItems.Add(copy);
+                copy.ArrayParent.AddArrayItem(copy);
                 copy.MakeKey();
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayParent, Item = copy });
                 Reload();
@@ -130,6 +130,9 @@ namespace RazorTransform
             if (editArrayItem(existingOne.Groups))
             {
                 existingOne.MakeKey();
+                // delete & add for sorting
+                (existingOne.Parent as TransformModelArray).ArrayItems.Remove(existingOne);
+                (existingOne.Parent as TransformModelArray).AddArrayItem(existingOne);
                 TransformModel.Instance.OnItemChanged(new ItemChangedArgs() { Group = existingOne.ArrayParent, Item = existingOne });
                 Reload();
             }
@@ -143,7 +146,7 @@ namespace RazorTransform
             if (editArrayItem(newOne.Groups))
             {
                 // add it to the parent array
-                parent.ArrayParent.ArrayItems.Add(newOne);
+                parent.ArrayParent.AddArrayItem(newOne);
                 newOne.MakeKey();
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayParent, Item = newOne });
                 Reload();

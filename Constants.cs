@@ -35,6 +35,7 @@ namespace RazorTransform
         internal const string DefaultValue = "defaultValue";
         internal const string Max = "max";
         internal const string Min = "min";
+        internal const string RegEx = "regex";
         internal const string Type = "type";
         internal const string Enum = "enum";
         internal const string Key = "key";
@@ -42,6 +43,8 @@ namespace RazorTransform
         internal const string ValueProvider = "valueProvider";
         internal const string Expanded = "expanded";
         internal const string Hidden = "hidden";
+        internal const string Sort = "sort";
+        internal const string Unique = "unique";
         internal const string ReadOnly  = "readOnly";
         internal const string Arguments = "arguments";
         internal const string Class = "classname";

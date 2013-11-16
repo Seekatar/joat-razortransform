@@ -144,6 +144,8 @@ namespace RazorTransform
             Description = g.Description;
             Expanded = g.Expanded;
             Hidden = g.Hidden;
+            Sort = g.Sort;
+            Unique = g.Unique;
 
             // load nested arrays (groups)
             foreach (var x in xml.Elements(Constants.Group))
@@ -187,7 +189,6 @@ namespace RazorTransform
                 foreach (var mv in myValues)
                 {
                     var nextOne = new TransformModelArrayItem(CreatePrototype);
-                    ArrayItems.Add(nextOne);
                     foreach (var g in nextOne.Groups)
                     {
                         if (g is TransformModelArray)
@@ -220,6 +221,7 @@ namespace RazorTransform
                         }
                     }
                     nextOne.MakeKey();
+                    AddArrayItem(nextOne);
                 }
             }
         }
@@ -287,7 +289,21 @@ namespace RazorTransform
             }
         }
 
-
+        internal void AddArrayItem(TransformModelArrayItem item)
+        {
+            if (Sort)
+            {
+                int i = 0;
+                for (; i < ArrayItems.Count; i++)
+                {
+                    if (String.Compare(ArrayItems[i].DisplayName, item.DisplayName) >= 0)
+                        break;
+                }
+                ArrayItems.Insert(i, item);
+            }
+            else
+                ArrayItems.Add(item);
+        }
 
     }
 }

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:my="clr-namespace:RazorTransform.Controls"
              xmlns:local="clr-namespace:RazorTransform"
+             xmlns:psGui="clr-namespace:PSHostGui"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Loaded="OnLoaded">
     <Grid >
@@ -36,9 +37,10 @@
                     <my:MyButton Style="{StaticResource mainButton}" Content="_Go! &amp; Close" HorizontalAlignment="Left" x:Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click"  ToolTip="Run the transforms and if ok, exit." Visibility="Hidden"/>
                     <my:MyButton Style="{StaticResource mainButton}" Content="G_o!" HorizontalAlignment="Left"  x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms." IsEnabled="False"/>
                     <my:MyButton Style="{StaticResource mainButton}" Content="_Save" HorizontalAlignment="Left"  x:Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click"/>
-                    <my:MyButton Style="{StaticResource mainButton}" Content="_Cancel" HorizontalAlignment="Right" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" IsEnabled="False"/>
+                    <my:MyButton Style="{StaticResource mainButton}"  Content="_Cancel" HorizontalAlignment="Right" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" IsEnabled="False"/>
                 </StackPanel>
             </DockPanel>
         </Border>
+        <psGui:PsConsole FontFamily="Lucida Console" x:Name="psConsole" Grid.Row="0" Visibility="Collapsed"/>
     </Grid>
 </UserControl>

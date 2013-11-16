@@ -6,8 +6,9 @@
     <item name="arrayValueName" displayName="Array Name" description="If not empty this is an array of items" type="String" defaultValue=""  />
     <item name="key" displayName="Key" description="If an array, this describes the key.  Use item names.  Empty to use first time" type="String" defaultValue=""  />
     <item name="min" displayName="Min Count" description="If any array, minimum number of items" type="Int32" defaultValue="0"  />
-    <item name="max" displayName="Max" description="If any array, minimum number of items.  0 is unbounded." type="Int32" defaultValue="0"  />
+    <item name="max" displayName="Max" description="If an array, minimum number of items.  0 is unbounded." type="Int32" defaultValue="0"  />
     <item name="hidden" displayName="Hidden" description="If checked, don't show in the UI" type="Bool" defaultValue="false"  />
+    <item name="sort" displayName="Sort" description="If an array sort by the Key" type="Bool" defaultValue="false"  />
 
     <group name="Item" description="Items in the group" arrayValueName="item" min="0">
       <item name="name" displayName="Name" description="Name of member on the Model" type="String" defaultValue=""  />
