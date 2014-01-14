@@ -496,7 +496,7 @@ namespace RazorTransform
         {
             _transformer.Save();
         }
-		
+
         public void Dispose()
         {
             if (_transformer != null)
@@ -505,9 +505,11 @@ namespace RazorTransform
                 _transformer = null;
             }
             _parent = null;
-            this.psConsole.Dispose();
-          
-           this.Dispatcher.InvokeShutdown();
+            if (this.psConsole != null)
+                this.psConsole.Dispose();
+
+            if (this.Dispatcher != null)
+                this.Dispatcher.InvokeShutdown();
         }
     }
 }

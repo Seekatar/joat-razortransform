@@ -49,16 +49,15 @@ namespace RazorTransform
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(new ProgressInfo(processing, currentOperation: f, percentComplete: 100 * i / fileList.Count));
+                    if (progress != null) progress.Report(new ProgressInfo(processing, currentOperation: f, percentComplete: (100 * i / fileList.Count)-1));
 
                     string template = File.ReadAllText(f);
-                    string content = RazorEngine.Razor.Parse(template, _model);
-
+                    var content = RazorTemplateUtil.Transform(_model,template);
                     if (content == null)
                         throw new Exception(String.Format(Resource.TransformNoContent, currentFile));
 
                     if (content.Contains("@Model.") || content.Contains("@(")) // allow one level of nesting of @Model. or @(
-                        content = RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(content), _model);
+                        content= RazorTemplateUtil.Transform(_model, HttpUtility.HtmlDecode(content));
 
                     if (saveFiles)
                         File.WriteAllText(Path.Combine(outputFolder, Path.GetFileName(f)), content);
@@ -77,6 +76,14 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
+                var fname = Path.Combine( System.IO.Path.GetTempPath(), "RazorTransform.xml");
+                try 
+                {
+                    System.IO.File.WriteAllText(fname, e.SourceCode);
+                    sb.AppendLine("    Output written to " + fname);
+                }
+                catch(Exception) {}
+                
                 throw new Exception(sb.ToString());
             }
             catch (OperationCanceledException)
@@ -115,25 +122,37 @@ namespace RazorTransform
             var scanning = Resource.ScanningDependents;
             if (progress != null)
                 progress.Report(new ProgressInfo(scanning));
-            foreach (var kv in ex)
+            try
             {
-                if (progress != null)
-                    progress.Report(new ProgressInfo(scanning,  currentOperation: kv.Key,  percentComplete: (++count * 100 / max)));
-
-                if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
+                foreach (var kv in ex)
                 {
-                    foreach (var e in kv.Value as System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
+                    if (progress != null)
+                        progress.Report(new ProgressInfo(scanning, currentOperation: kv.Key, percentComplete: (++count * 100 / max)));
+
+                    if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
                     {
-                        changeCount += substituteValues(e, cancel );
+                        foreach (var e in kv.Value as System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
+                        {
+                            changeCount += substituteValues(e, cancel);
+                        }
+                    }
+                    else if (kv.Value.ToString().Contains("@Model.") || kv.Value.ToString().Contains("@(")) // allow one level of nesting of @Model. or @(
+                    {
+                        string errorMessage = null;
+                        var result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(kv.Value.ToString()), out errorMessage);
+                        if (!String.IsNullOrEmpty(errorMessage))
+                        {
+                            throw new Exception(errorMessage);
+                        }
+                        changes.Add(kv.Key, result);
                     }
                 }
-                else if (kv.Value.ToString().Contains("@Model.") || kv.Value.ToString().Contains("@(")) // allow one level of nesting of @Model. or @(
-                {
-                    changes.Add(kv.Key, RazorEngine.Razor.Parse(HttpUtility.HtmlDecode(kv.Value.ToString()), model));
-                }
             }
-            if ( progress != null )
-                progress.Report(new ProgressInfo(scanning, percentComplete: 100));
+            finally
+            {
+                if (progress != null)
+                    progress.Report(new ProgressInfo(scanning, percentComplete: 100));
+            }
 
             if (changes.Count > 0)
             {

@@ -362,6 +362,7 @@ namespace RazorTransform
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
             _enums.Clear();
+            _regexes.Clear();
             TransformModel.Instance.Customs.Clear();
             Arrays.Clear();
             Groups.Clear();
@@ -373,7 +374,7 @@ namespace RazorTransform
                     throw new ArgumentNullException(Resource.ErrorNullEnumName);
                 var dict = new Dictionary<string, string>();
                 dict.LoadFromXml(x);
-                _enums.Add(name.Value, dict);
+                _enums[name.Value] = dict;
             }
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.RegEx))
@@ -383,7 +384,7 @@ namespace RazorTransform
 
                 if (name == null || value == null )
                     throw new ArgumentNullException(Resource.ErrorNullRegEx);
-                _regexes.Add(name.Value, value.Value);
+                _regexes[name.Value] = value.Value;
             }
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Custom))
@@ -418,7 +419,7 @@ namespace RazorTransform
                 else
                     custom.Initialize(this, parms);
 
-                TransformModel.Instance.Customs.Add(name, custom);
+                TransformModel.Instance.Customs[name] = custom;
             }
 
             // get any ones known to us already

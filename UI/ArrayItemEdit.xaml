@@ -9,7 +9,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <local:NameValueEdit Grid.Row="0" x:Name="nvEdit"/>
         <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="Black">
