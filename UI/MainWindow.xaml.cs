@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using RtPsHost;
+using System;
 
 namespace RazorTransform
 {
@@ -11,7 +12,21 @@ namespace RazorTransform
     {
         public MainWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch ( Exception e )
+            {
+                string msg = e.Message;
+                while ( e.InnerException != null )
+                {
+                    e = e.InnerException;
+                    msg += Environment.NewLine + e.Message;
+                }
+                MessageBox.Show(e.ToString(), "Error initializing");
+                throw;
+            }
         }
 
         internal void Initialize(Dictionary<string, object> parms, IDictionary<string, string> overrides)

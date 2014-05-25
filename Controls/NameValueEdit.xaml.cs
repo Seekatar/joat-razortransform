@@ -21,6 +21,7 @@ namespace RazorTransform
             InitializeComponent();
             DataContext = this;
             SearchVisibility = System.Windows.Visibility.Collapsed;
+            Dirty = false;
         }
 
         public System.Windows.Visibility SearchVisibility { get; set; }
@@ -61,15 +62,23 @@ namespace RazorTransform
                 }
                 else
                 {
-                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group, showHidden ));
+                    lastExpanderStack.Children.Add(LayoutManager.BuildGridView(group, showHidden, setDirty));
                 }
             }
             stackPanel.Children.Add(_tabCtrl);
             _tabCtrl.SelectedIndex = selectedIndex;
         }
 
+        public bool Dirty { get; set; }
+
+        private void setDirty()
+        {
+            Dirty = true;
+        }
+
         private MyTabItem createTab(TransformModelGroup group)
         {
+            System.Diagnostics.Debug.WriteLine("Dirty is " + Dirty);
             var tab = new MyTabItem();
             tab.Style = this.FindResource("tabStyle") as Style;
             tab.Header = CreateTabHeader(group.DisplayName);
@@ -96,6 +105,7 @@ namespace RazorTransform
             {
                 (delMe.Parent as TransformModelArray).ArrayItems.Remove(delMe);
                 TransformModel.Instance.OnItemDeleted(new ItemChangedArgs() { Group = delMe.Parent as TransformModelArray, Item = delMe } );
+                setDirty();
                 Reload();
             }
         }
@@ -115,6 +125,7 @@ namespace RazorTransform
                 copy.ArrayParent.AddArrayItem(copy);
                 copy.MakeKey();
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayParent, Item = copy });
+                setDirty();
                 Reload();
             }
         }
@@ -149,6 +160,7 @@ namespace RazorTransform
                 parent.ArrayParent.AddArrayItem(newOne);
                 newOne.MakeKey();
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayParent, Item = newOne });
+                setDirty();
                 Reload();
             }
         }
@@ -165,7 +177,10 @@ namespace RazorTransform
             var nve = new ArrayItemEdit();
             nve.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             nve.TrySetOwner(Window.GetWindow(this));
-            return nve.ShowDialog(orig, TransformModel.Instance.Settings.ShowHidden);
+            bool ret = nve.ShowDialog(orig, TransformModel.Instance.Settings.ShowHidden);
+            if (ret)
+                setDirty();
+            return ret;
         }
 
         private void Reload()

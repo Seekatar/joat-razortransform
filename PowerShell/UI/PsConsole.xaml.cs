@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using RazorTransform;
 using RtPsHost;
+using System.Security;
 
 namespace PSHostGui
 {
@@ -140,7 +141,7 @@ namespace PSHostGui
         {
             if (_loggingConsole != null)
             {
-                _loggingConsole.WriteText(msg, isLine,type);
+                _loggingConsole.WriteText(msg, isLine, type);
             }
 
             var run = new Run(msg.TrimEnd("\r\n".ToCharArray())) { Foreground = foreground, Background = background };
@@ -171,7 +172,7 @@ namespace PSHostGui
             set;
         }
 
-        public void Write(string msg,WriteType type)
+        public void Write(string msg, WriteType type)
         {
             syncContext.Post(_ =>
             {
@@ -195,7 +196,7 @@ namespace PSHostGui
             }, null);
         }
 
-        public void WriteLine(ConsoleColor foreground, ConsoleColor background, string msg,WriteType type)
+        public void WriteLine(ConsoleColor foreground, ConsoleColor background, string msg, WriteType type)
         {
             syncContext.Post(_ =>
             {
@@ -246,31 +247,31 @@ namespace PSHostGui
 
         public int PromptForChoice(string caption, string message, IEnumerable<PromptChoice> choices, int defaultChoice)
         {
-            int choice = -1;
-            if (syncContext != null)
-            {
-                syncContext.Send(_ =>
-                {
-                    var p = new Prompt(caption, message, choices, defaultChoice);
-                    p.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    p.Owner = GetTopLevelControl(this);
-                    if (p.Owner == null)
-                        p.Owner = Owner;
-                    if (p.Owner == null)
-                    {
-                        p.Loaded += (sender, e) => { (sender as Prompt).Topmost = true; };
-                        p.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-                    }
-                    p.ShowDialog();
-                    p.Topmost = true; 
-                    choice = p.Choice;
-                    if (_loggingConsole != null)
-                    {
-                        _loggingConsole.PromptForChoice(caption, message, choices, defaultChoice);
-                    }
-                }, null);
-            }
-            return choice;
+            var p = prompt(caption, message, choices, defaultChoice);
+            return p.Choice;
+        }
+
+        public string PromptForString(string caption, string message, string description)
+        {
+            var choices = new List<PromptChoice>() { new PromptChoice("OK"), new PromptChoice("Cancel") };
+            int defaultChoice = 0;
+
+            caption = description; // can we get > 1?
+            var p = prompt(caption, message, choices, defaultChoice, true);
+            return p.Text;
+        }
+
+
+        public System.Security.SecureString PromptForSecureString(string caption, string message, string description)
+        {
+            var choices = new List<PromptChoice>() { new PromptChoice("OK"), new PromptChoice("Cancel") };
+            int defaultChoice = 0;
+
+            caption = description; // can we get > 1?
+
+            var p = prompt(caption, message, choices, defaultChoice, true, true);
+
+            return p.SecureString;
         }
 
         Dictionary<ProgressInfo, Progress> _progress = new Dictionary<ProgressInfo, Progress>();
@@ -318,7 +319,7 @@ namespace PSHostGui
 
         public void WriteSystemMessage(string msg)
         {
-            WriteLine(SystemColor, BackgroundColor, "> " + msg,WriteType.System);
+            WriteLine(SystemColor, BackgroundColor, "> " + msg, WriteType.System);
         }
 
         private void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
@@ -355,7 +356,7 @@ namespace PSHostGui
         {
             // find the color
             var c = ColorMap.Where(o => o.Value.Color == foreground);
-            if ( c.Count() > 0  )
+            if (c.Count() > 0)
                 _defaultForeground = c.First().Key;
             c = ColorMap.Where(o => o.Value.Color == background);
             if (c.Count() > 0)
@@ -366,5 +367,33 @@ namespace PSHostGui
         }
 
         public System.Windows.Window Owner { get; set; }
+
+        private Prompt prompt(string caption, string message, IEnumerable<PromptChoice> choices, int defaultChoice, bool getText = false, bool isPassword = false)
+        {
+            Prompt p = null;
+            if (syncContext != null)
+            {
+                syncContext.Send(_ =>
+                {
+                    p = new Prompt(caption, message, choices, defaultChoice, getText, isPassword);
+                    p.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                    p.Owner = GetTopLevelControl(this);
+                    if (p.Owner == null)
+                        p.Owner = Owner;
+                    if (p.Owner == null)
+                    {
+                        p.Loaded += (sender, e) => { (sender as Prompt).Topmost = true; };
+                        p.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                    }
+                    p.ShowDialog();
+                    p.Topmost = true;
+                    if (_loggingConsole != null)
+                    {
+                        _loggingConsole.PromptForChoice(caption, message, choices, defaultChoice);
+                    }
+                }, null);
+            }
+            return p;
+        }
     }
 }

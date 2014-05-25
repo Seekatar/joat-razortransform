@@ -33,19 +33,20 @@ namespace RazorTransform.Custom
 
         public ColorType() { }
 
-        public void Initialize(ITransformModel model, IDictionary<string,string> parms) 
+        public virtual void Initialize(ITransformModel model, IDictionary<string,string> parms) 
         {
             // only one parm now
             _psColors = parms.ContainsKey("psColors") && bool.Parse(parms["psColors"]);
         }
 
-        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding)
+        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding,System.Action itemChanged)
         {
 
             var t = new ColorPicker(ci, _psColors);
             binding.Mode = BindingMode.TwoWay;
 
             t.SetBinding(ColorPicker.ColorProperty, binding);
+            t.ColorChanged += (o, e) => { itemChanged(); };
             return t;
         }
 
@@ -55,6 +56,14 @@ namespace RazorTransform.Custom
         }
     }
 
+    public class PsColorType : ColorType
+    {
+        public override void Initialize(ITransformModel model, IDictionary<string, string> parms)
+        {
+            parms["psColors"] = true.ToString();
+            base.Initialize(model, parms);
+        }
+    }
 
     /// <summary>
     /// user contorl for getting a color, wraps the Xceed color picker

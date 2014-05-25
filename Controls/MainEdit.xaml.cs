@@ -97,6 +97,10 @@ namespace RazorTransform
                 _workingDir = _overrides["PsWorkingDir"];
             _workingDir = System.IO.Path.GetFullPath(_workingDir); // convert .. to path
             _logFileName = String.Format("{0}_{1}.log", _logFileName, DateTime.Now.ToString("yyMMdd-hhmmss"));
+
+            _workingDir = Path.GetFullPath(_workingDir);
+            _scriptFname = Path.GetFullPath(_scriptFname);
+            _logFileName = Path.GetFullPath(_logFileName);
         }
         /// <summary>
         /// handler for whem the transformer saves the RTValues.xml file
@@ -124,8 +128,8 @@ namespace RazorTransform
              
             if (!_overrides.ContainsKey("PsSkipTransform"))
             {
+                editControl.Dirty = false;
                 transformResult = await _transformer.DoTransformAsync();
-               
             }
 
             if (transformResult.TranformResult == ProcessingResult.ok )
@@ -143,7 +147,7 @@ namespace RazorTransform
                         msg += Environment.NewLine + Resource.NoSave;
                     }
 
-                    if (_embedded)
+                    if (_embedded || _runPowerShell)
                         psConsole.WriteSystemMessage(msg);
                     else
                         _transformer.Output.ShowMessage(msg, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -387,10 +391,12 @@ namespace RazorTransform
             {
                 setButtonStates(ProcessingState.idle); // show Artie again if PS failed
             }
-            else 
-			if (!_transformer.Cancel())
+            else if (!_transformer.Cancel())
             {
-                _parent.ProcessingComplete(RanTransformOk ? ProcessingResult.close : ProcessingResult.canceled);
+                if (!editControl.Dirty || _transformer.Output.ShowMessage(Resource.IsDirty, MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    _parent.ProcessingComplete(RanTransformOk ? ProcessingResult.close : ProcessingResult.canceled);
+                else
+                    btnCancel.IsEnabled = true;
             }
             else
             {
@@ -495,6 +501,7 @@ namespace RazorTransform
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             _transformer.Save();
+            editControl.Dirty = false;
         }
 
         public void Dispose()

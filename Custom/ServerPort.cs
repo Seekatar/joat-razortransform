@@ -24,12 +24,12 @@ namespace RazorTransform.Custom
 
     public class ServerPort : ICustomRazorTransformType
     {
-        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding)
+        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding, System.Action itemChanged)
         {
-            return ServerPort.CreatePortControl(ci, binding);
+            return ServerPort.CreatePortControl(ci, binding, itemChanged);
         }
 
-        public static Control CreatePortControl(ITransformModelItem ci, System.Windows.Data.Binding binding)
+        public static Control CreatePortControl(ITransformModelItem ci, System.Windows.Data.Binding binding, System.Action itemChanged)
         {
             var t = new PortInput(ci);
             binding.Mode = BindingMode.TwoWay;

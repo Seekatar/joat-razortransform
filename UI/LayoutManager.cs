@@ -16,7 +16,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="group"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(TransformModelGroup group, bool showHidden )
+        public static FrameworkElement BuildGridView(TransformModelGroup group, bool showHidden, Action itemChanged = null )
         {
             var items = group.Items;
 
@@ -52,7 +52,7 @@ namespace RazorTransform
                 binding.Path = new PropertyPath("Value");
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
-                Control t = CreateControl(ci, binding);
+                Control t = CreateControl(ci, binding, itemChanged);
                 t.ToolTip = ci.Description;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
@@ -270,40 +270,34 @@ namespace RazorTransform
             return gb;
         }
 
-        private static Control CreateControl(ITransformModelItem info, Binding binding)
+        private static Control CreateControl(ITransformModelItem info, Binding binding, Action itemChanged )
         {
             switch (info.Type)
             {
                 case RtType.Folder:
-                case RtType.UncPath: return _Folder(info, binding);
-                case RtType.Guid: return _Guid(info, binding);
-                case RtType.Bool: return _Bool(info, binding);
-                case RtType.Int32: return _Int32(info, binding);
-                case RtType.Password: return _Password(info, binding);
-                case RtType.String: return _Default(info, binding);
-                case RtType.Enum:
-                    ComboBoxInput ret = _ComboBox(info, binding);
-                    var listBinding = new Binding();
-                    listBinding.Source = TransformModel.Instance.Enums[info.EnumName];
-                    listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                    ret.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
-                    return ret;
+                case RtType.UncPath: return _Folder(info, binding,itemChanged);
+                case RtType.Guid: return _Guid(info, binding, itemChanged);
+                case RtType.Bool: return _Bool(info, binding, itemChanged);
+                case RtType.Int32: return _Int32(info, binding, itemChanged);
+                case RtType.Password: return _Password(info, binding, itemChanged);
+                case RtType.String: return _Default(info, binding,itemChanged);
+                case RtType.Enum: return _ComboBox(info, binding, itemChanged);
                 default:
                     if (info.Type == RtType.Custom && TransformModel.Instance.Customs.ContainsKey(info.OriginalType))
-                        return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding);
+                        return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding, itemChanged);
                     else
-                        return _Default(info, binding);
+                        return _Default(info, binding, itemChanged);
             }
         }
 
 
 
-        private static Func<ITransformModelItem, Binding, Control> _Folder = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, Control> _Folder = (ci, binding, itemChanged) =>
         {
-            return _UncPath(ci, binding);
+            return _UncPath(ci, binding, itemChanged);
         };
 
-        private static Func<ITransformModelItem, Binding, Control> _UncPath = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, Control> _UncPath = (ci, binding, itemChanged) =>
         {
             var t = new FolderInputBox(ci.DisplayName, true);
             if (ci.ReadOnly)
@@ -311,9 +305,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
+            t.FolderNameChanged += (o, e) => { itemChanged(); };
             return t;
         };
-        private static Func<ITransformModelItem, Binding, Control> _Guid = (ci, binding) =>
+
+        private static Func<ITransformModelItem, Binding, Action, Control> _Guid = (ci, binding, itemChanged) =>
         {
             var t = new GuidInput();
             if (ci.ReadOnly)
@@ -321,9 +317,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(GuidInput.GuidStrProperty, binding);
+            t.GuidStrChanged += (o, e) => { itemChanged(); };
             return t;
         };
-        private static Func<ITransformModelItem, Binding, Control> _Bool = (ci, binding) =>
+
+        private static Func<ITransformModelItem, Binding, Action, Control> _Bool = (ci, binding, itemChanged) =>
         {
             var bib = new BoolInput();
             if (ci.ReadOnly)
@@ -331,10 +329,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             bib.SetBinding(BoolInput.BoolProperty, binding);
+            bib.BoolChanged += (o, e) => { itemChanged(); };
             return bib;
         };
 
-        private static Func<ITransformModelItem, Binding, ComboBoxInput> _ComboBox = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, ComboBoxInput> _ComboBox = (ci, binding, itemChanged) =>
         {
             var bib = new ComboBoxInput();
             if (ci.ReadOnly)
@@ -342,10 +341,17 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             bib.SetBinding(ComboBoxInput.ComboBoxProperty, binding);
+
+            var listBinding = new Binding();
+            listBinding.Source = TransformModel.Instance.Enums[ci.EnumName];
+            listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            bib.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
+
+            bib.ComboBoxChanged += (o, e) => { itemChanged(); };
             return bib;
         };
 
-        private static Func<ITransformModelItem, Binding, Control> _Default = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, Control> _Default = (ci, binding, itemChanged) =>
         {
             var t = new TextBox();
             if (ci.ReadOnly)
@@ -353,10 +359,11 @@ namespace RazorTransform
 
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
+            t.TextChanged += (o, e) => { itemChanged(); }; 
             return t;
         };
 
-        private static Func<ITransformModelItem, Binding, Control> _Password = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, Control> _Password = (ci, binding, itemChanged) =>
         {
             var t = new PasswordBox();
             if (ci.ReadOnly)
@@ -366,10 +373,11 @@ namespace RazorTransform
             var value = ci.Value;
             (ci as PasswordTransformModelItem).PasswordBox = t;
             t.Password = value;
+            t.PasswordChanged += (o, e) => { itemChanged(); };
             return t;
         };
 
-        private static Func<ITransformModelItem, Binding, Control> _Int32 = (ci, binding) =>
+        private static Func<ITransformModelItem, Binding, Action, Control> _Int32 = (ci, binding, itemChanged ) =>
         {
             var t = new Xceed.Wpf.Toolkit.IntegerUpDown();
             if (ci.ReadOnly)
@@ -382,8 +390,9 @@ namespace RazorTransform
             t.Value = Int32.Parse(ci.Value ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
-
+            t.ValueChanged += (o, e) => { itemChanged();  };
             return t;
         };
+
     }
 }

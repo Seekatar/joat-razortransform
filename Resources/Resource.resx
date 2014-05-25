@@ -193,6 +193,9 @@ Command line options are:
  &lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
 </value>
   </data>
+  <data name="IsDirty" xml:space="preserve">
+    <value>The data has changed.  Are you sure you want to exit?</value>
+  </data>
   <data name="MaxInt" xml:space="preserve">
     <value>{0} must be less than {1}</value>
   </data>

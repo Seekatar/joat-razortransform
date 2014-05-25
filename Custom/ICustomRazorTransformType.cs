@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Xml.Linq;
@@ -24,8 +25,9 @@ namespace RazorTransform.Custom
         /// </summary>
         /// <param name="info">an item created earlier when CreateItem was called</param>
         /// <param name="binding">the binding object for the control</param>
+        /// <param name="itemChanged"> call when the item has changed to indicate dirty</param>
         /// <returns>the control to show on the screen</returns>
-        Control CreateControl(ITransformModelItem info, Binding binding);
+        Control CreateControl(ITransformModelItem info, Binding binding, Action itemChanged);
 
         /// <summary>
         /// called after the object is constructed

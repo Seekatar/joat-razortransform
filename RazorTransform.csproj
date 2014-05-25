@@ -92,6 +92,7 @@
     <Compile Include="Custom\PortInput.xaml.cs">
       <DependentUpon>PortInput.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Custom\RtThyRegEx.cs" />
     <Compile Include="Custom\RtThySelfType.cs" />
     <Compile Include="Custom\ServerPort.cs" />
     <Compile Include="Custom\WebPort.cs" />
@@ -242,6 +243,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Resources\Settings.xml" />
     <Content Include="RtObject.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>

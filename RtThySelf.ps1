@@ -1,20 +1,21 @@
 ﻿
 <#
-.Summary
+.Synopsis
     Generate an RtValues file based on RtObject
     file to allow editing of it with Artie
 
 .Parameter rtObjectFile
     Input file that is usually RtObject.  Default value is RtThySelfValues.xml
 
-.Parameter outputFiler
+.Parameter outputFile
     Output filename.  Default value is RtThySelfValues.xml
 #>
 [CmdletBinding()]
 param(
-[Parameter(HelpMessage="Input file that is usually RtObject",Position=0)]
+[Parameter(Mandatory=$true,Position=0)]
+[ValidateScript({Test-Path $_ -PathType Leaf})]
 [string] $rtObjectFile="RtObject.xml",
-[Parameter(HelpMessage="Output file that can be used as RtValues for RtThySelf.xml object file",Position=1)]
+[Parameter(Mandatory=$true,Position=1)]
 [string] $outputFile="RtThySelfValues.xml"
 )
 
@@ -80,6 +81,7 @@ Write-Host "Loaded $rtObjectFile"
 
 $groups = $rtobject.SelectNodes("/RtObject/group")
 $enums = $rtobject.SelectNodes("/RtObject/enum")
+$regexes = $rtobject.SelectNodes("/RtObject/regex")
 $customs = $rtobject.SelectNodes("/RtObject/custom")
 
 Write-Verbose ("Found {0} groups {1} enums and {2} customs" -f ($groups.Count, $enums.Count, $customs.Count))
@@ -109,6 +111,30 @@ foreach ( $e in $enums )
         $value = $root.CreateElement("value")
         $value.SetAttribute("name",$v.name)
         $null = $enum.AppendChild($value)
+
+        addAllAttributes $root $v $value
+    }
+}
+
+# do regexes
+foreach ( $r in $regexes )
+{
+    $regex = $root.CreateElement("value")
+    $regex.SetAttribute("name","regex")
+
+    addAllAttributes $root $e $regex
+
+    $null = $root.FirstChild.AppendChild($regex)
+    
+    $name = $root.CreateElement("value")
+    $name.SetAttribute("name", $e.name )
+    $null = $regex.AppendChild($name)
+
+    foreach ( $v in $e.SelectNodes("./value") )
+    {
+        $value = $root.CreateElement("value")
+        $value.SetAttribute("name",$v.name)
+        $null = $regex.AppendChild($value)
 
         addAllAttributes $root $v $value
     }

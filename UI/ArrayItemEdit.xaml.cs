@@ -23,7 +23,7 @@ namespace RazorTransform
             var temp = new List<TransformModelGroup>(orig);
             Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            if (ShowDialog() ?? false)
+            if ((ShowDialog() ?? false) && nvEdit.Dirty)
             {
                 orig.CopyValueFrom(temp);
                 return true;

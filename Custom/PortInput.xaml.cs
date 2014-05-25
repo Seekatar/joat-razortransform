@@ -17,10 +17,7 @@ namespace RazorTransform
 
             this.info = info;
 
-
             InitializeComponent();
-
-            // portList.DataContext = PortUtility.GetAssignmentsFromInstalledServices();
         }
 
 
@@ -36,9 +33,6 @@ namespace RazorTransform
             var r = new PortValidation(this.info);
             if (r.Validate(((TextBox)sender).Text, null).IsValid)
             {
-
-
-
                 e.Handled = true;
                 RoutedEventArgs args = new RoutedEventArgs(PortChangedEvent);
                 RaiseEvent(args);

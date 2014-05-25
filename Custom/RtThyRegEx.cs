@@ -5,31 +5,29 @@ using System.Linq;
 namespace RazorTransform.Custom
 {
     /// <summary>
-    /// custom class for adding/removing types for the RtThySelf Xml
+    /// custom class for adding/removing regular expressions in the enum for the RtThySelf Xml
     /// </summary>
     /// This custom class doesn't create items, but just hooks onto the
     /// transform model's events
     /// 
-    class RtThySelfType : ICustomRazorTransformType
+    class RtThySelfRegEx : ICustomRazorTransformType
     {
-        static string enumPrefix = "Enum: ";
-        static string customPrefix = "Custom: ";
-        static string rtType = "RtType"; // name of type enum
-        static string enumTag = "enum";
-        static string customTag = "custom";
+        static string rtRegEx = "RtRegEx"; // name of RegEx enum
+        //static string enumTag = "enum";
+        static string regexTag = "regex";
 
         #region EventHandlers
         void OnItemChanged(object sender, ItemChangedArgs arg)
         {
             var model = sender as TransformModel;
 
-            if (arg.Group.ArrayValueName == enumTag || arg.Group.ArrayValueName == customTag)
+            if (arg.Group.ArrayValueName == regexTag) // changing the regex group?
             {
                 // remove all the existing ones
-                if (model.Enums.ContainsKey(rtType) && model.Enums[rtType] != null)
+                if (model.Enums.ContainsKey(rtRegEx) && model.Enums[rtRegEx] != null)
                 {
-                    var rtTypes = model.Enums[rtType];
-                    var delMe = rtTypes.Where(o => o.Value.StartsWith(enumPrefix) || o.Value.StartsWith(customPrefix)).Select( o => o.Key ).ToList();
+                    var rtTypes = model.Enums[rtRegEx];
+                    var delMe = rtTypes.Where(o => !String.IsNullOrEmpty(o.Key)).Select(o => o.Key).ToList(); // <None> has empty key
                     foreach (var d in delMe)
                     {
                         rtTypes.Remove(d);
@@ -46,33 +44,24 @@ namespace RazorTransform.Custom
             var model = sender as TransformModel;
 
             // add the custom and the enums to a type enum, if it exists
-            if (model.Enums.ContainsKey(rtType) && model.Enums[rtType] != null)
+            if (model.Enums.ContainsKey(rtRegEx) && model.Enums[rtRegEx] != null)
             {
-                var rtTypes = model.Enums[rtType];
+                var rtTypes = model.Enums[rtRegEx];
 
-                var enums = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == enumTag).SingleOrDefault();
-                if (enums != null)
+                var regexes = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == regexTag).SingleOrDefault();
+                if (regexes != null)
                 {
-                    foreach (var r in enums.Items.Select(o => o.DisplayName))
+                    foreach (var r in regexes.Items.Select(o => o.DisplayName))
                     {
                         if (!rtTypes.ContainsKey(r))
-                            rtTypes.Add(r, enumPrefix + r);
-                    }
-                }
-                var customs = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == customTag).SingleOrDefault();
-                if (customs != null)
-                {
-                    foreach (var r in customs.Items.Select(o => o.DisplayName))
-                    {
-                        if (!rtTypes.ContainsKey(r))
-                            rtTypes.Add(r, customPrefix + r);
+                            rtTypes.Add(r, r);
                     }
                 }
             }
         }
 
         #endregion
-        public RtThySelfType()
+        public RtThySelfRegEx()
         { }
 
         public TransformModelItem CreateItem(ITransformModelGroup parent, System.Xml.Linq.XElement e)

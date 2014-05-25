@@ -3,20 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:my="clr-namespace:RazorTransform.Controls"
         ShowInTaskbar="False"
-        Title="Prompt" Closing="Window_Closing_1"
-        SizeToContent="WidthAndHeight">
-    <Window.Resources>
-        <Style TargetType="my:MyButton" x:Key="txtButton">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Margin" Value="5" />
-        </Style>
-
-    </Window.Resources>
-        <StackPanel Height="Auto">
-            <TextBlock Name="txtPrompt" Margin="5">Prompt</TextBlock>
-            <TextBlock Name="txtDescription"  Margin="30,5,5,5" Visibility="Collapsed"></TextBlock>
-            <WrapPanel x:Name="stackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5"/>
-        </StackPanel>
+        Title="PowerShell Prompt" Closing="Window_Closing_1"
+        SizeToContent="WidthAndHeight"
+        MinWidth="300">
+    <StackPanel Height="Auto">
+        <TextBlock Name="txtPrompt" Margin="5">Prompt</TextBlock>
+        <TextBlock Name="txtDescription"  Margin="30,5,5,5" Visibility="Collapsed"></TextBlock>
+        <TextBox Name="tbEdit"  Margin="5,5,5,5" Visibility="Collapsed"></TextBox>
+        <PasswordBox Name="pbEdit"  Margin="5,5,5,5" Visibility="Collapsed"></PasswordBox>
+        <WrapPanel x:Name="stackPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5"/>
+    </StackPanel>
 </Window>

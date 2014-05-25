@@ -22,17 +22,7 @@ namespace RazorTransform
         private string _valuesFile;
 
         // object definition for settings is really static since code relies on it
-        static string _settingsXml =
-@"<RtObject>
-  <group name=""Settings"" description=""Settings that control how Artie works."" hidden=""False"">
-    <item name=""RTSettings_Title"" displayName=""Title"" description=""Title to show in the titlebar"" type=""" + RtType.String + @""" defaultValue=""RazorTransform""/>
-    <item name=""RTSettings_LastPath"" displayName=""Save Path"" description=""Location used when saving."" type=""" + RtType.Folder + @""" defaultValue=""..""/>
-    <item name=""RTSettings_LastTemplatePath"" displayName=""Template Path"" description=""Location for retrieving templates."" type=""" + RtType.Folder + @""" defaultValue=""Templates""/>
-    <item name=""RTSettings_PSForeground"" displayName=""PowerShell Foreground"" description=""Foreground color for PowerShell"" type=""PSColorType"" defaultValue=""White""/>
-    <item name=""RTSettings_PSBackground"" displayName=""PowerShell Background"" description=""Background color for PowerShell"" type=""PSColorType"" defaultValue=""DarkBlue""/>
-  </group>
-  <custom name=""PSColorType"" classname=""RazorTransform.Custom.ColorType,RazorTransform"" parameter=""psColors""/>
-</RtObject>";
+        static string _settingsXml = RazorTemplateUtil.LoadEmebeddedTemplate( "RazorTransform.Resources.Settings.xml");
 
         public void Load(IDictionary<string, string> overrideParms)
         {

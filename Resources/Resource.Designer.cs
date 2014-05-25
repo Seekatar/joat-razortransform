@@ -240,6 +240,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The data has changed.  Are you sure you want to exit?.
+        /// </summary>
+        internal static string IsDirty {
+            get {
+                return ResourceManager.GetString("IsDirty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be less than {1}.
         /// </summary>
         internal static string MaxInt {

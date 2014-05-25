@@ -68,7 +68,7 @@ namespace RazorTransform
                     // save right away in case it errors out
                     Save();
 
-                    var modelObject = _model.GetProperties(!_settings.Test, true, _settings.OutputFolder);
+                    var modelObject = _model.GetProperties(!_settings.Test, false, _settings.OutputFolder);
 
                     RazorFileTransformer rf = new RazorFileTransformer(modelObject);
                     _cts = new CancellationTokenSource();

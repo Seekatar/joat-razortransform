@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Web;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using RazorTransform.Custom;
 
 namespace RazorTransform
 {
@@ -85,10 +86,6 @@ namespace RazorTransform
         }
 
         #endregion
-
-        // ugly for backward compat
-        static IList<Type> _wellKnownCustoms = new List<Type>() { typeof(RazorTransform.Custom.ServerPort), typeof(RazorTransform.Custom.WebPort) };
-        public static IList<Type> WellKnownCustoms { get { return _wellKnownCustoms; } }
 
         /// <summary>
         /// all the enums loaded from the Xml
@@ -220,7 +217,7 @@ namespace RazorTransform
                         foreach (var c in i.Items)
                         {
                             currentName = (c as TransformModelArrayItem).DisplayName;
-                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, true, destinationFolder, ret, root));
+                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, htmlEncode, destinationFolder, ret, root));
                         }
                         dict.Add(i.ArrayValueName, children);
                     }
@@ -363,7 +360,7 @@ namespace RazorTransform
         {
             _enums.Clear();
             _regexes.Clear();
-            TransformModel.Instance.Customs.Clear();
+            //TransformModel.Instance.Customs.Clear();
             Arrays.Clear();
             Groups.Clear();
 
@@ -408,7 +405,14 @@ namespace RazorTransform
                     throw new ArgumentNullException(Resource.ErrorNullCustomClassName + name);
 
                 Custom.ICustomRazorTransformType custom = null;
-                Type t = Type.GetType(className);
+                Type t = null;
+                try
+                {
+                    t = Type.GetType(className);
+                }
+                catch( Exception )
+                { }
+
                 if (t == null)
                     throw new ArgumentException(Resource.ErrorCustomType + className);
 
@@ -422,19 +426,7 @@ namespace RazorTransform
                 TransformModel.Instance.Customs[name] = custom;
             }
 
-            // get any ones known to us already
-            foreach (var t in _wellKnownCustoms)
-            {
-                if (t.GetInterface(typeof(RazorTransform.Custom.ICustomRazorTransformType).FullName) != null)
-                {
-                    if (!TransformModel.Instance.Customs.Any(o => o.Key == t.Name))
-                    {
-                        var custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
-                        if (custom != null)
-                            TransformModel.Instance.Customs.Add(t.Name, custom);
-                    }
-                }
-            }
+            var noparms = new Dictionary<string, string>();
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Group))
             {
