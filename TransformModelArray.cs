@@ -119,7 +119,7 @@ namespace RazorTransform
         /// <param name="xml"></param>
         /// <param name="values"></param>
         /// <param name="overrides"></param>
-        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
+        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
             _element = xml;
 
@@ -135,7 +135,7 @@ namespace RazorTransform
 
             // load the loose items directly under item into a new group, if any
             var g = new TransformModelGroup();
-            g.LoadFromXml(xml, null, null); // also loads name, desc, the items that are our prototype
+            g.LoadFromXml(xml, null, null,rtValuesVersion); // also loads name, desc, the items that are our prototype
             if ( g.Children.Count > 0 )
                 PrototypeGroups.Add(g);
 
@@ -159,7 +159,7 @@ namespace RazorTransform
                 // this allows for recursive definitions
                 var existingOne = TransformModel.Instance.Arrays.FirstOrDefault(o => o.ArrayValueName == (string)x.Attribute(Constants.ArrayValueName));
 
-                newOne.LoadFromXml(x, null, null);
+                newOne.LoadFromXml(x, null, null,rtValuesVersion);
 
                 if (existingOne != null && newOne is TransformModelArray)
                 {
@@ -175,16 +175,21 @@ namespace RazorTransform
             makeKeyFormat(xml);
 
             // overrides not used in arrays -- for now
-            setArrayValues(values);
+            setArrayValues(values,rtValuesVersion);
         }
 
-        protected void setArrayValues(XElement values)
+        protected void setArrayValues(XElement values,int rtValuesVersion)
         {
             // load the values from the values file, if it exists
             if (values != null)
             {
                 // search for nested value is something like ./value[@name="itemA"]
-                string valuesXPath = String.Format("./value[@name=\"{0}\"]", ArrayValueName);
+                string valuesXPath;
+                if ( rtValuesVersion == 1 )
+                    valuesXPath = String.Format("./value[@name=\"{0}\"]", ArrayValueName);
+                else
+                    valuesXPath = String.Format("./{0}", ArrayValueName);
+
                 var myValues = values.XPathSelectElements(valuesXPath); 
                 foreach (var mv in myValues)
                 {
@@ -193,30 +198,13 @@ namespace RazorTransform
                     {
                         if (g is TransformModelArray)
                         {
-                            (g as TransformModelArray).setArrayValues(mv);
+                            (g as TransformModelArray).setArrayValues(mv,rtValuesVersion);
                         }
                         else if (g is TransformModelGroup)
                         {
                             foreach (var i in nextOne.Items)
                             {
-                                var childValues = mv.Elements().Where(n => 
-                                    {   
-                                        var a = n.Attribute(Constants.Name);
-                                        if (a != null)
-                                            return a.Value == i.PropertyName;
-                                        else
-                                            throw new Exception("Missing name on element " + n.ToString());
-                                    });
-
-                                var v = childValues.SingleOrDefault();
-                                if (v != null)
-                                {
-                                    var a = v.Attribute(Constants.Value);
-                                    if ( a != null )
-                                        i.Value = v.Attribute(Constants.Value).Value;
-                                    else
-                                        throw new Exception("Missing value on element " + v.ToString());
-                                }
+                                (i as TransformModelItem).SetItemValue(mv,null,rtValuesVersion);
                             }
                         }
                     }

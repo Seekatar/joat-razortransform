@@ -16,13 +16,13 @@ namespace RazorTransform
 
         public event EventHandler<string> OnValuesSave;
 
-       
+
 
         TransformModel _model = new TransformModel(true);
         Settings _settings = new Settings();
         ITransformOutput _output = null;
 
-        public bool Initialize(IDictionary<string, object> parms, IDictionary<string, string> overrides, MainEdit window = null)
+        public async Task<bool> InitializeAsync(IDictionary<string, object> parms, IDictionary<string, string> overrides, MainEdit window = null)
         {
             try
             {
@@ -33,7 +33,13 @@ namespace RazorTransform
                     _output = new GuiProgress(window);
 
                 _settings.Load(overrides);
-                return _model.Load(_settings);
+                bool ret = _model.Load(_settings);
+                if ( ret )
+                {
+                    var task = await RefreshModelAsync(false);
+                    ret = _model.Load(_settings, task.Item1.Root);
+                }
+                return ret;
             }
             catch (Exception settingsException)
             {
@@ -44,7 +50,7 @@ namespace RazorTransform
                     _output.ShowMessage(String.Format(Resource.SettingsException, settingsException.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     return false;
                 }
-                _output.ShowMessage(String.Format(Resource.SettingsException, settingsException.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation );
+                _output.ShowMessage(String.Format(Resource.SettingsException, settingsException.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
 
             return false;
@@ -59,30 +65,32 @@ namespace RazorTransform
             var ret = new TransformResult();
             if (!Directory.Exists(Settings.OutputFolder))
             {
-                Output.ShowMessage( String.Format(Resource.DestMustExist, Settings.OutputFolder) , MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                Output.ShowMessage(String.Format(Resource.DestMustExist, Settings.OutputFolder), MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
             else
             {
                 try
                 {
                     // save right away in case it errors out
-                    Save();
+                    var modelObject = await SaveAsync();
 
-                    var modelObject = _model.GetProperties(!_settings.Test, false, _settings.OutputFolder);
-
-                    RazorFileTransformer rf = new RazorFileTransformer(modelObject);
-                    _cts = new CancellationTokenSource();
-
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
-                    ret.Count = await rf.TransformFilesAsync(_settings.TemplateFolder, _settings.OutputFolder, !_settings.Test, _cts.Token, false, _output);
-                    sw.Stop();
-                    lock (this)
+                    if (modelObject != null)
                     {
-                        _cts = null;
+                        RazorFileTransformer rf = new RazorFileTransformer(modelObject);
+                        _cts = new CancellationTokenSource();
+
+                        Stopwatch sw = new Stopwatch();
+                        sw.Start();
+                        ret.Count = await rf.TransformFilesAsync(_settings.TemplateFolder, _settings.OutputFolder, !_settings.Test, _cts.Token, false, _output);
+                        sw.Stop();
+                        lock (this)
+                        {
+                            _cts = null;
+                        }
+                        ret.TranformResult = ProcessingResult.ok;
+                        ret.Elapsed = sw.Elapsed;
                     }
-                    ret.TranformResult = ProcessingResult.ok;
-                    ret.Elapsed = sw.Elapsed;
+
                 }
                 catch (OperationCanceledException)
                 {
@@ -113,26 +121,85 @@ namespace RazorTransform
         /// build the model from the values and save it to the file
         /// </summary>
         /// <returns></returns>
-        internal void Save()
+        internal async Task<System.Dynamic.ExpandoObject> SaveAsync(bool validateModel = true)
         {
             if (!_settings.Test && !_settings.NoSave)
             {
                 // add this to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
-                var dest = _model.Groups[0].Children.Where( o => o.PropertyName == "DestinationFolder" ).SingleOrDefault();
-                if ( dest != null )
+                var dest = _model.Groups[0].Children.Where(o => o.PropertyName == "DestinationFolder").SingleOrDefault();
+                if (dest != null)
                     dest.Value = _settings.OutputFolder;
 
-                var body = _model.Save(_settings.ValuesFile);
-
-                if (OnValuesSave != null)
+                var docModel = await RefreshModelAsync(validateModel);
+                if ( docModel.Item1 != null )
                 {
-                    OnValuesSave(this, body);
-                }
+                    docModel.Item1.Save(Settings.ValuesFile);
 
+                    if (OnValuesSave != null)
+                    {
+                        OnValuesSave(this, docModel.ToString());
+                    }
+                    return docModel.Item2;
+                }
             }
+            return null;
         }
 
+        private async Task<Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>> RefreshModelAsync(bool validateModel)
+        {
+            System.Dynamic.ExpandoObject modelObject = null;
+
+            var body = _model.GenerateXml();
+
+            if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
+            {
+                try
+                {
+                    modelObject = _model.GetProperties(!_settings.Test, false, _settings.OutputFolder, validateModel);
+                }
+                catch (ValidationException e)
+                {
+                    Output.ShowMessage(Resource.ValidationError, MessageBoxButton.OK, MessageBoxImage.Asterisk, String.Format(Resource.ValidationMessage, e.ToString()));
+                    return null;
+                }
+
+                RazorFileTransformer rf = new RazorFileTransformer(modelObject);
+                _cts = new CancellationTokenSource();
+
+                await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output );  // don't show substitute progress if running w/o UI
+
+                lock (this)
+                {
+                    _cts = null;
+                }
+
+                // do any substitutions in  XML
+                if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
+                {
+                    var r = new System.Text.RegularExpressions.Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
+                    var doc = System.Xml.Linq.XDocument.Parse(body);
+                    foreach (var x in doc.Root.Descendants())
+                    {
+                        if (!x.HasElements && x.Value.Contains("Model."))
+                        {
+                            // save off @Model.. in orig for next time
+                            x.Add(new System.Xml.Linq.XAttribute(Constants.Original, x.Value));
+                            var matches = r.Matches(x.Value);
+                            foreach (System.Text.RegularExpressions.Match m in matches)
+                            {
+                                if (rf.SubstituteMapping.ContainsKey(m.Value))
+                                {
+                                    x.Value = x.Value.Replace(m.Value, rf.SubstituteMapping[m.Value]);
+                                }
+                            }
+                        }
+                    }
+                    return new Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>(doc,modelObject);
+                }
+            }
+            return new Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>(null,null);
+        }
         /// <summary>
         /// cancel a running transform
         /// </summary>

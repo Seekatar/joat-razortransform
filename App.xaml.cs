@@ -22,13 +22,14 @@ namespace RazorTransform
             int ret = EXIT_ERROR; // failed
 
             bool run = false;
+            bool upgrade = false;
             bool showHelp = false;
             string outputFolder = "..";
             string logFile = "RazorTransform.log";
             Dictionary<string, object> parms = new Dictionary<string, object>();
 
             var options = new Mono.Options.OptionSet()
-                .Add("run", v => { parms.Add("Run", true); run = true; })
+                .Add("run", v => { parms["Run"] = true; run = true; })
                 .Add("h|?|help", v => showHelp = true)
                 .Add("object=", v => parms.Add("ObjectFile", v))
                 .Add("values=", v => parms.Add("ValuesFile", v))
@@ -39,7 +40,8 @@ namespace RazorTransform
                 .Add("debug", v => { parms.Add("Debug", true); ExceptionExtension.ShowStack = true; })
                 .Add("powerShell", v => { parms.Add("PowerShell", true); })
                 .Add("template=", v => parms.Add("OverrideTemplateFolder", v))
-                .Add("showHidden", v => parms.Add("ShowHidden", true));
+                .Add("showHidden", v => parms.Add("ShowHidden", true))
+                .Add("upgrade", v => { upgrade = true; parms["Run"] = true; run = true; });
 
             List<string> overrides = options.Parse(args);
 
@@ -48,12 +50,13 @@ namespace RazorTransform
                 ShowHelp();
             else
             {
-                if (run) // run without the UI
+                if (run ) // run without the UI
                 {
                     var transformer = new RazorTransformer();
                     try
                     {
-                        transformer.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
+                        var ok = transformer.InitializeAsync(parms, Settings.SplitCommandLineOverrides(overrides));
+                        ok.Wait();
 
                         transformer.Output.Report(new ProgressInfo( transformer.Settings.ToString(transformer.Model)));
                         if (transformer.Settings.Test)
@@ -61,19 +64,29 @@ namespace RazorTransform
                             transformer.Output.Report(new ProgressInfo(Resource.TestModeLogStart));
                         }
 
-                        var result = transformer.DoTransformAsync();
-                        result.Wait();
-
-                        if (result.Result.TranformResult == ProcessingResult.ok)
+                        if (upgrade) // only upgrading
                         {
-                            ret = EXIT_NO_ERROR; // ok
-                            if (transformer.Settings.Test)
+                            var result = transformer.SaveAsync(false);
+                            result.Wait();
+                            transformer.Output.Report(new ProgressInfo("Converted"));
+                            ret = EXIT_NO_ERROR;
+                        }
+                        else
+                        {
+                            var result = transformer.DoTransformAsync();
+                            result.Wait();
+
+                            if (result.Result.TranformResult == ProcessingResult.ok)
                             {
-                                transformer.Output.Report(new ProgressInfo(Resource.TestModeComplete));
-                            }
-                            else if (transformer.Settings.NoSave)
-                            {
-                                transformer.Output.Report(new ProgressInfo(Resource.NoSave));
+                                ret = EXIT_NO_ERROR; // ok
+                                if (transformer.Settings.Test)
+                                {
+                                    transformer.Output.Report(new ProgressInfo(Resource.TestModeComplete));
+                                }
+                                else if (transformer.Settings.NoSave)
+                                {
+                                    transformer.Output.Report(new ProgressInfo(Resource.NoSave));
+                                }
                             }
                         }
                     }

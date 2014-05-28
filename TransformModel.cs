@@ -145,9 +145,9 @@ namespace RazorTransform
         /// <param name="htmlEncode"></param>
         /// <param name="destinationFolder"></param>
         /// <returns></returns>
-        public ExpandoObject GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null)
+        public ExpandoObject GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true)
         {
-            return BuildObject(Groups, updateXml, htmlEncode, destinationFolder);
+            return BuildObject(Groups, updateXml, htmlEncode, destinationFolder, validateModel);
         }
 
         /// <summary>
@@ -159,9 +159,9 @@ namespace RazorTransform
         /// <param name="destinationFolder"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null)
+        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true )
         {
-            return buildObject(groups, updateXml, htmlEncode, destinationFolder, null, null);
+            return buildObject(groups, updateXml, htmlEncode, destinationFolder, null, null, validateModel);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace RazorTransform
         /// <param name="destinationFolder"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root)
+        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root, bool validateModel )
         {
             var ret = new ExpandoObject();
             var dict = ret as IDictionary<string, object>;
@@ -202,22 +202,26 @@ namespace RazorTransform
                     {
                         var i = g as TransformModelArray;
                         var children = new List<ExpandoObject>();
-                        if (i.Items.Count() < i.Min)
-                            throw new ValidationException(String.Format(Resource.MinCount, i.DisplayName, i.Min), g);
-                        if ( i.Unique )
+                        if (validateModel)
                         {
-                            for ( int j = 0; j < (i.Items.Count() -1); j++ )
+                            if (i.Items.Count() < i.Min)
+                                throw new ValidationException(String.Format(Resource.MinCount, i.DisplayName, i.Min), g);
+
+                            if (i.Unique)
                             {
-                                if ( i.Items.Skip(j+1).Any( o => o.DisplayName.Equals(i.Items.ElementAt(j).DisplayName)))
+                                for (int j = 0; j < (i.Items.Count() - 1); j++)
                                 {
-                                    throw new ValidationException( String.Format( Resource.UniqueViolation, i.Items.ElementAt(j).DisplayName), g);
+                                    if (i.Items.Skip(j + 1).Any(o => o.DisplayName.Equals(i.Items.ElementAt(j).DisplayName)))
+                                    {
+                                        throw new ValidationException(String.Format(Resource.UniqueViolation, i.Items.ElementAt(j).DisplayName), g);
+                                    }
                                 }
                             }
                         }
                         foreach (var c in i.Items)
                         {
                             currentName = (c as TransformModelArrayItem).DisplayName;
-                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, htmlEncode, destinationFolder, ret, root));
+                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, htmlEncode, destinationFolder, ret, root,validateModel));
                         }
                         dict.Add(i.ArrayValueName, children);
                     }
@@ -240,7 +244,8 @@ namespace RazorTransform
                             }
                             else
                             {
-                                checkLimits(i);
+                                if ( validateModel )
+                                    checkLimits(i);
                                 string value = (i.Value ?? String.Empty).Trim();
                                 if (htmlEncode)
                                     dict.Add(i.PropertyName, HttpUtility.HtmlEncode(value));
@@ -321,6 +326,7 @@ namespace RazorTransform
                 Instance = this;
         }
 
+
         // load both object def and values from files
         public bool LoadFromFile(Settings settings)
         {
@@ -358,6 +364,18 @@ namespace RazorTransform
         // load both object and values from XML
         public bool LoadFromXElement(XElement objectRoot, XElement values, IDictionary<string, string> overrides = null)
         {
+            // check RtValues file version
+            int rtValuesVersion = 1;
+            if (values != null)
+            {
+                var verAttr = values.Attribute(Constants.Version);
+                if (verAttr != null)
+                {
+                    if (Int32.TryParse(verAttr.Value, out rtValuesVersion) && rtValuesVersion > Constants.CurrentRtValuesVersion )
+                        throw new Exception(String.Format(Resource.BadRtValueVersion, verAttr.Value));
+                }
+            }
+
             _enums.Clear();
             _regexes.Clear();
             //TransformModel.Instance.Customs.Clear();
@@ -441,12 +459,12 @@ namespace RazorTransform
                 }
                 Groups.Add(g);
 
-                g.LoadFromXml(x, values, overrides);
+                g.LoadFromXml(x, values, overrides, rtValuesVersion);
             }
             return true;
         }
 
-        internal string Save(string _valueFileName)
+        internal string GenerateXml()
         {
             try
             {
@@ -457,18 +475,16 @@ namespace RazorTransform
                 return String.Empty;
             }
 
-            var doc = XDocument.Parse("<RtValues/>");
+            var doc = XDocument.Parse(String.Format("<RtValues {0}=\"{1}\"/>", Constants.Version, Constants.CurrentRtValuesVersion));
             var root = doc.Root;
 
             var groups = new List<TransformModelGroup>(Groups);
             groups.Insert(0, _settings.Group);
             saveGroups(root, groups);
 
-            doc.Save(_valueFileName);
-
             OnModelSaved();
 
-            return File.ReadAllText(_valueFileName);
+            return doc.ToString();
         }
 
         private void saveGroups(XElement root, List<TransformModelGroup> groups)
@@ -488,24 +504,23 @@ namespace RazorTransform
             if (item is TransformModelArrayItem)
             {
                 var arrayItem = item as TransformModelArrayItem;
-                var x = new XElement(Constants.Value, new XAttribute(Constants.Name, arrayItem.ArrayParent.ArrayValueName));
+                var x = new XElement(arrayItem.ArrayParent.ArrayValueName);
                 root.Add(x);
                 saveGroups(x, arrayItem.Groups);
             }
             else
             {
-                var x = new XElement(Constants.Value, new XAttribute(Constants.Name, item.PropertyName), new XAttribute(Constants.Value, item.Value ?? ""));
+                var x = new XElement(item.PropertyName, item.Value ?? "");
                 root.Add(x);
             }
         }
 
-        internal bool Load(Settings settings)
+        internal bool Load(Settings settings, XElement objectValues = null )
         {
             _settings = settings;
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var path = Path.Combine(directoryName, _settings.ValuesFile);
-            XElement objectValues = null;
-            if (File.Exists(path))
+            if (objectValues == null && File.Exists(path))
             {
                 objectValues = XDocument.Load(path).Root;
             }

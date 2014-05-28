@@ -24,7 +24,7 @@ namespace RazorTransform
 
         public override string ToString()
         {
-            var sb = new StringBuilder("Validation exception "+Message+Environment.NewLine+"    ");
+            var sb = new StringBuilder(Message+Environment.NewLine+"    ");
             _groups.Reverse();
             foreach (var g in _groups)
             {

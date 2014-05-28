@@ -20,5 +20,6 @@
         bool ReadOnly { get; set; }
         RtType Type { get; set; }
         string Value { get; set; }
+        string ExpandedValue { get; set; }
     }
 }

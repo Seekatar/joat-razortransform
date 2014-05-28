@@ -380,7 +380,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        private async void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             btnCancel.IsEnabled = false;
             if (_currentState == ProcessingState.shellExecuting )
@@ -393,7 +393,25 @@ namespace RazorTransform
             }
             else if (!_transformer.Cancel())
             {
-                if (!editControl.Dirty || _transformer.Output.ShowMessage(Resource.IsDirty, MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                bool okToClose = true;
+                if (editControl.Dirty )
+                {
+                    var resp = _transformer.Output.ShowMessage(String.Format(Resource.IsDirty, _transformer.Settings.ValuesFile), MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                    if (resp == MessageBoxResult.Yes)
+                    {
+                        if ((await _transformer.SaveAsync()) == null)  // failed validation don't exit
+                        {
+                            okToClose = false;
+                        }
+                    }
+                    else if (resp == MessageBoxResult.Cancel)
+                        okToClose = false; 
+
+                    // else No, so close window without saving
+                }
+                
+                if ( okToClose)
                     _parent.ProcessingComplete(RanTransformOk ? ProcessingResult.close : ProcessingResult.canceled);
                 else
                     btnCancel.IsEnabled = true;
@@ -406,7 +424,7 @@ namespace RazorTransform
 
 
         /// <summary>
-        /// run the transform
+        /// run the transform, Go button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -455,7 +473,8 @@ namespace RazorTransform
                     // init for powershell, then do init again below since script may have touched input
                     var oldValue = _transformer.Settings.Run;
                     _transformer.Settings.Run = true; // set run to true to avoid popups
-                    _transformer.Initialize(_parms, _overrides, this);
+                    var ok = _transformer.InitializeAsync(_parms, _overrides, this);
+                    ok.Wait();
                     _transformer.Settings.Run = oldValue;
 
                     psConsole.SyncContext = null;
@@ -466,7 +485,7 @@ namespace RazorTransform
                 {
                     psConsole.SetColors((Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSForeground"]), (Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSBackground"]));
                 }
-                _transformer.Initialize(_parms, _overrides, this); // reinit after running pre script
+                await _transformer.InitializeAsync(_parms, _overrides, this); // reinit after running pre script
                 editControl.Load(_transformer.Model.Groups, _transformer.Settings.ShowHidden );
                 setButtonStates(ProcessingState.idle);
                 _parent.SetTitle(TitleSuffix);
@@ -498,10 +517,10 @@ namespace RazorTransform
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        private async void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            _transformer.Save();
-            editControl.Dirty = false;
+            if ( await _transformer.SaveAsync() != null )
+                editControl.Dirty = false;
         }
 
         public void Dispose()

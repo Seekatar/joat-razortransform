@@ -23,19 +23,21 @@ namespace RazorTransform
         {
             syncContext.Post(_ =>
             {
-                _window.Report(value);
+                if ( _window != null )
+                     _window.Report(value);
             }, null);
         }
 
         public MessageBoxResult ShowMessage(string msg, MessageBoxButton messageBoxButton = MessageBoxButton.OK, MessageBoxImage messageBoxImage = MessageBoxImage.None, string secondaryMsg = null)
         {
-            if (!String.IsNullOrWhiteSpace(secondaryMsg))
-                msg += Environment.NewLine + secondaryMsg;
-
-            if ( App.Current != null && App.Current.MainWindow != null )
-                return MessageBox.Show(App.Current.MainWindow, msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+            if (App.Current != null && App.Current.MainWindow != null)
+            {
+                return Joat.TaskDialog.ShowMsg(App.Current.MainWindow, msg, secondaryMsg, messageBoxButton, messageBoxImage);
+            }
             else
-                return MessageBox.Show(msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+            {
+                return Joat.TaskDialog.ShowMsg(null, msg, secondaryMsg, messageBoxButton, messageBoxImage); 
+            }
         }
 
         public void Dispose()

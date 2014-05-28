@@ -7,6 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using RtPsHost;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace RazorTransform
 {
@@ -42,28 +44,35 @@ namespace RazorTransform
 
                 int i = 0;
                 var processing = Resource.ProcessingTransforms;
+#if USE_PARALLEL				
+                Parallel.ForEach(fileList, f =>
+#else
                 foreach (var f in fileList)
+#endif				
                 {
-                    i++;
+                    Interlocked.Increment(ref i);
                     currentFile = f;
 
                     cancel.ThrowIfCancellationRequested();
 
-                    if (progress != null) progress.Report(new ProgressInfo(processing, currentOperation: f, percentComplete: (100 * i / fileList.Count)-1));
+                    if (progress != null) progress.Report(new ProgressInfo(processing, currentOperation: f, percentComplete: (100 * i / fileList.Count) - 1));
 
                     string template = File.ReadAllText(f);
-                    var content = RazorTemplateUtil.Transform(_model,template);
+                    var content = RazorTemplateUtil.Transform(_model, template);
                     if (content == null)
                         throw new Exception(String.Format(Resource.TransformNoContent, currentFile));
 
                     if (content.Contains("@Model.") || content.Contains("@(")) // allow one level of nesting of @Model. or @(
-                        content= RazorTemplateUtil.Transform(_model, HttpUtility.HtmlDecode(content));
+                        content = RazorTemplateUtil.Transform(_model, HttpUtility.HtmlDecode(content));
 
                     if (saveFiles)
                         File.WriteAllText(Path.Combine(outputFolder, Path.GetFileName(f)), content);
 
-                    count++;
+                    Interlocked.Increment(ref count);
                 }
+#if USE_PARALLEL				
+				);
+#endif				
                 sw.Stop();
                 if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds), percentComplete: 100));
 
@@ -111,7 +120,12 @@ namespace RazorTransform
             _model = model;
         }
 
-        private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null )
+        /// <summary>
+        /// @Model mappings that were substituted during the transform.
+        /// </summary>
+        public IDictionary<string, string> SubstituteMapping = new Dictionary<string, string>();
+
+        private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth=0 )
         {
             var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
 
@@ -124,10 +138,19 @@ namespace RazorTransform
                 progress.Report(new ProgressInfo(scanning));
             try
             {
+#if NOT_PARALLEL_SUBST
+                Parallel.ForEach(ex, kv =>
+#else
                 foreach (var kv in ex)
+#endif
                 {
+                    Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
+
                     if (progress != null)
-                        progress.Report(new ProgressInfo(scanning, currentOperation: kv.Key, percentComplete: (++count * 100 / max)));
+                    {
+                        Interlocked.Increment(ref count);
+                        progress.Report(new ProgressInfo(scanning, currentOperation: kv.Key, percentComplete: (count * 100 / max)));
+                    }
 
                     if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
                     {
@@ -136,17 +159,47 @@ namespace RazorTransform
                             changeCount += substituteValues(e, cancel);
                         }
                     }
-                    else if (kv.Value.ToString().Contains("@Model.") || kv.Value.ToString().Contains("@(")) // allow one level of nesting of @Model. or @(
+                    else 
                     {
-                        string errorMessage = null;
-                        var result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(kv.Value.ToString()), out errorMessage);
-                        if (!String.IsNullOrEmpty(errorMessage))
+                        var subst = kv.Value.ToString();
+
+                        var matches = r.Matches(subst);
+                        if (matches.Count > 0)
                         {
-                            throw new Exception(errorMessage);
+                            foreach (Match match in r.Matches(subst))
+                            {
+                                string errorMessage = null;
+
+                                string result = null;
+                                lock (SubstituteMapping)
+                                {
+                                    if (SubstituteMapping.ContainsKey(match.Value))
+                                        result = SubstituteMapping[match.Value];
+                                }
+                                if (result == null)
+                                {
+                                    result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage);
+                                    if (!String.IsNullOrEmpty(errorMessage))
+                                    {
+                                        throw new Exception(errorMessage);
+                                    }
+                                    lock (SubstituteMapping)
+                                    {
+                                        SubstituteMapping[match.Value] = result;
+                                    }
+                                }
+                                if (result != null)
+                                    subst = subst.Replace(match.Value, result);
+
+                            }
+                            changes.Add(kv.Key, subst);
                         }
-                        changes.Add(kv.Key, result);
+
                     }
                 }
+#if NOT_PARALLEL_SUBST
+				);
+#endif				
             }
             finally
             {
@@ -176,18 +229,28 @@ namespace RazorTransform
             return transformFiles(inputMask, outputFolder, saveFiles, recursive, CancellationToken.None, progress);
         }
 
-        public Task<int> TransformFilesAsync( string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<ProgressInfo> progress = null )
+        public Task<int> TransformFilesAsync(string inputMask, string outputFolder, bool saveFiles, CancellationToken cancel, bool recursive = false, IProgress<ProgressInfo> progress = null)
         {
             return Task.Run(() =>
-            {             
+            {
+                return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);
+            });
+        }
+
+        public Task SubstituteValuesAsync(CancellationToken cancel, IProgress<ProgressInfo> progress = null)
+        {
+            return Task.Run(() =>
+            {
+                SubstituteMapping.Clear();
+
                 // first do any values that have @Model in them
                 for (int i = 0; i < 5; i++) // allow 5 levels of nesting
                 {
                     if (substituteValues(_model, cancel, progress) == 0)
                         break;
                 }
-                return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);
             });
         }
+
     }
 }

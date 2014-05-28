@@ -82,7 +82,7 @@ namespace RazorTransform
         /// <param name="xml"></param>
         /// <param name="values"></param>
         /// <param name="overrides"></param>
-        public virtual void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
+        public virtual void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion )
         {
             // attributes
             DisplayName = (String)xml.Attribute(Constants.Name) ?? "<no name>";
@@ -110,7 +110,7 @@ namespace RazorTransform
                     else
                         i = new TransformModelItem(this);
 
-                    i.LoadFromXml(e, values, overrides);
+                    i.LoadFromXml(e, values, overrides, rtValuesVersion);
 
                     Children.Add(i);
                 }

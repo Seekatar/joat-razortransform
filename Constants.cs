@@ -51,6 +51,13 @@ namespace RazorTransform
         internal const string Custom = "custom";
         internal const string Parameter = "parameter";
         internal const string Model = "model";
+        internal const string Original = "orig";
+        internal const string Version = "version";
+
+        // Version history
+        // 2 = switch RtValues to use names instead of value for everything
+        internal const int RtValuesVersion2 = 2;
+        internal const int CurrentRtValuesVersion = RtValuesVersion2;
 
         /// <summary>
         /// map the type name to an RtType

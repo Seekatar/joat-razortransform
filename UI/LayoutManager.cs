@@ -53,7 +53,32 @@ namespace RazorTransform
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
                 Control t = CreateControl(ci, binding, itemChanged);
-                t.ToolTip = ci.Description;
+                if (!String.IsNullOrWhiteSpace(ci.ExpandedValue))
+                {
+                    // build a stack panel for the tooltip to look like this:
+                    // <description>
+                    // Expanded value: <expandedvalue>
+                    var ttBinding = new Binding()
+                    {
+                        Source = ci,
+                        Path = new PropertyPath("ExpandedValue"),
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    };
+                    var sp = new StackPanel() { Orientation = Orientation.Vertical };
+                    var tt = new TextBlock() { Text = ci.Description };
+                    sp.Children.Add(tt);
+                    var horizSp = new StackPanel() { Orientation = Orientation.Horizontal };
+                    sp.Children.Add(horizSp);
+                    horizSp.Children.Add(new Label() { Content = Resource.ExpandedValue });
+                    tt = new TextBlock();
+                    tt.SetBinding(TextBlock.TextProperty, ttBinding);
+                    tt.VerticalAlignment = VerticalAlignment.Center;
+                    horizSp.Children.Add(tt);
+
+                    t.ToolTip = sp;
+                }
+                else
+                    t.ToolTip = ci.Description;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
                 t.HorizontalAlignment = HorizontalAlignment.Left;

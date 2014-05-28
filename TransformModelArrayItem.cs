@@ -50,11 +50,6 @@ namespace RazorTransform
             } 
         }
 
-        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
-        {
-            
-        }
-
         internal void MakeKey()
         {
             DisplayName = ArrayParent.makeKey(this);

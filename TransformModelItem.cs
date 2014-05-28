@@ -149,6 +149,11 @@ namespace RazorTransform
         public virtual string Value { get; set; }
 
         /// <summary>
+        /// current value of the item, with macros e.g @Model.* in it
+        /// </summary>
+        public virtual string ExpandedValue { get; set; }
+
+        /// <summary>
         /// gets the value of Value as Type T
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -177,15 +182,61 @@ namespace RazorTransform
         /// <param name="xml"></param>
         /// <param name="values"></param>
         /// <param name="overrides"></param>
-        public virtual void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
+        public virtual void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion )
         {
             loadFromXml(xml);
 
+
+            SetItemValue(values, overrides, rtValuesVersion);
+        }
+
+        internal void SetItemValue(XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
+        {
             if (overrides != null && overrides.ContainsKey(PropertyName))
+            {
                 Value = overrides[PropertyName];
+            }
             else if (values != null)
             {
-                var v = values.Elements(Constants.Value).Where(n => (string)n.Attribute(Constants.Name) == PropertyName).Select(n => (string)n.Attribute(Constants.Value)).SingleOrDefault();
+                string v = null;
+                if (rtValuesVersion == 1)
+                {
+                    var childValues = values.Elements().Where(n =>
+                    {
+                        var a = n.Attribute(Constants.Name);
+                        if (a != null)
+                            return a.Value == PropertyName;
+                        else
+                            throw new Exception("Missing name on element " + n.ToString());
+                    });
+
+                    var val = childValues.SingleOrDefault();
+                    if (val != null)
+                    {
+                        var a = val.Attribute(Constants.Value);
+                        if (a != null)
+                            Value = val.Attribute(Constants.Value).Value;
+                        else
+                            throw new Exception("Missing value on element " + v.ToString());
+                    }
+                }
+                else // must be 2
+                {
+                    var element = values.Elements(PropertyName).SingleOrDefault();
+                    if (element != null)
+                    {
+                        v = element.Value;
+
+                        // show the original value as Value in the model
+                        // and filled in one in tooltip
+                        var attr = element.Attribute(Constants.Original);
+                        if (attr != null)
+                        {
+                            ExpandedValue = v;
+                            v = attr.Value;
+                        }
+                    }
+                }
                 if (v != null)
                     Value = v;
             }

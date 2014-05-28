@@ -120,6 +120,9 @@
   <data name="BadInteger" xml:space="preserve">
     <value>{0} is not a number: "{1}"</value>
   </data>
+  <data name="BadRtValueVersion" xml:space="preserve">
+    <value>RtValues version not supported: {0}</value>
+  </data>
   <data name="BrowsePrompt" xml:space="preserve">
     <value>Select destination folder for transformed files.  Use context menu to create a new folder.</value>
   </data>
@@ -168,6 +171,9 @@
     <value>Exception!
 {0}</value>
   </data>
+  <data name="ExpandedValue" xml:space="preserve">
+    <value>Expanded value:</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>File "{0}" not found.</value>
   </data>
@@ -194,7 +200,7 @@ Command line options are:
 </value>
   </data>
   <data name="IsDirty" xml:space="preserve">
-    <value>The data has changed.  Are you sure you want to exit?</value>
+    <value>Do you want to save changes in {0}?</value>
   </data>
   <data name="MaxInt" xml:space="preserve">
     <value>{0} must be less than {1}</value>
@@ -259,5 +265,12 @@ Command line options are:
   </data>
   <data name="UniqueViolation" xml:space="preserve">
     <value>Non unique name : "{0}"</value>
+  </data>
+  <data name="ValidationError" xml:space="preserve">
+    <value>Error validating values</value>
+  </data>
+  <data name="ValidationMessage" xml:space="preserve">
+    <value>Correct the following before continuing:
+{0}</value>
   </data>
 </root>
