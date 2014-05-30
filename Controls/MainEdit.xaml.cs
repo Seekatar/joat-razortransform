@@ -128,8 +128,8 @@ namespace RazorTransform
              
             if (!_overrides.ContainsKey("PsSkipTransform"))
             {
-                editControl.Dirty = false;
                 transformResult = await _transformer.DoTransformAsync(editControl.Dirty);
+                editControl.Dirty = false;
             }
 
             if (transformResult.TranformResult == ProcessingResult.ok )

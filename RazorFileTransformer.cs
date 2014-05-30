@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define serial
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -125,7 +126,7 @@ namespace RazorTransform
         /// </summary>
         public IDictionary<string, string> SubstituteMapping = new Dictionary<string, string>();
 
-        private int substituteValues(TransformModelArrayItem model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, string nestedName = null )
+        private int substituteValues(TransformModelArrayItem model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null )
         {
             Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
 
@@ -156,7 +157,7 @@ namespace RazorTransform
                     {
                         foreach (var a in (g as TransformModelArray).ArrayItems)
                         {
-                            changeCount += substituteValues(a, cancel, null, g.DisplayName);
+                            changeCount += substituteValues(a, cancel, null, depth++, g.DisplayName);
                         }
                     }
                     else
@@ -186,6 +187,11 @@ namespace RazorTransform
                                             {
                                                 throw new Exception(errorMessage);
                                             }
+                                            lock (SubstituteMapping)
+                                            {
+                                                if ( match.Value.Contains(".Root.") || depth == 0 )
+                                                    SubstituteMapping[match.Value] = result;
+                                            }
                                         }
                                         if (result != null)
                                             subst = subst.Replace(match.Value, result);
@@ -211,6 +217,7 @@ namespace RazorTransform
             return changeCount;
         }
 
+#if oldway
         private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth=0 )
         {
             var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
@@ -303,7 +310,7 @@ namespace RazorTransform
             }
             return changeCount;
         }
-
+#endif
         /// <summary>
         /// Synchronous transform
         /// </summary>

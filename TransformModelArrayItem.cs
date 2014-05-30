@@ -85,6 +85,11 @@ namespace RazorTransform
         object _parent;
         public object Parent { get { return _parent ?? TransformModel.Instance; } set { _parent = value; } }
 
+        public TransformModelArrayItem(TransformModelArrayItem src) : this(src,null)
+        {
+            
+        }
+
         public TransformModelArrayItem(TransformModelArrayItem src, TransformModelArrayItem parent = null ) : base(src)
         {
             if (parent != null)
