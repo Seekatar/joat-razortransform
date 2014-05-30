@@ -15,11 +15,6 @@ namespace RazorTransform.Custom
             : base(src)
         {
         }
-
-        public override void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
-        {
-            base.LoadFromXml(xml, values, overrides);
-        }
     }
 
     public class ServerPort : ICustomRazorTransformType

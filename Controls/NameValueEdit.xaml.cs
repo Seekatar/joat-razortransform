@@ -101,10 +101,10 @@ namespace RazorTransform
         {
             // find it in the list
             var delMe = (sender as Control).Tag as TransformModelArrayItem;
-            if (delMe != null && delMe.Parent is TransformModelArray)
+            if (delMe != null && delMe.Group is TransformModelArray)
             {
-                (delMe.Parent as TransformModelArray).ArrayItems.Remove(delMe);
-                TransformModel.Instance.OnItemDeleted(new ItemChangedArgs() { Group = delMe.Parent as TransformModelArray, Item = delMe } );
+                (delMe.Group as TransformModelArray).ArrayItems.Remove(delMe);
+                TransformModel.Instance.OnItemDeleted(new ItemChangedArgs() { Group = delMe.Group as TransformModelArray, Item = delMe } );
                 setDirty();
                 Reload();
             }
@@ -122,9 +122,9 @@ namespace RazorTransform
             if (copyMe != null)
             {
                 var copy = new TransformModelArrayItem(copyMe);
-                copy.ArrayParent.AddArrayItem(copy);
+                copy.ArrayGroup.AddArrayItem(copy);
                 copy.MakeKey();
-                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayParent, Item = copy });
+                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayGroup, Item = copy });
                 setDirty();
                 Reload();
             }
@@ -142,9 +142,9 @@ namespace RazorTransform
             {
                 existingOne.MakeKey();
                 // delete & add for sorting
-                (existingOne.Parent as TransformModelArray).ArrayItems.Remove(existingOne);
-                (existingOne.Parent as TransformModelArray).AddArrayItem(existingOne);
-                TransformModel.Instance.OnItemChanged(new ItemChangedArgs() { Group = existingOne.ArrayParent, Item = existingOne });
+                (existingOne.Group as TransformModelArray).ArrayItems.Remove(existingOne);
+                (existingOne.Group as TransformModelArray).AddArrayItem(existingOne);
+                TransformModel.Instance.OnItemChanged(new ItemChangedArgs() { Group = existingOne.ArrayGroup, Item = existingOne });
                 Reload();
             }
         }
@@ -157,9 +157,9 @@ namespace RazorTransform
             if (editArrayItem(newOne.Groups))
             {
                 // add it to the parent array
-                parent.ArrayParent.AddArrayItem(newOne);
+                parent.ArrayGroup.AddArrayItem(newOne);
                 newOne.MakeKey();
-                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayParent, Item = newOne });
+                TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayGroup, Item = newOne });
                 setDirty();
                 Reload();
             }

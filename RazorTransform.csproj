@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RazorTransform</RootNamespace>
     <AssemblyName>RazorTransform</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -51,9 +51,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\RazorEngine.3.4.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
+    <Reference Include="RtPsHost">
+      <HintPath>..\joat-rtpshost\bin\Debug\RtPsHost.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -124,6 +128,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="UI\LayoutManager.cs" />
     <Compile Include="Util\ExceptionExtension.cs" />
+    <Compile Include="Util\Helpers.cs" />
     <Compile Include="Util\WindowExtensions.cs" />
     <Compile Include="ValidationException.cs" />
     <Page Include="App.xaml">
@@ -282,12 +287,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\favicon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\joat-rtpshost\RtPsHost.csproj">
-      <Project>{412dc3ea-c4b8-4010-b9cd-7dbb5650ddb3}</Project>
-      <Name>RtPsHost</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

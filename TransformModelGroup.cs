@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace RazorTransform
 {
-    public class TransformModelGroup : RazorTransform.ITransformModelGroup
+    public class TransformModelGroup : System.Dynamic.DynamicObject, RazorTransform.ITransformModelGroup
     {
         protected List<ITransformModelItem> _children = new List<ITransformModelItem>();
 
@@ -64,7 +64,7 @@ namespace RazorTransform
             Children.AddRange(src.Children.Select(o => 
                             { 
                                 var ret = (TransformModelItem)Activator.CreateInstance(o.GetType(), o); 
-                                ret.Parent = this; 
+                                ret.Group = this; 
                                 return ret; 
                             }));
         }
@@ -72,7 +72,7 @@ namespace RazorTransform
         /// <summary>
         /// default constructor
         /// </summary>
-        public TransformModelGroup()
+        internal TransformModelGroup()
         {
         }
 

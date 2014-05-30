@@ -30,13 +30,21 @@ namespace RazorTransform
 
         public MessageBoxResult ShowMessage(string msg, MessageBoxButton messageBoxButton = MessageBoxButton.OK, MessageBoxImage messageBoxImage = MessageBoxImage.None, string secondaryMsg = null)
         {
-            if (App.Current != null && App.Current.MainWindow != null)
+            try
             {
-                return Joat.TaskDialog.ShowMsg(App.Current.MainWindow, msg, secondaryMsg, messageBoxButton, messageBoxImage);
+                if (App.Current != null && App.Current.MainWindow != null)
+                {
+                    return Joat.TaskDialog.ShowMsg(App.Current.MainWindow, msg, secondaryMsg, messageBoxButton, messageBoxImage);
+                }
+                else
+                {
+                    return Joat.TaskDialog.ShowMsg(null, msg, secondaryMsg, messageBoxButton, messageBoxImage);
+                }
             }
-            else
+            catch (EntryPointNotFoundException)
             {
-                return Joat.TaskDialog.ShowMsg(null, msg, secondaryMsg, messageBoxButton, messageBoxImage); 
+                // fall back to message box since in debugger TaskDialog doesn't usually work
+                return MessageBox.Show(msg+ Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
             }
         }
 

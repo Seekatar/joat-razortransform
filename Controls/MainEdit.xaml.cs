@@ -129,7 +129,7 @@ namespace RazorTransform
             if (!_overrides.ContainsKey("PsSkipTransform"))
             {
                 editControl.Dirty = false;
-                transformResult = await _transformer.DoTransformAsync();
+                transformResult = await _transformer.DoTransformAsync(editControl.Dirty);
             }
 
             if (transformResult.TranformResult == ProcessingResult.ok )
@@ -400,7 +400,7 @@ namespace RazorTransform
 
                     if (resp == MessageBoxResult.Yes)
                     {
-                        if ((await _transformer.SaveAsync()) == null)  // failed validation don't exit
+                        if ((await _transformer.SaveAsync(true,editControl.Dirty)) == null)  // failed validation don't exit
                         {
                             okToClose = false;
                         }
@@ -519,8 +519,10 @@ namespace RazorTransform
         /// <param name="e"></param>
         private async void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            if ( await _transformer.SaveAsync() != null )
+            setButtonStates(ProcessingState.transforming);
+            if ( await _transformer.SaveAsync(true,editControl.Dirty) != null )
                 editControl.Dirty = false;
+            setButtonStates(ProcessingState.idle);
         }
 
         public void Dispose()

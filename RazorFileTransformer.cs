@@ -125,6 +125,92 @@ namespace RazorTransform
         /// </summary>
         public IDictionary<string, string> SubstituteMapping = new Dictionary<string, string>();
 
+        private int substituteValues(TransformModelArrayItem model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, string nestedName = null )
+        {
+            Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
+
+            int max = Math.Max(1, model.Groups.Count);
+            int changeCount = 0;
+            int count = 0;
+
+            var scanning = Resource.ScanningDependents;
+            if (nestedName != null)
+                scanning += " " + nestedName;
+            if (progress != null)
+                progress.Report(new ProgressInfo(scanning));
+
+            try
+            {
+#if serial
+                foreach (var g in model.Groups)
+#else
+                Parallel.ForEach( model.Groups, g =>
+#endif
+                {
+                    if (progress != null)
+                    {
+                        progress.Report(new ProgressInfo(scanning, currentOperation: g.DisplayName, percentComplete: (count * 100 / max)));
+                    }
+
+                    if (g is TransformModelArray)
+                    {
+                        foreach (var a in (g as TransformModelArray).ArrayItems)
+                        {
+                            changeCount += substituteValues(a, cancel, null, g.DisplayName);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var i in g.Children)
+                        {
+                            {
+                                var subst = i.Value != null ? i.Value.ToString() : String.Empty;
+
+                                var matches = r.Matches(subst);
+                                if (matches.Count > 0)
+                                {
+                                    foreach (Match match in r.Matches(subst))
+                                    {
+                                        string errorMessage = null;
+
+                                        string result = null;
+                                        lock (SubstituteMapping)
+                                        {
+                                            if (SubstituteMapping.ContainsKey(match.Value))
+                                                result = SubstituteMapping[match.Value];
+                                        }
+                                        if (result == null)
+                                        {
+                                            result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage);
+                                            if (!String.IsNullOrEmpty(errorMessage))
+                                            {
+                                                throw new Exception(errorMessage);
+                                            }
+                                        }
+                                        if (result != null)
+                                            subst = subst.Replace(match.Value, result);
+
+                                    }
+                                    i.ExpandedValue = subst;
+                                }
+
+                            }
+                        }
+                    }
+                    Interlocked.Increment(ref count);
+                }
+#if !serial
+                );
+#endif
+            }
+            finally
+            {
+                if (progress != null)
+                    progress.Report(new ProgressInfo(scanning, percentComplete: 100));
+            }
+            return changeCount;
+        }
+
         private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth=0 )
         {
             var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
@@ -246,7 +332,9 @@ namespace RazorTransform
                 // first do any values that have @Model in them
                 for (int i = 0; i < 5; i++) // allow 5 levels of nesting
                 {
-                    if (substituteValues(_model, cancel, progress) == 0)
+                    var model = new TransformModelArrayItem();
+                    model.Groups.AddRange((_model as TransformModel).Groups);
+                    if (substituteValues(model, cancel, progress) == 0)
                         break;
                 }
             });

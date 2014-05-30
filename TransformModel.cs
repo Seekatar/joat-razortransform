@@ -14,8 +14,66 @@ namespace RazorTransform
     /// <summary>
     /// class to read and contain the settings to be merged with all the other files
     /// </summary>
-    class TransformModel : RazorTransform.ITransformModel
+    class TransformModel : System.Dynamic.DynamicObject, RazorTransform.ITransformModel
     {
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            bool ret = false;
+            result = null;
+
+            if (binder.Name == "Root")
+            {
+                result = this; // needs to b
+                return true;
+            }
+            if (binder.Name == "Parent")
+            {
+                result = this;
+                return true;
+            }
+            if ( binder.Name == "CurrentSettings")
+            {
+                result = _settings;
+                return true;
+            }
+
+            // find in all the groups, an item or array with this name
+            // var list = Groups.Where( o => o.Children.Where(p => p.PropertyName == binder.Name));
+            var list = Groups.SelectMany( o => o.Children.Where(p => p.PropertyName == binder.Name));
+            var arrays = Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == binder.Name).SingleOrDefault();
+            if ( arrays != null )
+            {
+                ret = true;
+                result = arrays;
+            }
+            else if ( list != null )
+            {
+                result = list.FirstOrDefault();
+                    ret = true;
+                    if ( result is TransformModelItem )
+                    {
+                        var item = (result as TransformModelItem);
+                        if (item.ExpandedValue != null)
+                            result = item.ExpandedValue;
+                        else
+                            result = item.Value;
+
+                        if (item.Type == RtType.Bool)
+                            result = item.GetValue<bool>();
+                        else if (item.Type == RtType.Int32)
+                            result = item.GetValue<Int32>();
+                    }
+                    else if ( !(result is TransformModelArray))
+                    {
+                        if (result != null)
+                            throw new Exception("Bad type found for item " + binder.Name + " " + result.GetType().Name);
+                        else
+                            System.Diagnostics.Debug.WriteLine("Null result for " + binder.Name);
+                    }
+            }
+            return ret;
+        }
 
         #region Events
         public event EventHandler<ItemChangedArgs> ItemChanged;
@@ -145,9 +203,10 @@ namespace RazorTransform
         /// <param name="htmlEncode"></param>
         /// <param name="destinationFolder"></param>
         /// <returns></returns>
-        public ExpandoObject GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true)
+        public object GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true)
         {
-            return BuildObject(Groups, updateXml, htmlEncode, destinationFolder, validateModel);
+            return this;
+            //return BuildObject(Groups, updateXml, htmlEncode, destinationFolder, validateModel);
         }
 
         /// <summary>
@@ -504,13 +563,18 @@ namespace RazorTransform
             if (item is TransformModelArrayItem)
             {
                 var arrayItem = item as TransformModelArrayItem;
-                var x = new XElement(arrayItem.ArrayParent.ArrayValueName);
+                var x = new XElement(arrayItem.ArrayGroup.ArrayValueName);
                 root.Add(x);
                 saveGroups(x, arrayItem.Groups);
             }
             else
             {
-                var x = new XElement(item.PropertyName, item.Value ?? "");
+                XElement x = null;
+                if ( !String.IsNullOrEmpty(item.ExpandedValue))
+                    x = new XElement(item.PropertyName, item.ExpandedValue, new XAttribute(Constants.Original,  item.Value ?? ""));
+                else
+                    x = new XElement(item.PropertyName, item.Value ?? "");
+
                 root.Add(x);
             }
         }

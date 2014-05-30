@@ -15,7 +15,7 @@
         int MinInt { get; }
         string RegEx { get; }
         string OriginalType { get; set; }
-        ITransformModelGroup Parent { get; set; }
+        ITransformModelGroup Group { get; set; }
         string PropertyName { get; set; }
         bool ReadOnly { get; set; }
         RtType Type { get; set; }

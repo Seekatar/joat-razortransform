@@ -10,7 +10,7 @@ namespace RazorTransform
     /// <summary>
     /// one piece of config info meta data
     /// </summary>
-    public class TransformModelItem : ITransformModelItem
+    public class TransformModelItem : System.Dynamic.DynamicObject, ITransformModelItem
     {
         protected XElement _element;
 
@@ -19,7 +19,7 @@ namespace RazorTransform
         /// <param name="parent"></param>
         public TransformModelItem(TransformModelGroup parent )
         {
-            Parent = parent;
+            Group = parent;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace RazorTransform
         public TransformModelItem(XElement x, TransformModelGroup parent = null)
         {
             loadFromXml(x);
-            Parent = parent;
+            Group = parent;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace RazorTransform
             Description = src.Description;
             Type = src.Type;
             OriginalType = src.OriginalType;
-            Parent = src.Parent;
+            Group = src.Group;
             Min = src.Min;
             Max = src.Max;
             EnumName = src.EnumName;
@@ -141,7 +141,7 @@ namespace RazorTransform
         /// <summary>
         /// group we're in 
         /// </summary>
-        public ITransformModelGroup Parent { get; set; }
+        public ITransformModelGroup Group { get; set; }
 
         /// <summary>
         /// current value of the item
@@ -220,7 +220,7 @@ namespace RazorTransform
                             throw new Exception("Missing value on element " + v.ToString());
                     }
                 }
-                else // must be 2
+                else // must be v2
                 {
                     var element = values.Elements(PropertyName).SingleOrDefault();
                     if (element != null)

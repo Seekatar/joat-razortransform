@@ -6,12 +6,25 @@ using System.Xml.XPath;
 
 namespace RazorTransform
 {
-    public class TransformModelArray : TransformModelGroup
+    public class TransformModelArray : TransformModelGroup, IEnumerable<ITransformModelItem>
     {
         private List<string> _keyReplacements = new List<string>();
         private List<TransformModelArrayItem> _items = new List<TransformModelArrayItem>();
         private List<TransformModelGroup> _prototypeGroups = new List<TransformModelGroup>();
         private XElement _element;
+
+        public override bool TryGetIndex(System.Dynamic.GetIndexBinder binder, object[] indexes, out object result)
+        {
+            result = null;
+            int index = (int)indexes[0];
+            if (index < 0 || index >= _items.Count)
+                throw new IndexOutOfRangeException();
+            else
+            {
+                result = _items[index];
+                return true;
+            }
+        }
 
         /// <summary>
         /// min items in array
@@ -36,7 +49,7 @@ namespace RazorTransform
         /// </summary>
         public TransformModelArrayItem CreatePrototype 
         {
-            get { return new TransformModelArrayItem(PrototypeGroups) { Parent = this } ; } 
+            get { return new TransformModelArrayItem(PrototypeGroups) { Group = this } ; } 
         }
 
         /// <summary>
@@ -85,7 +98,7 @@ namespace RazorTransform
             _items.AddRange(src._items.Select(o =>
             {
                 var ret = (TransformModelArrayItem)Activator.CreateInstance(o.GetType(), o);
-                ret.Parent = this;
+                ret.Group = this;
                 return ret;
             }));
             _prototypeGroups = src._prototypeGroups;
@@ -109,7 +122,7 @@ namespace RazorTransform
         /// <summary>
         /// default constructor
         /// </summary>
-        public TransformModelArray()
+        public TransformModelArray() 
         {
         }
 
@@ -178,7 +191,7 @@ namespace RazorTransform
             setArrayValues(values,rtValuesVersion);
         }
 
-        protected void setArrayValues(XElement values,int rtValuesVersion)
+        protected void setArrayValues(XElement values,int rtValuesVersion,TransformModelArrayItem parent = null)
         {
             // load the values from the values file, if it exists
             if (values != null)
@@ -193,12 +206,12 @@ namespace RazorTransform
                 var myValues = values.XPathSelectElements(valuesXPath); 
                 foreach (var mv in myValues)
                 {
-                    var nextOne = new TransformModelArrayItem(CreatePrototype);
+                    var nextOne = new TransformModelArrayItem(CreatePrototype,parent);
                     foreach (var g in nextOne.Groups)
                     {
                         if (g is TransformModelArray)
                         {
-                            (g as TransformModelArray).setArrayValues(mv,rtValuesVersion);
+                            (g as TransformModelArray).setArrayValues(mv,rtValuesVersion,nextOne);
                         }
                         else if (g is TransformModelGroup)
                         {
@@ -293,5 +306,16 @@ namespace RazorTransform
                 ArrayItems.Add(item);
         }
 
+        public int Count { get { return ArrayItems.Count;  } }
+
+        public IEnumerator<ITransformModelItem> GetEnumerator()
+        {
+            return ArrayItems.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ArrayItems.GetEnumerator();
+        }
     }
 }

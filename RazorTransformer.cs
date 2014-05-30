@@ -36,8 +36,10 @@ namespace RazorTransform
                 bool ret = _model.Load(_settings);
                 if ( ret )
                 {
-                    var task = await RefreshModelAsync(false);
-                    ret = _model.Load(_settings, task.Item1.Root);
+                    var task = await RefreshModelAsync(false,true); // don't validate, assume dirty 
+                    // TODO could use a checksum to see if changed since last time.
+
+                    // now _model is ok do I need to return XML? maybe for saveret = _model.Load(_settings, task.Item1.Root);
                 }
                 return ret;
             }
@@ -46,7 +48,11 @@ namespace RazorTransform
                 // continue if output got initialize
                 if (_output == null)
                 {
-                    _output = new GuiProgress(null);
+                    if (_settings.Run)
+                        _output = new LogProgress(new ProgressInfo(_settings.LogFile));
+                    else
+                        _output = new GuiProgress(window);
+
                     _output.ShowMessage(String.Format(Resource.SettingsException, settingsException.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     return false;
                 }
@@ -60,7 +66,7 @@ namespace RazorTransform
         public ITransformOutput Output { get { return _output; } }
         public Settings Settings { get { return _settings; } }
 
-        internal async Task<TransformResult> DoTransformAsync()
+        internal async Task<TransformResult> DoTransformAsync(bool dirty)
         {
             var ret = new TransformResult();
             if (!Directory.Exists(Settings.OutputFolder))
@@ -72,7 +78,7 @@ namespace RazorTransform
                 try
                 {
                     // save right away in case it errors out
-                    var modelObject = await SaveAsync();
+                    var modelObject = await SaveAsync(true,dirty); // validate, only save if dirty
 
                     if (modelObject != null)
                     {
@@ -121,7 +127,7 @@ namespace RazorTransform
         /// build the model from the values and save it to the file
         /// </summary>
         /// <returns></returns>
-        internal async Task<System.Dynamic.ExpandoObject> SaveAsync(bool validateModel = true)
+        internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
             if (!_settings.Test && !_settings.NoSave)
             {
@@ -131,7 +137,7 @@ namespace RazorTransform
                 if (dest != null)
                     dest.Value = _settings.OutputFolder;
 
-                var docModel = await RefreshModelAsync(validateModel);
+                var docModel = await RefreshModelAsync(validateModel, dirty);
                 if ( docModel.Item1 != null )
                 {
                     docModel.Item1.Save(Settings.ValuesFile);
@@ -146,9 +152,9 @@ namespace RazorTransform
             return null;
         }
 
-        private async Task<Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>> RefreshModelAsync(bool validateModel)
+        private async Task<Tuple<System.Xml.Linq.XDocument,object>> RefreshModelAsync(bool validateModel, bool dirty)
         {
-            System.Dynamic.ExpandoObject modelObject = null;
+            object modelObject = null;
 
             var body = _model.GenerateXml();
 
@@ -165,20 +171,24 @@ namespace RazorTransform
                 }
 
                 RazorFileTransformer rf = new RazorFileTransformer(modelObject);
-                _cts = new CancellationTokenSource();
-
-                await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output );  // don't show substitute progress if running w/o UI
-
-                lock (this)
+                if (dirty)
                 {
-                    _cts = null;
+                    _cts = new CancellationTokenSource();
+
+                    await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output);  // don't show substitute progress if running w/o UI
+
+                    lock (this)
+                    {
+                        _cts = null;
+                    }
                 }
 
                 // do any substitutions in  XML
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
                 {
-                    var r = new System.Text.RegularExpressions.Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
                     var doc = System.Xml.Linq.XDocument.Parse(body);
+#if false
+                    var r = new System.Text.RegularExpressions.Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
                     foreach (var x in doc.Root.Descendants())
                     {
                         if (!x.HasElements && x.Value.Contains("Model."))
@@ -195,10 +205,11 @@ namespace RazorTransform
                             }
                         }
                     }
-                    return new Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>(doc,modelObject);
+#endif
+                    return new Tuple<System.Xml.Linq.XDocument,object>(doc,modelObject);
                 }
             }
-            return new Tuple<System.Xml.Linq.XDocument,System.Dynamic.ExpandoObject>(null,null);
+            return new Tuple<System.Xml.Linq.XDocument,object>(null,null);
         }
         /// <summary>
         /// cancel a running transform
