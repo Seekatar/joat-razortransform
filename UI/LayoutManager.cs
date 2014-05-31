@@ -6,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using RazorTransform.Controls;
+using System.Windows.Documents;
 
 namespace RazorTransform
 {
@@ -300,13 +301,22 @@ namespace RazorTransform
             switch (info.Type)
             {
                 case RtType.Folder:
-                case RtType.UncPath: return _Folder(info, binding,itemChanged);
-                case RtType.Guid: return _Guid(info, binding, itemChanged);
-                case RtType.Bool: return _Bool(info, binding, itemChanged);
-                case RtType.Int32: return _Int32(info, binding, itemChanged);
-                case RtType.Password: return _Password(info, binding, itemChanged);
-                case RtType.String: return _Default(info, binding,itemChanged);
-                case RtType.Enum: return _ComboBox(info, binding, itemChanged);
+                case RtType.UncPath: 
+                    return _Folder(info, binding, itemChanged);
+                case RtType.Guid: 
+                    return _Guid(info, binding, itemChanged);
+                case RtType.Bool: 
+                    return _Bool(info, binding, itemChanged);
+                case RtType.Int32: 
+                    return _Int32(info, binding, itemChanged);
+                case RtType.Password: 
+                    return _Password(info, binding, itemChanged);
+                case RtType.String: 
+                    return _Default(info, binding, itemChanged);
+                case RtType.Enum: 
+                    return _ComboBox(info, binding, itemChanged);
+                case RtType.HyperLink: 
+                    return _HyperLink(info, binding, itemChanged);
                 default:
                     if (info.Type == RtType.Custom && TransformModel.Instance.Customs.ContainsKey(info.OriginalType))
                         return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding, itemChanged);
@@ -373,6 +383,22 @@ namespace RazorTransform
             bib.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
 
             bib.ComboBoxChanged += (o, e) => { itemChanged(); };
+            return bib;
+        };
+
+        private static Func<ITransformModelItem, Binding, Action, Hyperlink> _HyperLink = (ci, binding, itemChanged) =>
+        {
+            var bib = new Hyperlink();
+
+            try
+            {
+                bib.NavigateUri = new System.Uri(ci.Value);
+                bib.Text = ci.Description;
+            }
+            catch
+            {
+                bib.Text = Resource.InvalidUri + ci.Value;
+            }
             return bib;
         };
 

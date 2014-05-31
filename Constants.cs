@@ -17,6 +17,7 @@ namespace RazorTransform
         HiddenString, 
         Guid,
         Enum,
+        HyperLink,
         Custom
     }
 
@@ -87,6 +88,8 @@ namespace RazorTransform
                     return RtType.Bool;
                 case "hidden":
                     return RtType.HiddenString;
+                case "hyperlink":
+                    return RtType.HyperLink;
                 default:
                     if (TransformModel.Instance.Enums.ContainsKey(typeName))
                         return RtType.Enum;

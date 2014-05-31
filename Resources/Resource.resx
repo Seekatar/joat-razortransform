@@ -202,6 +202,9 @@ Command line options are:
  &lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
 </value>
   </data>
+  <data name="InvalidUri" xml:space="preserve">
+    <value>Invalid Uri: </value>
+  </data>
   <data name="IsDirty" xml:space="preserve">
     <value>Do you want to save changes in {0}?</value>
   </data>

@@ -267,6 +267,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Uri: .
+        /// </summary>
+        internal static string InvalidUri {
+            get {
+                return ResourceManager.GetString("InvalidUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to save changes in {0}?.
         /// </summary>
         internal static string IsDirty {

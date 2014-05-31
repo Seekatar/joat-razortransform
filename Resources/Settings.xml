@@ -9,7 +9,8 @@
   <group name="About" description="About RazorTransform." hidden="False">
     <item name="RTSettings_About" displayName="About" description="About" type="String" defaultValue="RazorTransform tool for tranforming files." readOnly="true"/>
     <item name="RTSettings_Copyright" displayName="Copyright" description="Copyright" type="string" defaultValue="Copyright (c) 2014. Jim Wallace" readOnly="true"/>
-    <item name="RTSettings_Version" displayName="version" description="Major version" type="string" defaultValue="2.0" readOnly="true"/>
+    <item name="RTSettings_Version" displayName="Version" description="Major version" type="string" defaultValue="2.0" readOnly="true"/>
+    <item name="RTSettings_License" displayName="License" description="License link" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/wiki/License" readOnly="true"/>
   </group>
   <custom name="PsColorType" classname="RazorTransform.Custom.PsColorType,RazorTransform"/>
 </RtObject>
