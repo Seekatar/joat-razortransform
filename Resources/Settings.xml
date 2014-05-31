@@ -10,7 +10,10 @@
     <item name="RTSettings_About" displayName="About" description="About" type="String" defaultValue="RazorTransform tool for tranforming files." readOnly="true"/>
     <item name="RTSettings_Copyright" displayName="Copyright" description="Copyright" type="string" defaultValue="Copyright (c) 2014. Jim Wallace" readOnly="true"/>
     <item name="RTSettings_Version" displayName="Version" description="Major version" type="string" defaultValue="2.0" readOnly="true"/>
-    <item name="RTSettings_License" displayName="License" description="License link" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/wiki/License" readOnly="true"/>
+    <item name="RTSettings_License" displayName="License" description="MIT License" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/wiki/License" />
+    <item name="RTSettings_Doc" displayName="Using Guide" description="" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/" />
+    <item name="RTSettings_MainPage" displayName="Project page" description="" type="hyperlink" defaultValue="https://joat-razortransform.googlecode.com/git/Doc/Using%20Arite.docx" />
+    
   </group>
   <custom name="PsColorType" classname="RazorTransform.Custom.PsColorType,RazorTransform"/>
 </RtObject>

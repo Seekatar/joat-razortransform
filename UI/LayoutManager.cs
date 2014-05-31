@@ -393,7 +393,10 @@ namespace RazorTransform
             try
             {
                 bib.NavigateUri = new System.Uri(ci.Value);
-                bib.Text = ci.Description;
+                if ( String.IsNullOrWhiteSpace(ci.Description))
+                    bib.Text = ci.Value;
+                else
+                    bib.Text = ci.Description;
             }
             catch
             {
