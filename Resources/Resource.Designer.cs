@@ -115,6 +115,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Conversion complete..
+        /// </summary>
+        internal static string ConversionComplete {
+            get {
+                return ResourceManager.GetString("ConversionComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Destination folder must exist. {0}.
         /// </summary>
         internal static string DestMustExist {

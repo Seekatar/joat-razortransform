@@ -66,9 +66,8 @@ namespace RazorTransform
 
                         if (upgrade) // only upgrading
                         {
-                            var result = transformer.SaveAsync(false,false);
-                            result.Wait();
-                            transformer.Output.Report(new ProgressInfo("Converted"));
+                            transformer.SaveAsync(false,false).Wait();
+                            transformer.Output.Report(new ProgressInfo(Resource.ConversionComplete,percentComplete:100));
                             ret = EXIT_NO_ERROR;
                         }
                         else

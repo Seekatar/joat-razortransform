@@ -245,7 +245,12 @@ namespace RazorTransform
                 if (i == null)
                     return s;
                 else
-                    values[j++] = i.Value;
+                {
+                    if ( String.IsNullOrEmpty(i.ExpandedValue))
+                        values[j++] = i.Value;
+                    else
+                        values[j++] = i.ExpandedValue;
+                }
             }
             if (String.IsNullOrWhiteSpace(Key))
             {

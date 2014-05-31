@@ -17,63 +17,26 @@ namespace RazorTransform
     class TransformModel : System.Dynamic.DynamicObject, RazorTransform.ITransformModel
     {
 
+        #region DynamicObject Overrides
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            return TransformModelArrayItem.TrySetMemberFn(binder, value, Groups);
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            bool ret = false;
             result = null;
 
-            if (binder.Name == "Root")
-            {
-                result = this; // needs to b
-                return true;
-            }
-            if (binder.Name == "Parent")
-            {
-                result = this;
-                return true;
-            }
-            if ( binder.Name == "CurrentSettings")
+            // only on root
+            if (binder.Name == Constants.CurrentSettings)
             {
                 result = _settings;
                 return true;
             }
 
-            // find in all the groups, an item or array with this name
-            // var list = Groups.Where( o => o.Children.Where(p => p.PropertyName == binder.Name));
-            var list = Groups.SelectMany( o => o.Children.Where(p => p.PropertyName == binder.Name));
-            var arrays = Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == binder.Name).SingleOrDefault();
-            if ( arrays != null )
-            {
-                ret = true;
-                result = arrays;
-            }
-            else if ( list != null )
-            {
-                result = list.FirstOrDefault();
-                    ret = true;
-                    if ( result is TransformModelItem )
-                    {
-                        var item = (result as TransformModelItem);
-                        if (item.ExpandedValue != null)
-                            result = item.ExpandedValue;
-                        else
-                            result = item.Value;
-
-                        if (item.Type == RtType.Bool)
-                            result = item.GetValue<bool>();
-                        else if (item.Type == RtType.Int32)
-                            result = item.GetValue<Int32>();
-                    }
-                    else if ( !(result is TransformModelArray))
-                    {
-                        if (result != null)
-                            throw new Exception("Bad type found for item " + binder.Name + " " + result.GetType().Name);
-                        else
-                            System.Diagnostics.Debug.WriteLine("Null result for " + binder.Name);
-                    }
-            }
-            return ret;
+            return TransformModelArrayItem.TryGetMemberFn(binder, out result, this, Groups);
         }
+        #endregion
 
         #region Events
         public event EventHandler<ItemChangedArgs> ItemChanged;
@@ -196,145 +159,6 @@ namespace RazorTransform
         /// </summary>
         public IList<TransformModelArray> Arrays { get { return _arrays; } }
  
-        /// <summary>
-        /// get the object with all the properties set on it
-        /// </summary>
-        /// <param name="updateXml"></param>
-        /// <param name="htmlEncode"></param>
-        /// <param name="destinationFolder"></param>
-        /// <returns></returns>
-        public object GetProperties(bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true)
-        {
-            return this;
-            //return BuildObject(Groups, updateXml, htmlEncode, destinationFolder, validateModel);
-        }
-
-        /// <summary>
-        /// get the object with all the properties set on it
-        /// </summary>
-        /// <param name="items"></param>
-        /// <param name="updateXml"></param>
-        /// <param name="htmlEncode"></param>
-        /// <param name="destinationFolder"></param>
-        /// <param name="parent"></param>
-        /// <returns></returns>
-        internal ExpandoObject BuildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder = null, bool validateModel = true )
-        {
-            return buildObject(groups, updateXml, htmlEncode, destinationFolder, null, null, validateModel);
-        }
-
-        /// <summary>
-        /// get the object with all the properties set on it
-        /// </summary>
-        /// <param name="items"></param>
-        /// <param name="updateXml"></param>
-        /// <param name="htmlEncode"></param>
-        /// <param name="destinationFolder"></param>
-        /// <param name="parent"></param>
-        /// <returns></returns>
-        private ExpandoObject buildObject(IEnumerable<TransformModelGroup> groups, bool updateXml, bool htmlEncode, string destinationFolder, ExpandoObject parent, ExpandoObject root, bool validateModel )
-        {
-            var ret = new ExpandoObject();
-            var dict = ret as IDictionary<string, object>;
-
-            if (parent != null)
-                dict.Add("Parent", parent);
-            else
-                dict.Add("CurrentSettings", _settings); // only add to root object
-
-            if (root == null)
-                root = ret;
-
-            dict.Add("Root", root);
-
-            String currentName = "<unknown>";
-            ITransformModelGroup currentGroup = null;
-
-            try
-            {
-                foreach (var g in groups)
-                {
-                    currentGroup = g;
-                    currentName = g.DisplayName;
-
-                    if (g is TransformModelArray)
-                    {
-                        var i = g as TransformModelArray;
-                        var children = new List<ExpandoObject>();
-                        if (validateModel)
-                        {
-                            if (i.Items.Count() < i.Min)
-                                throw new ValidationException(String.Format(Resource.MinCount, i.DisplayName, i.Min), g);
-
-                            if (i.Unique)
-                            {
-                                for (int j = 0; j < (i.Items.Count() - 1); j++)
-                                {
-                                    if (i.Items.Skip(j + 1).Any(o => o.DisplayName.Equals(i.Items.ElementAt(j).DisplayName)))
-                                    {
-                                        throw new ValidationException(String.Format(Resource.UniqueViolation, i.Items.ElementAt(j).DisplayName), g);
-                                    }
-                                }
-                            }
-                        }
-                        foreach (var c in i.Items)
-                        {
-                            currentName = (c as TransformModelArrayItem).DisplayName;
-                            children.Add(buildObject((c as TransformModelArrayItem).Groups, false, htmlEncode, destinationFolder, ret, root,validateModel));
-                        }
-                        dict.Add(i.ArrayValueName, children);
-                    }
-                    else
-                    {
-                        foreach (var i in g.Children)
-                        {
-                            currentName = i.DisplayName;
-
-                            if (i.Type == RtType.Bool)
-                            {
-                                bool value = false;
-                                if (i.Value != null)
-                                {
-                                    bool result;
-                                    if (Boolean.TryParse(i.Value, out result))
-                                        value = result;
-                                }
-                                dict.Add(i.PropertyName, value);
-                            }
-                            else
-                            {
-                                if ( validateModel )
-                                    checkLimits(i);
-                                string value = (i.Value ?? String.Empty).Trim();
-                                if (htmlEncode)
-                                    dict.Add(i.PropertyName, HttpUtility.HtmlEncode(value));
-                                else
-                                    dict.Add(i.PropertyName, value);
-                            }
-
-                            if (updateXml)
-                            {
-                                (i as TransformModelItem).UpdateXml();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (ValidationException ve)
-            {
-                if (ve.Group.Count() == 0 || ve.Group.Last().Item1 != currentGroup)
-                    ve.AddGroup(currentGroup,currentName);
-                throw ve;
-            }
-            catch (Exception e)
-            {
-                string msg = String.Format(Resource.ProcessError, currentName, e.BuildMessage());
-                throw new Exception(msg);
-
-            }
-            return ret;
-        }
-
         protected void checkLimits(ITransformModelItem i)
         {
             string value = (i.Value ?? String.Empty).Trim();
@@ -583,7 +407,7 @@ namespace RazorTransform
         {
             _settings = settings;
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(directoryName, _settings.ValuesFile);
+            var path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
             if (objectValues == null && File.Exists(path))
             {
                 objectValues = XDocument.Load(path).Root;

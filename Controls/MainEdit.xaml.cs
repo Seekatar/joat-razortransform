@@ -473,15 +473,14 @@ namespace RazorTransform
                     // init for powershell, then do init again below since script may have touched input
                     var oldValue = _transformer.Settings.Run;
                     _transformer.Settings.Run = true; // set run to true to avoid popups
-                    var ok = _transformer.InitializeAsync(_parms, _overrides, this);
-                    ok.Wait();
+                    await _transformer.InitializeAsync(_parms, _overrides, this);
                     _transformer.Settings.Run = oldValue;
 
                     psConsole.SyncContext = null;
                     psConsole.Initialize();
                     var result = await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, variableItems(), ScriptInfo.ScriptType.preRun);
                 }
-                if (_transformer.Settings.ContainsKey("RTSettings_PSForeground") && _transformer.Settings.ContainsKey("RTSettings_PSBackground"))
+                if (!String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSForeground"]) && !String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSBackground"]))
                 {
                     psConsole.SetColors((Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSForeground"]), (Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSBackground"]));
                 }

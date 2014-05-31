@@ -4,6 +4,9 @@
 
 /obj/x86
 /bin
+/packages
+/templates/bak
 *.user
 *.suo
 *.netrc
+_netrc

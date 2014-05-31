@@ -14,9 +14,9 @@ namespace RazorTransform
     /// </summary>
     /// use RT for managing the settings -- wheee!
     /// could have used more static class, but eat our own dog food
-    public class Settings
+    public class Settings 
     {
-        private ExpandoObject _settings = null;
+        private TransformModel _settings;
         private TransformModelGroup _settingsGroup;
         private string _objectFile;
         private string _valuesFile;
@@ -24,17 +24,33 @@ namespace RazorTransform
         // object definition for settings is really static since code relies on it
         static string _settingsXml = RazorTemplateUtil.LoadEmebeddedTemplate( "RazorTransform.Resources.Settings.xml");
 
+        Dictionary<string, object> _extras = new Dictionary<string, object>();
+
+        private bool tryGetMember( string name, out object result )
+        {
+            result = null;
+            if (_extras.ContainsKey(name ))
+            {
+                result = _extras[name ];
+                return true;
+            }
+            if (_settings != null)
+                return TransformModelArrayItem.TryGetMemberFn(name, out result, null, _settings.Groups);
+            else
+                return false;
+        }
+
+
         public void Load(IDictionary<string, string> overrideParms)
         {
             setOverrides(overrideParms);
 
             // load the settings
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
-            var settings = new TransformModel();
-            settings.LoadValuesFromXml(settingsDefinition, this);
+            _settings = new TransformModel();
+            _settings.LoadValuesFromXml(settingsDefinition, this);
 
-            _settingsGroup = settings.Groups[0];
-            _settings = settings.BuildObject(settings.Groups, false, false);
+            _settingsGroup = _settings.Groups[0];
         }
 
         public Settings()
@@ -55,11 +71,12 @@ namespace RazorTransform
         // for editing
         public IList<TransformModelGroup> ConfigInfo 
         {
-            get { return new List<TransformModelGroup>() { _settingsGroup }; } 
+            get { return _settings.Groups; } 
         }
 
         // values saved in values file
         public string Title { get { return this["RTSettings_Title"]; } set { this["RTSettings_Title"] = value; } }
+
         public string OutputFolder 
         { 
             get 
@@ -69,6 +86,7 @@ namespace RazorTransform
             }
             set { this["RTSettings_LastPath"] = value; }
         }
+
         public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["RTSettings_LastTemplatePath"]); } set { this["RTSettings_LastTemplatePath"] = value; } }
 
         // temp values passed in on command line, set from dict passed in via reflection, see SetParameters
@@ -147,12 +165,6 @@ namespace RazorTransform
             return ret;
         }
 
-        public bool ContainsKey(string key)
-        {
-            var dict = _settings as IDictionary<string, object>;
-            return dict != null ? dict.ContainsKey(key) : false;
-        }
-
         /// <summary>
         /// indexing override to allow access to setting via string index
         /// </summary>
@@ -163,15 +175,16 @@ namespace RazorTransform
         {
             get
             {
-                var dict = _settings as IDictionary<string,object>;
+
                 object value = null;
-                dict.TryGetValue(key, out value );
-                return value.ToString();
+                if (tryGetMember(key, out value))
+                    return value.ToString();
+                else
+                    return string.Empty;
             }
             set
             {
-                var dict = _settings as IDictionary<string, object>;
-                dict[key] = value;
+                _extras[key] = value;
             }
         }
 
@@ -213,7 +226,10 @@ namespace RazorTransform
             return sb.ToString();
         }
 
-        // set all the parameters from a dict passed in using reflection
+        /// <summary>
+        /// set all the command-line parameters, passed in as dict.  Uses reflection to set values on this
+        /// </summary>
+        /// <param name="parms"></param>
         internal void SetParameters(IDictionary<string, object> parms)
         {
             var props = this.GetType().GetProperties();

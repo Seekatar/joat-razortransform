@@ -137,6 +137,9 @@
     <value>_Close</value>
     <comment>Button text</comment>
   </data>
+  <data name="ConversionComplete" xml:space="preserve">
+    <value>Conversion complete.</value>
+  </data>
   <data name="DestMustExist" xml:space="preserve">
     <value>Destination folder must exist. {0}</value>
   </data>

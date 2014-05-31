@@ -22,6 +22,13 @@ namespace RazorTransform
         Settings _settings = new Settings();
         ITransformOutput _output = null;
 
+        /// <summary>
+        /// load the settings, model and values from disk
+        /// </summary>
+        /// <param name="parms"></param>
+        /// <param name="overrides"></param>
+        /// <param name="window"></param>
+        /// <returns></returns>
         public async Task<bool> InitializeAsync(IDictionary<string, object> parms, IDictionary<string, string> overrides, MainEdit window = null)
         {
             try
@@ -36,10 +43,9 @@ namespace RazorTransform
                 bool ret = _model.Load(_settings);
                 if ( ret )
                 {
-                    var task = await RefreshModelAsync(false,true); // don't validate, assume dirty 
-                    // TODO could use a checksum to see if changed since last time.
-
-                    // now _model is ok do I need to return XML? maybe for saveret = _model.Load(_settings, task.Item1.Root);
+                    // refresh the model to update any @Model values in values file if they changed manually since last save
+                    // TODO could use a checksum embedded in to see if changed since last time.
+                    var task = await RefreshModelAsync(false, true); // don't validate, assume dirty 
                 }
                 return ret;
             }
@@ -162,7 +168,7 @@ namespace RazorTransform
             {
                 try
                 {
-                    modelObject = _model.GetProperties(!_settings.Test, false, _settings.OutputFolder, validateModel);
+                    modelObject = _model;
                 }
                 catch (ValidationException e)
                 {
@@ -187,25 +193,6 @@ namespace RazorTransform
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
                 {
                     var doc = System.Xml.Linq.XDocument.Parse(body);
-#if false
-                    var r = new System.Text.RegularExpressions.Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
-                    foreach (var x in doc.Root.Descendants())
-                    {
-                        if (!x.HasElements && x.Value.Contains("Model."))
-                        {
-                            // save off @Model.. in orig for next time
-                            x.Add(new System.Xml.Linq.XAttribute(Constants.Original, x.Value));
-                            var matches = r.Matches(x.Value);
-                            foreach (System.Text.RegularExpressions.Match m in matches)
-                            {
-                                if (rf.SubstituteMapping.ContainsKey(m.Value))
-                                {
-                                    x.Value = x.Value.Replace(m.Value, rf.SubstituteMapping[m.Value]);
-                                }
-                            }
-                        }
-                    }
-#endif
                     return new Tuple<System.Xml.Linq.XDocument,object>(doc,modelObject);
                 }
             }

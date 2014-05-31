@@ -124,7 +124,7 @@ namespace RazorTransform
         /// <summary>
         /// @Model mappings that were substituted during the transform.
         /// </summary>
-        public IDictionary<string, string> SubstituteMapping = new Dictionary<string, string>();
+        private IDictionary<string, string> _substituteMapping = new Dictionary<string, string>();
 
         private int substituteValues(TransformModelArrayItem model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null )
         {
@@ -175,10 +175,10 @@ namespace RazorTransform
                                         string errorMessage = null;
 
                                         string result = null;
-                                        lock (SubstituteMapping)
+                                        lock (_substituteMapping)
                                         {
-                                            if (SubstituteMapping.ContainsKey(match.Value))
-                                                result = SubstituteMapping[match.Value];
+                                            if (_substituteMapping.ContainsKey(match.Value))
+                                                result = _substituteMapping[match.Value];
                                         }
                                         if (result == null)
                                         {
@@ -187,10 +187,10 @@ namespace RazorTransform
                                             {
                                                 throw new Exception(errorMessage);
                                             }
-                                            lock (SubstituteMapping)
+                                            lock (_substituteMapping)
                                             {
                                                 if ( match.Value.Contains(".Root.") || depth == 0 )
-                                                    SubstituteMapping[match.Value] = result;
+                                                    _substituteMapping[match.Value] = result;
                                             }
                                         }
                                         if (result != null)
@@ -217,100 +217,6 @@ namespace RazorTransform
             return changeCount;
         }
 
-#if oldway
-        private int substituteValues(dynamic model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth=0 )
-        {
-            var ex = model as System.Dynamic.ExpandoObject as System.Collections.Generic.IDictionary<string, object>;
-
-            int changeCount = 0;
-            var changes = new System.Collections.Generic.Dictionary<string, object>();
-            int max = Math.Max(1,ex.Count);
-            int count = 0;
-            var scanning = Resource.ScanningDependents;
-            if (progress != null)
-                progress.Report(new ProgressInfo(scanning));
-            try
-            {
-#if NOT_PARALLEL_SUBST
-                Parallel.ForEach(ex, kv =>
-#else
-                foreach (var kv in ex)
-#endif
-                {
-                    Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
-
-                    if (progress != null)
-                    {
-                        Interlocked.Increment(ref count);
-                        progress.Report(new ProgressInfo(scanning, currentOperation: kv.Key, percentComplete: (count * 100 / max)));
-                    }
-
-                    if (kv.Value is System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
-                    {
-                        foreach (var e in kv.Value as System.Collections.Generic.IList<System.Dynamic.ExpandoObject>)
-                        {
-                            changeCount += substituteValues(e, cancel);
-                        }
-                    }
-                    else 
-                    {
-                        var subst = kv.Value.ToString();
-
-                        var matches = r.Matches(subst);
-                        if (matches.Count > 0)
-                        {
-                            foreach (Match match in r.Matches(subst))
-                            {
-                                string errorMessage = null;
-
-                                string result = null;
-                                lock (SubstituteMapping)
-                                {
-                                    if (SubstituteMapping.ContainsKey(match.Value))
-                                        result = SubstituteMapping[match.Value];
-                                }
-                                if (result == null)
-                                {
-                                    result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage);
-                                    if (!String.IsNullOrEmpty(errorMessage))
-                                    {
-                                        throw new Exception(errorMessage);
-                                    }
-                                    lock (SubstituteMapping)
-                                    {
-                                        SubstituteMapping[match.Value] = result;
-                                    }
-                                }
-                                if (result != null)
-                                    subst = subst.Replace(match.Value, result);
-
-                            }
-                            changes.Add(kv.Key, subst);
-                        }
-
-                    }
-                }
-#if NOT_PARALLEL_SUBST
-				);
-#endif				
-            }
-            finally
-            {
-                if (progress != null)
-                    progress.Report(new ProgressInfo(scanning, percentComplete: 100));
-            }
-
-            if (changes.Count > 0)
-            {
-                foreach (var c in changes)
-                {
-                    ex[c.Key] = c.Value;
-                }
-                changeCount += changes.Count;
-            }
-            return changeCount;
-        }
-#endif
         /// <summary>
         /// Synchronous transform
         /// </summary>
@@ -334,7 +240,7 @@ namespace RazorTransform
         {
             return Task.Run(() =>
             {
-                SubstituteMapping.Clear();
+                _substituteMapping.Clear();
 
                 // first do any values that have @Model in them
                 for (int i = 0; i < 5; i++) // allow 5 levels of nesting
