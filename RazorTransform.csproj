@@ -96,13 +96,8 @@
       <DependentUpon>Progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="Custom\ICustomRazorTransformType.cs" />
-    <Compile Include="Custom\PortInput.xaml.cs">
-      <DependentUpon>PortInput.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Custom\RtThyRegEx.cs" />
     <Compile Include="Custom\RtThySelfType.cs" />
-    <Compile Include="Custom\ServerPort.cs" />
-    <Compile Include="Custom\WebPort.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="ITransformModel.cs" />
     <Compile Include="ITransformModelGroup.cs" />
@@ -183,10 +178,6 @@
     <Page Include="Controls\Progress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Custom\PortInput.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="PowerShell\UI\Prompt.xaml">
       <Generator>MSBuild:Compile</Generator>
