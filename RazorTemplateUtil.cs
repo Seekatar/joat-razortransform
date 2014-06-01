@@ -53,20 +53,22 @@ namespace RazorTransform
         /// </summary>
         /// <param name="model"></param>
         /// <param name="template"></param>
+        /// <param name="cacheName"></param>
         /// <returns></returns>
-        public static string Transform(object model, string template)
+        public static string Transform(object model, string template, string cacheName = null)
         {
-            return Transform<object>(model, template);
+            return Transform<object>(model, template,cacheName);
         }
         /// <summary>
         ///Given a template and a model transforms the template to a text string
         /// </summary>
         /// <param name="model"></param>
         /// <param name="template"></param>
+        /// <param name="cacheName"></param>
         /// <returns></returns>
-        public static string Transform<TModel>(TModel model, string template)
+        public static string Transform<TModel>(TModel model, string template, string cacheName = null )
         {
-            return RazorEngine.Razor.Parse(template, model);
+            return RazorEngine.Razor.Parse(template, model, cacheName);
 
         }
 
@@ -75,24 +77,26 @@ namespace RazorTransform
         /// </summary>
         /// <param name="model"></param>
         /// <param name="template"></param>
+        /// <param name="cacheName"></param>
         /// <returns></returns>
-        public static string TryTransform(object model, string template, out string errorMessage)
+        public static string TryTransform(object model, string template, out string errorMessage, string cacheName = null)
         {
-            return TryTransform<object>(model, template, out errorMessage);
+            return TryTransform<object>(model, template, out errorMessage, cacheName);
         }
         /// <summary>
         ///Given a template and a model transforms the template to a text string.  Catches any exceptions and returns them as a string.
         /// </summary>
         /// <param name="model"></param>
         /// <param name="template"></param>
+        /// <param name="cacheName"></param>
         /// <returns></returns>
-        public static string TryTransform<TModel>(TModel model, string template, out string errorMessage)
+        public static string TryTransform<TModel>(TModel model, string template, out string errorMessage, string cacheName = null )
         {
             try
             {
                 errorMessage = null;
 
-                return RazorEngine.Razor.Parse(template, model);
+                return RazorEngine.Razor.Parse(template, model,  cacheName);
             }
             catch (RazorEngine.Templating.TemplateCompilationException t)
             {

@@ -182,7 +182,7 @@ namespace RazorTransform
                                         }
                                         if (result == null)
                                         {
-                                            result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage);
+                                            result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage,match.Value);
                                             if (!String.IsNullOrEmpty(errorMessage))
                                             {
                                                 throw new Exception(errorMessage);

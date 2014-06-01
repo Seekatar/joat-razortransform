@@ -5,8 +5,8 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RazorTransform")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Artie, aka RazorTransform")]
+[assembly: AssemblyDescription("Tools to edit and transform an object into files")]
 [assembly: AssemblyConfiguration("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -46,3 +46,5 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyCompanyAttribute("Jim Wallace (JOAT Services)")]
+[assembly: AssemblyCopyrightAttribute("Copyright (c) 2014 Jim Wallace")]

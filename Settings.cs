@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Linq;
@@ -43,6 +45,14 @@ namespace RazorTransform
 
         public void Load(IDictionary<string, string> overrideParms)
         {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+   
+            overrideParms["RTSettings_Version"] = fvi.ProductVersion;
+            overrideParms["RTSettings_FileVersion"] = fvi.FileVersion;
+            overrideParms["RTSettings_About"] = fvi.FileDescription;
+            overrideParms["RTSettings_Copyright"] =  fvi.LegalCopyright;
+
             setOverrides(overrideParms);
 
             // load the settings
@@ -51,6 +61,7 @@ namespace RazorTransform
             _settings.LoadValuesFromXml(settingsDefinition, this);
 
             _settingsGroup = _settings.Groups[0];
+
         }
 
         public Settings()

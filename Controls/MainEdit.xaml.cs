@@ -455,6 +455,8 @@ namespace RazorTransform
             var aie = new ArrayItemEdit();
             aie.TrySetOwner(Window.GetWindow(this));
             aie.ShowDialog(_transformer.Settings.ConfigInfo,_transformer.Settings.ShowHidden);
+            if (aie.Dirty)
+                editControl.Dirty = true;
         }
 
         /// <summary>

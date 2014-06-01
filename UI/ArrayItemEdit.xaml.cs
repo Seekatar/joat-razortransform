@@ -47,5 +47,7 @@ namespace RazorTransform
         {
             Close();
         }
+
+        public bool Dirty { get { return nvEdit.Dirty; } }
     }
 }
