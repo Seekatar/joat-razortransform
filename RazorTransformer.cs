@@ -135,7 +135,7 @@ namespace RazorTransform
         /// <returns></returns>
         internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
-            if (!_settings.Test && !_settings.NoSave)
+            if (!_settings.Test && !_settings.NoSave && _model.Groups.Count > 0 )
             {
                 // add this to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
