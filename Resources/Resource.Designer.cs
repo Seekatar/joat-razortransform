@@ -88,7 +88,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Cancel.
+        ///   Looks up a localized string similar to Cancel processing.
         /// </summary>
         internal static string Cancel {
             get {
@@ -106,7 +106,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Close.
+        ///   Looks up a localized string similar to Close the application.
         /// </summary>
         internal static string Close {
             get {

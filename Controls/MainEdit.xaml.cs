@@ -199,31 +199,31 @@ namespace RazorTransform
 
                         zoomConsole(0, endHeight, 0, endWidth);
                     }
-                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = false;
+                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = btnRefresh.IsEnabled = false;
                     btnCancel.IsEnabled = true;
 
-                    btnCancel.Content = Resource.Cancel;
+                    btnCancel.ToolTip = Resource.Cancel;
                     break;
                 case ProcessingState.shellExecuting:
                     // set buttons, control visibility
                     editControl.Visibility = System.Windows.Visibility.Collapsed;
                     zoomConsole(0, endHeight, 0, endWidth);
 
-                    btnSave.Visibility = btnSettings.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Collapsed;
-                    btnCancel.Content = Resource.Cancel;
+                    btnSave.Visibility = btnSettings.Visibility = btnSettings.Visibility = btnOk.Visibility = btnOkAndClose.Visibility = System.Windows.Visibility.Collapsed;
+                    btnCancel.ToolTip = Resource.Cancel;
                     break;
                 case ProcessingState.shellExecuted:
                     btnCancel.IsEnabled = true;
-                    btnCancel.Content = Resource.Close;
+                    btnCancel.ToolTip = Resource.Close;
                     break;
                 case ProcessingState.transformed:
                 case ProcessingState.idle:
-                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = true;
+                    btnSave.IsEnabled = btnOk.IsEnabled = btnOkAndClose.IsEnabled = editControl.IsEnabled = btnSettings.IsEnabled = btnRefresh.IsEnabled = true;
 
                     if (_embedded)
                     {
                         btnSave.Visibility = btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Collapsed;
-                        btnCancel.Content = Resource.Cancel;
+                        btnCancel.ToolTip = Resource.Cancel;
                         btnCancel.IsEnabled = false;
                     }
                     else
@@ -231,7 +231,7 @@ namespace RazorTransform
                         if (!_transformer.Settings.NoSave && !_transformer.Settings.Test)
                             btnSave.Visibility = System.Windows.Visibility.Visible;
                         btnOkAndClose.Visibility = btnSettings.Visibility = System.Windows.Visibility.Visible;
-                        btnCancel.Content = Resource.Close;
+                        btnCancel.ToolTip = Resource.Close;
                         btnCancel.IsEnabled = true;
                     }
 
@@ -526,6 +526,18 @@ namespace RazorTransform
             setButtonStates(ProcessingState.idle);
         }
 
+        /// <summary>
+        /// refresh the model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void btnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await _transformer.RefreshModelAsync(false, true);
+            // reload 
+            editControl.Load(_transformer.Model.Groups, _transformer.Settings.ShowHidden);
+        }
+
         public void Dispose()
         {
             if (_transformer != null)
@@ -540,5 +552,6 @@ namespace RazorTransform
             if (this.Dispatcher != null)
                 this.Dispatcher.InvokeShutdown();
         }
+
     }
 }

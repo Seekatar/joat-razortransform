@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:RazorTransform"
              xmlns:psGui="clr-namespace:PSHostGui"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Loaded="OnLoaded">
+             d:DesignHeight="300" d:DesignWidth="600" Loaded="OnLoaded">
     <Grid >
        
         <Grid.RowDefinitions>
@@ -18,26 +18,34 @@
         <local:NameValueEdit Grid.Row="0" x:Name="editControl"  />
         <local:Progress x:Name="progress" Visibility="Collapsed" Grid.Row="1" />
         <Border Grid.Row="2" BorderThickness="0,2,0,0" BorderBrush="Black">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="10" Color="Black" Direction="90" Opacity=".3"/>
-            </Border.Effect>
             <DockPanel >
                 <DockPanel.Background>
 
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="#FF991B27" Offset="0"/>
-                        <GradientStop Color="Black" Offset="1"/>
-                    </LinearGradientBrush>
+                    <SolidColorBrush  Color="{StaticResource DarkColor}">
+                    </SolidColorBrush>
 
                 </DockPanel.Background>
-                <StackPanel HorizontalAlignment="Left" Margin="5,5,0,0">
-                    <my:MyButton Content="Settings" x:Name="btnSettings" Click="btnSettings_Click" Style="{StaticResource mainButton}" Visibility="Hidden"></my:MyButton>
+                <StackPanel HorizontalAlignment="Left" Margin="5,5,0,0" Orientation="Horizontal">
+                    <my:MyButton x:Name="btnSettings" Click="btnSettings_Click" Style="{StaticResource mainImageButton}" Visibility="Collapsed" ToolTip="Settings">
+                        <Image Source="..\Resources\Gear.png"/>
+                    </my:MyButton>
+                    <my:MyButton x:Name="btnRefresh" Click="btnRefresh_Click" Style="{StaticResource mainImageButton}" Visibility="Visible" ToolTip="Refresh">
+                        <Image Source="..\Resources\Refresh.png" ></Image>
+                    </my:MyButton>
                 </StackPanel>
                 <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" >
-                    <my:MyButton Style="{StaticResource mainButton}" Content="_Go! &amp; Close" HorizontalAlignment="Left" x:Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click"  ToolTip="Run the transforms and if ok, exit." Visibility="Hidden"/>
-                    <my:MyButton Style="{StaticResource mainButton}" Content="G_o!" HorizontalAlignment="Left"  x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms." IsEnabled="False"/>
-                    <my:MyButton Style="{StaticResource mainButton}" Content="_Save" HorizontalAlignment="Left"  x:Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click"/>
-                    <my:MyButton Style="{StaticResource mainButton}"  Content="_Cancel" HorizontalAlignment="Right" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" IsEnabled="False"/>
+                    <my:MyButton Style="{StaticResource mainImageButton}" HorizontalAlignment="Left" x:Name="btnOkAndClose" VerticalAlignment="Top" Click="btnOkAndClose_Click"  ToolTip="Run the transforms and if ok, exit." Visibility="Hidden">
+                        <Image Source="..\Resources\PlayClose.png"/>
+                    </my:MyButton>
+                    <my:MyButton Style="{StaticResource mainImageButton}" HorizontalAlignment="Left"  x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" ToolTip="Run the transforms." IsEnabled="False">
+                        <Image Source="..\Resources\Play.png"/>
+                    </my:MyButton>
+                    <my:MyButton Style="{StaticResource mainImageButton}" HorizontalAlignment="Left"  x:Name="btnSave" VerticalAlignment="Top" Visibility="Collapsed"  ToolTip="Save the current values." Click="btnSave_Click">
+                        <Image Source="..\Resources\Save.png"/>
+                    </my:MyButton>
+                    <my:MyButton Style="{StaticResource mainImageButton}"  HorizontalAlignment="Right" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click" IsEnabled="False" ToolTip="Close">
+                        <Image Source="..\Resources\Cancel.png"/>
+                    </my:MyButton>
                 </StackPanel>
             </DockPanel>
         </Border>

@@ -158,7 +158,7 @@ namespace RazorTransform
             return null;
         }
 
-        private async Task<Tuple<System.Xml.Linq.XDocument,object>> RefreshModelAsync(bool validateModel, bool dirty)
+        internal async Task<Tuple<System.Xml.Linq.XDocument,object>> RefreshModelAsync(bool validateModel, bool dirty)
         {
             object modelObject = null;
 

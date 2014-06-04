@@ -88,13 +88,7 @@ namespace RazorTransform
 
                 if ((i & 1) == 0)
                 {
-                    /**
-                     *    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                            <GradientStop Color="#fdd3a8" Offset="0"/>
-                            <GradientStop Color="#fce79f" Offset="1"/>
-                        </LinearGradientBrush>
-                     * */
-                    LinearGradientBrush gb = GetAltGradient();
+                    var gb = GetAltBrush();
 
                     Rectangle re = new Rectangle();
                     re.Fill = gb;
@@ -165,7 +159,7 @@ namespace RazorTransform
 
             StackPanel p = new StackPanel();
             p.Orientation = Orientation.Horizontal;
-            p.Background = GetButtonRowGradient();
+            p.Background = GetButtonRowBrush();
 
             // add a New button under the expander
             var add = new MyButton()
@@ -173,8 +167,13 @@ namespace RazorTransform
                     Content = String.Format( Resource.NewItem, parent.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
                     Tag = parent.CreatePrototype,
-                    Style = Application.Current.FindResource("ArrayNewButton") as Style
+                    Style = Application.Current.FindResource("ArrayNewImageButton") as Style
                 };
+            var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri( @"..\Resources\create.png", UriKind.Relative);
+            bitmap.EndInit();
+            add.Content = new Image() { Source = bitmap };
             add.ToolTip = "Add a new item of type "+parent.DisplayName;
             add.HorizontalAlignment = HorizontalAlignment.Left;
             add.Click += (sender, args) =>
@@ -254,7 +253,7 @@ namespace RazorTransform
                 if ((i & 1) == 0)
 				{
 
-                    LinearGradientBrush gb = GetAltGradient();
+                    var gb = GetAltBrush();
 
                     Rectangle re = new Rectangle();
                     re.Fill = gb;
@@ -270,30 +269,14 @@ namespace RazorTransform
             return grid;
         }
 
-        private static LinearGradientBrush GetAltGradient()
+        private static Brush GetAltBrush()
         {
-            LinearGradientBrush gb = new LinearGradientBrush();
-            gb.StartPoint = new Point(0.5, 0);
-            gb.EndPoint = new Point(0.5, 1);
-
-            Color color1 = (Color)ColorConverter.ConvertFromString("#fdd3a8");
-            Color color2 = (Color)ColorConverter.ConvertFromString("#fce79f");
-            gb.GradientStops.Add(new GradientStop(color1, 0));
-            gb.GradientStops.Add(new GradientStop(color2, 1));
-            return gb;
+            return new SolidColorBrush() { Color = (Color)Application.Current.FindResource("LightColor") };
         }
 
-        private static LinearGradientBrush GetButtonRowGradient()
+        private static Brush GetButtonRowBrush()
         {
-            LinearGradientBrush gb = new LinearGradientBrush();
-            gb.StartPoint = new Point(0.5, 0);
-            gb.EndPoint = new Point(0.5, 1);
-
-            Color color1 = (Color)ColorConverter.ConvertFromString("#FF991B27");
-            Color color2 = Colors.Black;
-            gb.GradientStops.Add(new GradientStop(color1, 0));
-            gb.GradientStops.Add(new GradientStop(color2, 1));
-            return gb;
+            return new SolidColorBrush() { Color = (Color)Application.Current.FindResource("DarkColor") };
         }
 
         private static Control CreateControl(ITransformModelItem info, Binding binding, Action itemChanged )

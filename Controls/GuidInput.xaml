@@ -4,7 +4,9 @@
     xmlns:my="clr-namespace:RazorTransform.Controls"
     x:Name="root">
     <DockPanel>
-        <my:MyButton Style="{StaticResource txtButton}" x:Name="theButton" DockPanel.Dock="Right"  Click="theButton_Click">New</my:MyButton>
+        <my:MyButton Style="{StaticResource ArrayImageButton}" x:Name="theButton" DockPanel.Dock="Right"  Click="theButton_Click">
+            <Image Source="..\Resources\create.png"/>
+        </my:MyButton>
         <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding GuidStr, ElementName=root}"/>
     </DockPanel>
 </UserControl>

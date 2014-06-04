@@ -127,14 +127,14 @@
     <value>Select destination folder for transformed files.  Use context menu to create a new folder.</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>_Cancel</value>
+    <value>Cancel processing</value>
     <comment>Button text</comment>
   </data>
   <data name="Canceled" xml:space="preserve">
     <value>Canceled</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>_Close</value>
+    <value>Close the application</value>
     <comment>Button text</comment>
   </data>
   <data name="ConversionComplete" xml:space="preserve">

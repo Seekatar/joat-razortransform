@@ -13,20 +13,19 @@
         </Grid.RowDefinitions>
         <local:NameValueEdit Grid.Row="0" x:Name="nvEdit"/>
         <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="Black">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="10" Color="Black" Direction="90" Opacity=".3"/>
-            </Border.Effect>
             <StackPanel Grid.Row="1">
                 <StackPanel.Background>
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="#FF991B27" Offset="0"/>
-                        <GradientStop Color="Black" Offset="1"/>
-                    </LinearGradientBrush>
+                    <SolidColorBrush  Color="{StaticResource DarkColor}">
+                    </SolidColorBrush>
                 </StackPanel.Background>
                 <DockPanel  HorizontalAlignment="Right" >
 
-                    <my:MyButton Style="{StaticResource txtButton}" Content="_OK"  HorizontalAlignment="Left" Margin="5" x:Name="btnOk" VerticalAlignment="Top" Width="75" Click="btnOk_Click"  IsDefault="True" />
-                    <my:MyButton Style="{StaticResource txtButton}" Content="_Cancel" HorizontalAlignment="Right" Margin="5" x:Name="btnCancel" VerticalAlignment="Top" Width="75" IsCancel="True" Click="btnCancel_Click" />
+                    <my:MyButton Style="{StaticResource mainImageButton}" x:Name="btnOk" VerticalAlignment="Top" Click="btnOk_Click" IsDefault="True">
+                        <Image Source="..\Resources\Apply.png"/>
+                    </my:MyButton>
+                    <my:MyButton Style="{StaticResource mainImageButton}" x:Name="btnCancel" VerticalAlignment="Top" IsCancel="True" Click="btnCancel_Click">
+                        <Image Source="..\Resources\Cancel.png"/>
+                    </my:MyButton>
                 </DockPanel>
             </StackPanel>
 

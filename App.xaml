@@ -3,6 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"     
              xmlns:my="clr-namespace:RazorTransform.Controls">
     <Application.Resources>
+        <Color x:Key="TabInactive" >LightGray</Color>
+        <Color x:Key="DarkColor" >#D9C789</Color>
+        <Color x:Key="LightColor" >#fce79f</Color>
         <LinearGradientBrush x:Key="ButtonBackground" StartPoint="0.5,0" EndPoint="0.5,1">
             <GradientStop Color="#f0f0f0" Offset="0"/>
             <GradientStop Color="LightGray" Offset=".5"/>
@@ -71,16 +74,35 @@
             <Setter Property="Control.Margin" Value="5"/>
             <Setter Property="Control.Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
+        <Style x:Key="ArrayImageButton" TargetType="my:MyButton" >
+            <Setter Property="Margin" Value="3  "/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ArrayNewImageButton" TargetType="my:MyButton" >
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style TargetType="my:MyTabControl" x:Key="tabControlStyle">
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
         <Style TargetType="my:MyTabItem" x:Key="tabStyle">
             <Setter Property="Background">
                 <Setter.Value>
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="#fdd3a8" Offset="0"/>
-                        <GradientStop Color="#fce79f" Offset="1"/>
-                    </LinearGradientBrush>
+                    <SolidColorBrush Color="{StaticResource TabInactive}"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="Padding" Value="5"/>
@@ -111,11 +133,39 @@
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Template" Value="{StaticResource ButtonTemplate}"/>
         </Style>
+        <Style TargetType="my:MyButton" x:Key="extraButton">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Control.Width" Value="32"/>
+        </Style>
         <Style TargetType="my:MyButton" x:Key="mainButton">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Template" Value="{StaticResource ButtonTemplate}"/>
+        </Style>
+        <Style TargetType="my:MyButton" >
+            <Style.Resources>
+                <Style TargetType="Image">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style TargetType="my:MyButton" x:Key="mainImageButton">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="progressTitle">
             <Setter Property="Control.FontFamily" Value="Arial"/>
@@ -141,18 +191,14 @@
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Background">
                 <Setter.Value>
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="#fdd3a8" Offset="0"/>
-                        <GradientStop Color="#fce79f" Offset="1"/>
-                    </LinearGradientBrush>
+                    <SolidColorBrush  Color="{StaticResource LightColor}">
+                    </SolidColorBrush>
                 </Setter.Value>
             </Setter>
             <Setter Property="Foreground">
                 <Setter.Value>
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="#FF991B27" Offset="0"/>
-                        <GradientStop Color="Black" Offset="1"/>
-                    </LinearGradientBrush>
+                    <SolidColorBrush Color="{StaticResource DarkColor}" >
+                    </SolidColorBrush>
                 </Setter.Value>
             </Setter>
         </Style>
