@@ -12,7 +12,7 @@
     <item name="passwordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
     <item name="guidS1" displayName="Guid" description="Click to create a Guid" defaultValue="" type="Guid" hidden="false" />
     <item name="version" displayName="Version" description="Enter a dotted version number" defaultValue="1.2.3.4" type="String" hidden="false" />
-    <item name="versionShort" displayName="Version" description="Hiddent" defaultValue="@(Model.version.Substring(0,Model.version.LastIndexOf('.')))" type="String" hidden="true" />
+    <item name="versionShort" displayName="Version" description="Hiddent" defaultValue="s" type="String" hidden="true" />
   </group>
 
   <group name="Strings" description="A few strings" hidden="false">
@@ -84,8 +84,6 @@
   </group>
 
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
-  <custom name="ServerPort" classname="RazorTransform.Custom.ServerPort,RazorTransform"/>
-  <custom name="WebPort" classname="RazorTransform.Custom.WebPort,RazorTransform"/>
 
   <enum name="EnumA">
     <value key="enumKeyA" value="Enum A" />

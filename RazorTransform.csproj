@@ -73,9 +73,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Westwind.RazorHosting">
-      <HintPath>..\RazorHosting\Libraries\Westwind.RazorHosting.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -262,7 +259,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <Resource Include="Templates\ClrCalls.txt" />
+    <Content Include="Templates\ClrCalls.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\ItemBTranforms.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
