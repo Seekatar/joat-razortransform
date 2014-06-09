@@ -77,8 +77,17 @@ namespace RazorTransform
             var ret = new TransformResult();
             if (!Directory.Exists(Settings.OutputFolder))
             {
-                Output.ShowMessage(String.Format(Resource.DestMustExist, Settings.OutputFolder), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                // try to create it
+                try
+                {
+                    Directory.CreateDirectory(Settings.OutputFolder);
+                }
+                catch (Exception) {}
+                if (!Directory.Exists(Settings.OutputFolder))
+                    Output.ShowMessage(String.Format(Resource.DestMustExist, Settings.OutputFolder), MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
+
+
             else
             {
                 try

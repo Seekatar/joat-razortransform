@@ -211,6 +211,7 @@ namespace RazorTransform
 
 
         // load both object def and values from files
+#if isThisUsed
         public bool LoadFromFile(Settings settings)
         {
             XDocument doc = null;
@@ -221,6 +222,7 @@ namespace RazorTransform
             checkDestinationFolder(doc, settings.OutputFolder);
             return LoadValuesFromXml(doc.Root, settings);
         }
+#endif
 
         // load object from xml and values from file (if exists)
         public bool LoadValuesFromXml(XElement objectRoot, Settings settings)
@@ -407,17 +409,31 @@ namespace RazorTransform
         {
             _settings = settings;
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
+            // load the main file
+            var path = Path.Combine(directoryName, _settings.ObjectFile);
+            if (!File.Exists(path))
+            {
+                // look in appdata folder
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RazorTransform", "RtObject.xml");
+                if ( !File.Exists(path))
+                    throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
+                _settings.ObjectFile = path;
+            }
+
+            path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
+            if ( !File.Exists(path))
+            {
+                // set destination to same as obj
+                path = Path.Combine(Path.GetDirectoryName(_settings.ObjectFile), "RtValues.xml");
+            }
+
             if (objectValues == null && File.Exists(path))
             {
                 objectValues = XDocument.Load(path).Root;
             }
-            // load the main file
-            path = Path.Combine(directoryName, _settings.ObjectFile);
-            if (!File.Exists(path))
-                throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
 
-            var definitionDoc = XDocument.Load(path);
+
+            var definitionDoc = XDocument.Load(_settings.ObjectFile);
             checkDestinationFolder(definitionDoc, _settings.OutputFolder);
             LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
 

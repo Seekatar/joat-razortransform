@@ -1,7 +1,7 @@
 ﻿<RtObject>
   <group name="Settings" description="Settings that control how Artie works." hidden="False">
     <item name="RTSettings_Title" displayName="Title" description="Title to show in the titlebar" type="String" defaultValue="RazorTransform"/>
-    <item name="RTSettings_LastPath" displayName="Save Path" description="Location used when saving." type="Folder" defaultValue=".."/>
+    <item name="RTSettings_LastPath" displayName="Save Path" description="Location used when saving." type="Folder" defaultValue="Output"/>
     <item name="RTSettings_LastTemplatePath" displayName="Template Path" description="Location for retrieving templates." type="Folder" defaultValue="Templates"/>
     <item name="RTSettings_PSForeground" displayName="PowerShell Foreground" description="Foreground color for PowerShell" type="PsColorType" defaultValue="White"/>
     <item name="RTSettings_PSBackground" displayName="PowerShell Background" description="Background color for PowerShell" type="PsColorType" defaultValue="DarkBlue"/>

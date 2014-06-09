@@ -2,10 +2,29 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="*" Name="RazorTransform" Language="1033" Version="2.0.0.0" Manufacturer="Jim Wallace (JOAT Services)" UpgradeCode="fe630472-7cdc-4728-808e-9ba458832a9a">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-    <UIRef Id="WixUI_InstallDir" />
+    <UI>
+      <UIRef Id="WixUI_InstallDir"/>
+      <Publish Dialog="ExitDialog"
+          Control="Finish"
+          Event="DoAction"
+          Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
 
+    <Property Id="WixShellExecTarget" Value="[#razortransform.exe]" />
+    <CustomAction Id="LaunchApplication"
+        BinaryKey="WixCA"
+        DllEntry="WixShellExec"
+        Impersonate="yes" />
+    
     <MajorUpgrade DowngradeErrorMessage="A newer version of RazorTransform is already installed." />
     <MediaTemplate />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch RazorTransform" />
+    
+    <!-- Icon settings -->
+    <Icon Id="ProductIcon" SourceFile="..\Resources\favicon.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon"/>
+    <Property Id="ARPNOREPAIR" Value="1"/>
 
     <Feature Id="ProductFeature" Title="RazorTransform"  Description="The entire product" Level="1" >
       <ComponentGroupRef Id="ProductComponents" />
@@ -37,7 +56,7 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
       <Component Id="ProductComponent" Guid="{220ACD1F-DBAC-4ED9-8469-C9E2FC511E1E}">
-        <File Source="$(var.RazorTransform.TargetPath)" />
+        <File Id="razortransform.exe" Source="$(var.RazorTransform.TargetPath)" />
         <File Source="$(var.RazorTransform.TargetDir)\RazorEngine.dll" />
         <File Source="$(var.RazorTransform.TargetDir)\RtPsHost.dll" />
         <File Source="$(var.RazorTransform.TargetDir)\System.Web.Razor.dll" />
@@ -49,7 +68,7 @@
         <File Source="$(var.RazorTransform.TargetDir)\RtObject.xml" />
         <RemoveFolder Id="SAMPLEFOLDER" On ="uninstall"/>
         <!-- This gets rid of ICE38/64 errors -->
-        <RegistryKey Root="HKCU" Key="Software\joat\RazorTransform" Action="createAndRemoveOnUninstall">
+        <RegistryKey Root="HKCU" Key="Software\joat\RazorTransform">
           <RegistryValue Name="Version" Value="[ProductVersion]" Type="string" KeyPath="yes"/>
         </RegistryKey>
       </Component>
@@ -63,7 +82,7 @@
         <File Source="$(var.RazorTransform.TargetDir)\Templates\SimpleXml.xml"  />
         <RemoveFolder Id="TEMPLATEFOLDER" On ="uninstall"/>
         <!-- This gets rid of ICE38/64 errors -->
-        <RegistryKey Root="HKCU" Key="Software\joat\RazorTransform" Action="createAndRemoveOnUninstall">
+        <RegistryKey Root="HKCU" Key="Software\joat\RazorTransform" >
           <RegistryValue Name="Version" Value="[ProductVersion]" Type="string" KeyPath="yes"/>
         </RegistryKey>
       </Component>
