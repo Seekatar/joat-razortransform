@@ -116,7 +116,7 @@ namespace RazorTransform
         /// <summary>
         /// all the enums loaded from the Xml
         /// </summary>
-        private IDictionary<string, string> _regexes = new Dictionary<string,string>();
+        private IDictionary<string, string> _regexes = new Dictionary<string, string>();
 
         /// <summary>
         /// all the custom items loaded from the Xml
@@ -126,12 +126,12 @@ namespace RazorTransform
         /// <summary>
         ///  list of all arrays created so far for recursive use
         /// </summary>
-        private IList<TransformModelArray> _arrays = new List<TransformModelArray>(); 
+        private IList<TransformModelArray> _arrays = new List<TransformModelArray>();
 
         /// <summary>
         /// settings object of the current run to allow Razor views to have access to it
         /// </summary>
-        public Settings Settings { get { return _settings;  } }
+        public Settings Settings { get { return _settings; } }
         protected Settings _settings { get; set; }
 
         /// <summary>
@@ -158,24 +158,24 @@ namespace RazorTransform
         /// list of all arrays created so far for recursive use
         /// </summary>
         public IList<TransformModelArray> Arrays { get { return _arrays; } }
- 
+
         protected void checkLimits(ITransformModelItem i)
         {
             string value = (i.Value ?? String.Empty).Trim();
             switch (i.Type)
             {
                 case RtType.String:
-                    if (!String.IsNullOrWhiteSpace(i.RegEx) && !Regex.IsMatch( value, TransformModel.Instance.RegExes[i.RegEx] ))
+                    if (!String.IsNullOrWhiteSpace(i.RegEx) && !Regex.IsMatch(value, TransformModel.Instance.RegExes[i.RegEx]))
                     {
                         throw new ValidationException(String.Format(Resource.RegExViolation, i.DisplayName, i.RegEx), i);
                     }
                     if (i.MinInt != Int32.MinValue && value.Length < i.MinInt)
                     {
-                        throw new ValidationException(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt),i);
+                        throw new ValidationException(String.Format(Resource.MinStrLen, i.DisplayName, i.MinInt), i);
                     }
                     if (i.MaxInt != Int32.MaxValue && value.Length > i.MaxInt)
                     {
-                        throw new ValidationException(String.Format(Resource.MaxStrLen, i.DisplayName, i.MaxInt),i);
+                        throw new ValidationException(String.Format(Resource.MaxStrLen, i.DisplayName, i.MaxInt), i);
                     }
                     break;
 
@@ -185,16 +185,16 @@ namespace RazorTransform
                     {
                         if (v < i.MinInt)
                         {
-                            throw new ValidationException(String.Format(Resource.MinInt, i.DisplayName, i.MinInt),i);
+                            throw new ValidationException(String.Format(Resource.MinInt, i.DisplayName, i.MinInt), i);
                         }
                         if (i.MaxInt != Int32.MaxValue && i.MaxInt != 0 && v > i.MaxInt)
                         {
-                            throw new ValidationException(String.Format(Resource.MaxInt, i.DisplayName, i.MaxInt),i);
+                            throw new ValidationException(String.Format(Resource.MaxInt, i.DisplayName, i.MaxInt), i);
                         }
                     }
                     else
                     {
-                        throw new ValidationException(String.Format(Resource.BadInteger, i.DisplayName, i.Value),i);
+                        throw new ValidationException(String.Format(Resource.BadInteger, i.DisplayName, i.Value), i);
                     }
                     break;
             }
@@ -205,7 +205,7 @@ namespace RazorTransform
         public TransformModel(bool setInstance = false)
         {
             Groups = new List<TransformModelGroup>();
-            if ( setInstance )
+            if (setInstance)
                 Instance = this;
         }
 
@@ -256,7 +256,7 @@ namespace RazorTransform
                 var verAttr = values.Attribute(Constants.Version);
                 if (verAttr != null)
                 {
-                    if (Int32.TryParse(verAttr.Value, out rtValuesVersion) && rtValuesVersion > Constants.CurrentRtValuesVersion )
+                    if (Int32.TryParse(verAttr.Value, out rtValuesVersion) && rtValuesVersion > Constants.CurrentRtValuesVersion)
                         throw new Exception(String.Format(Resource.BadRtValueVersion, verAttr.Value));
                 }
             }
@@ -282,7 +282,7 @@ namespace RazorTransform
                 var name = x.Attribute(Constants.Name);
                 var value = x.Attribute(Constants.Value);
 
-                if (name == null || value == null )
+                if (name == null || value == null)
                     throw new ArgumentNullException(Resource.ErrorNullRegEx);
                 _regexes[name.Value] = value.Value;
             }
@@ -313,7 +313,7 @@ namespace RazorTransform
                 {
                     t = Type.GetType(className);
                 }
-                catch( Exception )
+                catch (Exception)
                 { }
 
                 if (t == null)
@@ -351,15 +351,6 @@ namespace RazorTransform
 
         internal string GenerateXml()
         {
-            try
-            {
-                OnModelValidate();
-            }
-            catch (Exception)
-            {
-                return String.Empty;
-            }
-
             var doc = XDocument.Parse(String.Format("<RtValues {0}=\"{1}\"/>", Constants.Version, Constants.CurrentRtValuesVersion));
             var root = doc.Root;
 
@@ -370,6 +361,29 @@ namespace RazorTransform
             OnModelSaved();
 
             return doc.ToString();
+        }
+
+        public void Validate()
+        {
+            try
+            {
+                OnModelValidate();
+            }
+            catch (Exception)
+            {
+            }
+            validate(Groups);
+        }
+
+        private void validate(List<TransformModelGroup> groups)
+        {
+            foreach (var g in groups)
+            {
+                foreach (var i in g.Items)
+                {
+                    checkLimits(i);
+                }
+            }
         }
 
         private void saveGroups(XElement root, List<TransformModelGroup> groups)
@@ -396,8 +410,8 @@ namespace RazorTransform
             else
             {
                 XElement x = null;
-                if ( !String.IsNullOrEmpty(item.ExpandedValue))
-                    x = new XElement(item.PropertyName, item.ExpandedValue, new XAttribute(Constants.Original,  item.Value ?? ""));
+                if (!String.IsNullOrEmpty(item.ExpandedValue))
+                    x = new XElement(item.PropertyName, item.ExpandedValue, new XAttribute(Constants.Original, item.Value ?? ""));
                 else
                     x = new XElement(item.PropertyName, item.Value ?? "");
 
@@ -405,7 +419,7 @@ namespace RazorTransform
             }
         }
 
-        internal bool Load(Settings settings, XElement objectValues = null )
+        internal bool Load(Settings settings, XElement objectValues = null)
         {
             _settings = settings;
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -415,13 +429,13 @@ namespace RazorTransform
             {
                 // look in appdata folder
                 path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RazorTransform", "RtObject.xml");
-                if ( !File.Exists(path))
+                if (!File.Exists(path))
                     throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
                 _settings.ObjectFile = path;
             }
 
             path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
-            if ( !File.Exists(path))
+            if (!File.Exists(path))
             {
                 // set destination to same as obj
                 path = Path.Combine(Path.GetDirectoryName(_settings.ObjectFile), "RtValues.xml");
@@ -444,7 +458,7 @@ namespace RazorTransform
 
         private void checkDestinationFolder(XDocument doc, string p)
         {
-            if (doc.Root.Elements().Count() > 0 && 
+            if (doc.Root.Elements().Count() > 0 &&
                 doc.Root.Elements().First().Elements("item").Where(o => o.Attribute("name").Value == "DestinationFolder").SingleOrDefault() == null)
             {
                 doc.Root.Elements().First().Add(new XElement("item", new XAttribute("name", "DestinationFolder"),
@@ -452,7 +466,7 @@ namespace RazorTransform
                                                    new XAttribute("displayName", "Do not use"),
                                                    new XAttribute("description", "do not use"),
                                                    new XAttribute("type", "String"),
-                                                   new XAttribute("defaultValue",p)));
+                                                   new XAttribute("defaultValue", p)));
             }
         }
 

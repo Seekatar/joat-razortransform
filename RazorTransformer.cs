@@ -171,6 +171,18 @@ namespace RazorTransform
         {
             object modelObject = null;
 
+            if ( validateModel )
+            {
+                try
+                {
+                    _model.Validate();
+                }
+                catch ( ValidationException e2 )
+                {
+                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: e2.Message);
+                }
+            }
+
             var body = _model.GenerateXml();
 
             if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
