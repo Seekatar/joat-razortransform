@@ -41,7 +41,7 @@ namespace RazorTransform
 
                 _settings.Load(overrides);
                 bool ret = _model.Load(_settings);
-                if ( ret )
+                if (ret)
                 {
                     // refresh the model to update any @Model values in values file if they changed manually since last save
                     // TODO could use a checksum embedded in to see if changed since last time.
@@ -82,59 +82,59 @@ namespace RazorTransform
                 {
                     Directory.CreateDirectory(Settings.OutputFolder);
                 }
-                catch (Exception) {}
+                catch (Exception) { }
                 if (!Directory.Exists(Settings.OutputFolder))
+                {
                     Output.ShowMessage(String.Format(Resource.DestMustExist, Settings.OutputFolder), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    ret.Result = ProcessingResult.failed;
+                    return ret;
+                }
             }
 
-
-            else
+            try
             {
-                try
-                {
-                    // save right away in case it errors out
-                    var modelObject = await SaveAsync(true,dirty); // validate, only save if dirty
+                // save right away in case it errors out
+                var modelObject = await SaveAsync(true, dirty); // validate, only save if dirty
 
-                    if (modelObject != null)
-                    {
-                        RazorFileTransformer rf = new RazorFileTransformer(modelObject);
-                        _cts = new CancellationTokenSource();
+                if (modelObject != null)
+                {
+                    RazorFileTransformer rf = new RazorFileTransformer(modelObject);
+                    _cts = new CancellationTokenSource();
 
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        ret.Count = await rf.TransformFilesAsync(_settings.TemplateFolder, _settings.OutputFolder, !_settings.Test, _cts.Token, false, _output);
-                        sw.Stop();
-                        lock (this)
-                        {
-                            _cts = null;
-                        }
-                        ret.TranformResult = ProcessingResult.ok;
-                        ret.Elapsed = sw.Elapsed;
-                    }
-
-                }
-                catch (OperationCanceledException)
-                {
-                    _output.ShowMessage(Resource.Canceled, MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (ValidationException ve)
-                {
-                    _output.ShowMessage(ve.ToString(), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-                }
-                catch (Exception ee)
-                {
-                    _output.ShowMessage(String.Format(Resource.ExceptionFormat, ee.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                }
-                finally
-                {
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    ret.Count = await rf.TransformFilesAsync(_settings.TemplateFolder, _settings.OutputFolder, !_settings.Test, _cts.Token, false, _output);
+                    sw.Stop();
                     lock (this)
                     {
                         _cts = null;
                     }
+                    ret.Result = ProcessingResult.ok;
+                    ret.Elapsed = sw.Elapsed;
                 }
 
             }
+            catch (OperationCanceledException)
+            {
+                _output.ShowMessage(Resource.Canceled, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (ValidationException ve)
+            {
+                _output.ShowMessage(ve.ToString(), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            }
+            catch (Exception ee)
+            {
+                _output.ShowMessage(String.Format(Resource.ExceptionFormat, ee.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            finally
+            {
+                lock (this)
+                {
+                    _cts = null;
+                }
+            }
+
             return ret;
         }
 
@@ -144,7 +144,7 @@ namespace RazorTransform
         /// <returns></returns>
         internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
-            if (!_settings.Test && !_settings.NoSave && _model.Groups.Count > 0 )
+            if (!_settings.Test && !_settings.NoSave && _model.Groups.Count > 0)
             {
                 // add this to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
@@ -153,7 +153,7 @@ namespace RazorTransform
                     dest.Value = _settings.OutputFolder;
 
                 var docModel = await RefreshModelAsync(validateModel, dirty);
-                if ( docModel.Item1 != null )
+                if (docModel.Item1 != null)
                 {
                     docModel.Item1.Save(Settings.ValuesFile);
 
@@ -167,19 +167,21 @@ namespace RazorTransform
             return null;
         }
 
-        internal async Task<Tuple<System.Xml.Linq.XDocument,object>> RefreshModelAsync(bool validateModel, bool dirty)
+        internal async Task<Tuple<System.Xml.Linq.XDocument, object>> RefreshModelAsync(bool validateModel, bool dirty)
         {
             object modelObject = null;
 
-            if ( validateModel )
+            if (validateModel)
             {
                 try
                 {
                     _model.Validate();
                 }
-                catch ( ValidationException e2 )
+                catch (ValidationException e2)
                 {
-                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: e2.Message);
+                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: e2.ToString(), messageBoxImage: MessageBoxImage.Asterisk);
+                    return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
+
                 }
             }
 
@@ -214,10 +216,10 @@ namespace RazorTransform
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
                 {
                     var doc = System.Xml.Linq.XDocument.Parse(body);
-                    return new Tuple<System.Xml.Linq.XDocument,object>(doc,modelObject);
+                    return new Tuple<System.Xml.Linq.XDocument, object>(doc, modelObject);
                 }
             }
-            return new Tuple<System.Xml.Linq.XDocument,object>(null,null);
+            return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
         }
         /// <summary>
         /// cancel a running transform

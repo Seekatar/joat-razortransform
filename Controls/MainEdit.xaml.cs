@@ -124,7 +124,7 @@ namespace RazorTransform
 
             RanTransformOk = false;
             TransformResult transformResult = new TransformResult();
-            transformResult.TranformResult = ProcessingResult.ok;
+            transformResult.Result = ProcessingResult.ok;
              
             if (!_overrides.ContainsKey("PsSkipTransform"))
             {
@@ -132,7 +132,7 @@ namespace RazorTransform
                 editControl.Dirty = false;
             }
 
-            if (transformResult.TranformResult == ProcessingResult.ok )
+            if (transformResult.Result == ProcessingResult.ok )
             {
                 RanTransformOk = true;
                 if (sentFromOk)
@@ -163,17 +163,17 @@ namespace RazorTransform
                 {
                     {"PSStart", DateTime.Now.Ticks.ToString() }
                 });
-                transformResult.TranformResult = await runPowerShell();
+                transformResult.Result = await runPowerShell();
                 _parent.SendData(new Dictionary<string, string>
                 {
                     {"PSEnd", DateTime.Now.Ticks.ToString() }
                 });
-                RanTransformOk = transformResult.TranformResult == ProcessingResult.ok;
+                RanTransformOk = transformResult.Result == ProcessingResult.ok;
             }
             else
                 setButtonStates(ProcessingState.transformed);
 
-            return transformResult.TranformResult;
+            return transformResult.Result;
         }
 
         /// <summary>

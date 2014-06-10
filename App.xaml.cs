@@ -75,7 +75,7 @@ namespace RazorTransform
                             var result = transformer.DoTransformAsync(false);
                             result.Wait();
 
-                            if (result.Result.TranformResult == ProcessingResult.ok)
+                            if (result.Result.Result == ProcessingResult.ok)
                             {
                                 ret = EXIT_NO_ERROR; // ok
                                 if (transformer.Settings.Test)
