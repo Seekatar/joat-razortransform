@@ -208,6 +208,9 @@ Command line options are:
   <data name="IsDirty" xml:space="preserve">
     <value>Do you want to save changes in {0}?</value>
   </data>
+  <data name="MaxCount" xml:space="preserve">
+    <value>{0} must have at least {1} items</value>
+  </data>
   <data name="MaxInt" xml:space="preserve">
     <value>{0} must be less than {1}</value>
   </data>

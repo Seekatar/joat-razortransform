@@ -285,6 +285,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} must have at least {1} items.
+        /// </summary>
+        internal static string MaxCount {
+            get {
+                return ResourceManager.GetString("MaxCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be less than {1}.
         /// </summary>
         internal static string MaxInt {

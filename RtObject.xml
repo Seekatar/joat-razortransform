@@ -47,7 +47,7 @@
     </group>
   </group>
 
-  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2" hidden="false" arrayValueName="itemAS" min="2">
+  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2, unique name." hidden="false" arrayValueName="itemAS" min="2" unique="true">
     <group name="Basic" description="this is the basic stuff" hidden="false" >
       <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
       <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />

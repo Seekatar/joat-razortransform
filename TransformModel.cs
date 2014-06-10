@@ -379,6 +379,29 @@ namespace RazorTransform
         {
             foreach (var g in groups)
             {
+                if (g is TransformModelArray)
+                {
+                    var a = g as TransformModelArray;
+                    if (a.Count < a.Min )
+                    {
+                        throw new ValidationException(String.Format(Resource.MinCount, a.DisplayName, a.Min), g);
+                    }
+                    else if ( a.Count > a.Max)
+                    {
+                        throw new ValidationException(string.Format(Resource.MaxCount, a.DisplayName, a.Max), g);
+                    }
+                    if (a.Unique)
+                    {
+                        for (int j = 0; j < (a.Items.Count() - 1); j++)
+                        {
+                            if (a.Items.Skip(j + 1).Any(o => o.DisplayName.Equals(a.Items.ElementAt(j).DisplayName)))
+                            {
+                                throw new ValidationException(String.Format(Resource.UniqueViolation, a.Items.ElementAt(j).DisplayName), g);
+                            }
+                        }
+                    }
+                }
+
                 foreach (var i in g.Items)
                 {
                     checkLimits(i);
