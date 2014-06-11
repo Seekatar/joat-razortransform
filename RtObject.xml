@@ -10,7 +10,7 @@
   </group>
   <group name="Sampler" description="One of each" hidden="false">
     <item name="s1" displayName="Sampler" description="Sample string" defaultValue="This tab has one of each simple type." type="String" readOnly="true" />
-    <item name="colorS1" displayName="Color" description="pick a color" defaultValue="Blue" type="ColorType" />
+    <item name="colorS1" displayName="Color" description="pick a color.  This is a custom control" defaultValue="Blue" type="ColorType" />
     <item name="stringS1" displayName="Name" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20" />
     <item name="boolS1" displayName="Check" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
     <item name="intS1" displayName="Limit" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
@@ -23,24 +23,25 @@
 
   <group name="Strings" description="A few strings" hidden="false">
     <item name="s2" displayName="Strings" description="Sample string" defaultValue="This tab has strings with differnt size ranges." type="String" readOnly="true" />
-    <item name="stringA1" displayName="String Range" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
-    <item name="stringA2" displayName="String Min" description="String with min size of 10." defaultValue="another default value" type="String" hidden="false" min="10" />
-    <item name="stringA3" displayName="String Max" description="String with max size of 10." defaultValue="test" type="String" hidden="false" max="10" />
-    <item name="version4" displayName="Version4" description="RegEx" defaultValue="1.0.0.0" type="String" regex="version4" hidden="false" />
-    <item name="version2" displayName="Version2" description="RegEx" defaultValue="1.0" type="String" regex="version2" hidden="false" />
+    <item name="stringA1" displayName="String Range 10-20" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
+    <item name="stringA2" displayName="String Min 10" description="String with min size of 10." defaultValue="another default value" type="String" hidden="false" min="10" />
+    <item name="stringA3" displayName="String Max 10" description="String with max size of 10." defaultValue="test" type="String" hidden="false" max="10" />
+    <item name="version4" displayName="Version4" description="RegEx restricting to d.d.d.d" defaultValue="1.0.0.0" type="String" regex="version4" hidden="false" />
+    <item name="version2" displayName="Version2" description="RegEx restricting to d.d" defaultValue="1.0" type="String" regex="version2" hidden="false" />
   </group>
 
   <group name="Ints" description="Some integers" hidden="false" >
     <item name="s4" displayName="Ints" description="Sample string" defaultValue="This tab has ints with different limits." type="String" readOnly="true" />
-    <item name="intA1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
-    <item name="intA2" displayName="Int32 #2" description="Int32 with min of 10." defaultValue="12" type="Int32" hidden="false" min="10" />
-    <item name="intA3" displayName="Int32 #3" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" />
+    <item name="intA1" displayName="Int32 10-20" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
+    <item name="intA2" displayName="Int32 &gt; 10" description="Int32 with min of 10." defaultValue="12" type="Int32" hidden="false" min="10" />
+    <item name="intA3" displayName="Int32 &lt; 10" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" />
   </group>
   
-  <group name="Grouped" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemB" min="3" key="-&gt;description name//" >
-    <item name="name" displayName="Name" description="Name, no spaces" regex="No spaces" defaultValue="" type="string" hidden="false" />
-    <item name="description" displayName="Description" description="description" defaultValue="" type="string" hidden="false" />
-
+  <group name="Grouped" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemB" min="3" key="-&gt;name description" >
+    <group name="First">
+      <item name="name" displayName="Name" description="Name, no spaces" regex="No spaces" defaultValue="" type="string" hidden="false" />
+      <item name="description" displayName="Description" description="description" defaultValue="" type="string" hidden="false" />
+    </group>
     <group name="Nested Tab" description="this is another group" hidden="false" >
       <item name="enumD1" displayName="Enumeration A" description="EnumA description" defaultValue="enumKeyA" type="EnumA" hidden="false" />
       <item name="enumD2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
@@ -53,7 +54,7 @@
       <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
     </group>
     <group name="Other" description="this is other stuff" hidden="false" >
-      <item name="stringInA" displayName="String" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="stringInA" displayName="String" description="Name, no spaces" regex="" defaultValue="" type="string" hidden="false" />
       <item name="intInA" displayName="Int" description="an integer" defaultValue="" type="Int32" hidden="false" />
     </group>
   </group>
@@ -63,13 +64,12 @@
       <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
       <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
     </group>
-    <group name="ItemB Array" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemAB" key="Key = nameB nameB2" >
-      <item name="nameB" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-      <item name="nameB2" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+    <group name="ItemB Array" description="Array of itemAB objects." hidden="false" arrayValueName="itemAB" key="Key = nameB" >
+      <item name="nameB" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" regex="No spaces"/>
       <item name="descriptionB" displayName="Description for B" description="description" defaultValue="" type="string" hidden="false" />
-      <group name="ItemC Array" description="Array of itemC objects." hidden="false" arrayValueName="itemAB" key="nameC" >
-        <item name="nameC" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
-        <item name="descC" displayName="Name part 2 for B" description="Name, no spaces" defaultValue="" type="Int32" hidden="false" />
+      <group name="ItemC Array" description="Array of itemC objects." hidden="false" arrayValueName="itemABC" key="nameC" >
+        <item name="nameC" displayName="Name for B" description="Name, no spaces" defaultValue="" type="string" hidden="false" regex="No spaces"/>
+        <item name="descC" displayName="Name part 2 for B" description="description" defaultValue="" type="Int32" hidden="false" />
       </group>
     </group>
   </group>

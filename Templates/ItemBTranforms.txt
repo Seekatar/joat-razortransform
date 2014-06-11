@@ -4,12 +4,13 @@
     for every object in the Model.itemB array
 *@
 Creating output file for each Domain object of which there are @Model.itemB.Count
+@{var i = 0;}
 @foreach ( var x in Model.itemB)
 {
 	// to make things interesting, we do a tranform in the transform!
-	var contents = RazorEngine.Razor.Parse(@"<Domain name=""@Model.name"" provider=""@Model.description"" />", x);
+	var contents = RazorEngine.Razor.Parse(@"<Item name=""@Model.name"" provider=""@Model.description"" />", x);
 
-	var fname = Path.Combine(Model.CurrentSettings.OutputFolder,x.name);
+	var fname = Path.Combine(Model.CurrentSettings.OutputFolder,String.Format("{0}_{1}.txt", x.name, i++));
     File.WriteAllText(fname,contents);
     
     // below we switch out of C#

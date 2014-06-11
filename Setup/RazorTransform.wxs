@@ -75,7 +75,7 @@
     </ComponentGroup>
     <ComponentGroup Id="SampleTemplateFiles" Directory="TEMPLATEFOLDER">
       <Component Id="SampleTemplateFiles" Guid="{5B06D6B7-592D-45F1-819E-3FF7A0D3406A}">
-        <File Source="$(var.RazorTransform.TargetDir)\Templates\ClrCalls.txt" />
+        <File Source="$(var.RazorTransform.TargetDir)\Templates\zBasic.txt" />
         <File Source="$(var.RazorTransform.TargetDir)\Templates\ItemBTranforms.txt" />
         <File Source="$(var.RazorTransform.TargetDir)\Templates\ItemBXml.xml" />
         <File Source="$(var.RazorTransform.TargetDir)\Templates\NestedTest.txt" />

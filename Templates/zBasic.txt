@@ -1,0 +1,3 @@
+﻿The version is @Model.version4 and short version is @Model.version2
+@* This will launch explorer in the output folder *@
+@{System.Diagnostics.Process.Start(Model.CurrentSettings.OutputFolder);}

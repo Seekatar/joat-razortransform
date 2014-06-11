@@ -8,7 +8,7 @@ Count of itemA is @Model.itemA.Count
 	@:Name @a.nameA
 	@:Desc @a.descriptionA
 	@:Count of itemAB is @a.itemAB.Count
-	@foreach ( var b in a.itemAB ) 
+	foreach ( var b in a.itemAB ) 
 	{
 		@:   ParentName @b.Parent.nameA
 		@:   Parent.Desc @b.Parent.descriptionA
