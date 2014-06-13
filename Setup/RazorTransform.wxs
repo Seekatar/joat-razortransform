@@ -17,8 +17,8 @@
         Impersonate="yes" />
     
     <MajorUpgrade DowngradeErrorMessage="A newer version of RazorTransform is already installed." />
-    <MediaTemplate />
-
+    <Media Id="1" Cabinet="Cab1.cab" EmbedCab="yes" />
+    
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch RazorTransform" />
     
     <!-- Icon settings -->
