@@ -454,7 +454,10 @@ namespace RazorTransform
                 path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RazorTransform", "RtObject.xml");
                 if (!File.Exists(path))
                     throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
+
+                // set output to under appdata
                 _settings.ObjectFile = path;
+                _settings.OverrideOutputFolder = Path.Combine(Path.GetDirectoryName(path), "Output");
             }
 
             path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned

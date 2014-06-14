@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="RazorTransform" Language="1033" Version="2.0.0.0" Manufacturer="Jim Wallace (JOAT Services)" UpgradeCode="fe630472-7cdc-4728-808e-9ba458832a9a">
+  <Product Id="*" Name="JOAT RazorTransform" Language="1033" Version="2.0.0.0" Manufacturer="JOAT Services (Jim Wallace)" UpgradeCode="fe630472-7cdc-4728-808e-9ba458832a9a">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <UI>
       <UIRef Id="WixUI_InstallDir"/>
@@ -57,6 +57,7 @@
     <ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
       <Component Id="ProductComponent" Guid="{220ACD1F-DBAC-4ED9-8469-C9E2FC511E1E}">
         <File Id="razortransform.exe" Source="$(var.RazorTransform.TargetPath)" />
+        <File Id="razortransform.exe.config" Source="$(var.RazorTransform.TargetPath).config" />
         <File Source="$(var.RazorTransform.TargetDir)\RazorEngine.dll" />
         <File Source="$(var.RazorTransform.TargetDir)\RtPsHost.dll" />
         <File Source="$(var.RazorTransform.TargetDir)\System.Web.Razor.dll" />

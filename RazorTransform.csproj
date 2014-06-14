@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RazorTransform</RootNamespace>
     <AssemblyName>RazorTransform</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -244,6 +244,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Resources\Settings.xml" />
+    <None Include="RtValues.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <Resource Include="Resources\Gear.png" />
     <Resource Include="Resources\Play.png" />
     <Resource Include="Resources\Refresh.png" />
@@ -258,6 +261,9 @@
     <Content Include="RtObject.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="RtValues.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\zBasic.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

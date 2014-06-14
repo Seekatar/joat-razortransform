@@ -2,22 +2,22 @@
 <RtObject>
   <group name="Hello" description="Welcome to Artie" hidden="false">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="String" readOnly="true" />
-    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Click the Gear for links to the documentation" type="String" readOnly="true" />
-    <item name="w6" displayName="More Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="String" readOnly="true" />
+    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="String" readOnly="true" />
     <item name="w3" displayName="Go!" description="Welcome String3" defaultValue="Click the play button to transform these values into output" type="String" readOnly="true" />
-    <item name="w4" displayName="Where?" description="Welcome String4" defaultValue="LocalAppData\RazorTransform has these sample files" type="String" readOnly="true" />
-    <item name="w5" displayName="Output?" description="Welcome String5" defaultValue="After running output is in the folder in the title bar" type="String" readOnly="true" />
+    <item name="w4" displayName="Where?" description="Welcome String4" defaultValue="&lt;user&gt;\LocalAppData\RazorTransform has these sample files" type="String" readOnly="true" />
+    <item name="w5" displayName="Output?" description="Welcome String5" defaultValue="After running, output is in the folder shown in the title bar" type="String" readOnly="true" />
+    <item name="w7" displayName="Using Guide" description="" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/" />
   </group>
   <group name="Sampler" description="One of each" hidden="false">
     <item name="s1" displayName="Sampler" description="Sample string" defaultValue="This tab has one of each simple type." type="String" readOnly="true" />
     <item name="colorS1" displayName="Color" description="pick a color.  This is a custom control" defaultValue="Blue" type="ColorType" />
-    <item name="stringS1" displayName="Name" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20" />
-    <item name="boolS1" displayName="Check" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
-    <item name="intS1" displayName="Limit" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
-    <item name="enumS2" displayName="Animal" description="animals" defaultValue="cow" type="Animals" hidden="false" />
+    <item name="stringS1" displayName="String" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20" />
+    <item name="boolS1" displayName="Boolean" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
+    <item name="intS1" displayName="Int32" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
+    <item name="enumS2" displayName="Enum" description="animals" defaultValue="cow" type="Animals" hidden="false" />
     <item name="uncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="c:\" type="UncPath" hidden="false" />
     <item name="folderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
-    <item name="passwordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
+    <item name="passwordS1" displayName="Password" description="enter a password.  Password values are never stored." defaultValue="" type="Password" hidden="false" />
     <item name="guidS1" displayName="Guid" description="Click to create a Guid" defaultValue="" type="Guid" hidden="false" />
   </group>
 
@@ -74,15 +74,14 @@
     </group>
   </group>
 
-  <group name="RO" description="One of each read only " hidden="false">
+  <group name="R/O" description="One of each read only " hidden="false">
+    <item name="s7" displayName="Read onlys" description="Read only fields" defaultValue="This tab has different types, all read-only" type="String" readOnly="true" />
     <item readOnly="true" name="RostringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
     <item readOnly="true" name="RoboolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
     <item readOnly="true" name="RointS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
     <item readOnly="true" name="RoenumS2" displayName="Enumeration B" description="EnumB description" defaultValue="enumKeyZ" type="EnumB" hidden="false" />
-    <item readOnly="true" name="RouncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="c:\" type="UncPath" hidden="false" />
-    <item readOnly="true" name="RofolderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
-    <item readOnly="true" name="RopasswordS1" displayName="Password" description="enter a password" defaultValue="" type="Password" hidden="false" />
-    <item readOnly="true" name="RoguidS1" displayName="Guid" description="enter a password" defaultValue="" type="Guid" hidden="false" />
+    <item readOnly="true" name="RouncS1" displayName="UNC Folder name" description="Unc Description" defaultValue="\\localhost\c$\Program Files" type="UncPath" hidden="false" />
+    <item readOnly="true" name="RofolderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\Program Files" type="Folder" hidden="false" />
   </group>
 
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
