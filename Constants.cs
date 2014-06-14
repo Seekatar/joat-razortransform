@@ -28,6 +28,8 @@ namespace RazorTransform
     {
         // elements and attributes
         internal const string Group = "group";
+        internal const string NestedGroup = "nestedGroup";
+        internal const string GroupName = "groupArrayValueName";
         internal const string Item = "item";
         internal const string Name = "name";
         internal const string DisplayName = "displayName";

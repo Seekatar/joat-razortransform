@@ -22,33 +22,15 @@
       <item name="regex" displayName="RegEx validator" description="Regular expression to validate this item" type="RtRegEx" defaultValue="&lt;None&gt;"  />
     </group>
 
-	<group name="SubGroup" description="Nested Groups for Artie" arrayValueName="group" min="0">
-	<!--
-		<item name="name" displayName="Name" description="Name of member on the Model" type="String" defaultValue=""  />
-		<item name="description" displayName="Description" description="Description show in the tooltip in the UI" type="String" defaultValue=""  />
-		<item name="arrayValueName" displayName="Array Name" description="If not empty this is an array of items" type="String" defaultValue=""  />
-		<item name="min" displayName="Min Count" description="If any array, minimum number of items" type="Int32" defaultValue="1"  />
-		<item name="hidden" displayName="Hidden" description="If checked, don't show in the UI" type="Bool" defaultValue="false"  />
-
-		<group name="Item" description="Items in the group" arrayValueName="item" min="0">
-		  <item name="name" displayName="Name" description="Name of member on the Model" type="String" defaultValue=""  />
-		  <item name="displayName" displayName="Display Name" description="Name displayed in the UI" type="String" defaultValue=""  />
-		  <item name="description" displayName="Description" description="Description show in the tooltip in the UI" type="String" defaultValue=""  />
-		  <item name="defaultValue" displayName="Default Value" description="Default value for the item if nothing in RtValues.xml" type="String" defaultValue=""  />
-		  <item name="type" displayName="Type" description="Type of item it is" type="RtType" defaultValue="String"  />
-		  <item name="hidden" displayName="Hidden" description="If checked, don't show in the UI" type="Bool" defaultValue="false"  />
-		  <item name="min" displayName="Min" description="For string, min length, for number min value" type="Int32" defaultValue="0"  />
-		  <item name="max" displayName="Max" description="For string, max length, for number max value" type="Int32" defaultValue="0"  />
-		</group>
-		-->
-	</group>
+    <nestedGroup name="SubGroup" description="Nested Groups for Artie" arrayValueName="group" min="0" groupArrayValueName="group">
+    </nestedGroup>
   </group>
-  
+
   <group name="Custom" description="Custom classes" arrayValueName="custom" min="0">
     <item name="name" displayName="Name" description="Name used in the type value" type="String" defaultValue=""  />
     <item name="classname" displayName="Class" description=".NET class, assembly name to load" type="String" defaultValue=""  />
   </group>
-  
+
   <group name="Enum" description="Enumeration values" arrayValueName="enumeration" min="0">
     <item name="name" displayName="Name" description="Name used in the type value" type="String" defaultValue=""  />
     <group name="Value" description="Values for the enum" arrayValueName="value" min="1">
@@ -64,11 +46,11 @@
 
   <custom name="RtThySelfType" classname="RazorTransform.Custom.RtThySelfType,RazorTransform"/>
   <custom name="RtThySelfRegEx" classname="RazorTransform.Custom.RtThySelfRegEx,RazorTransform"/>
-  
+
   <enum name="RtRegEx">
     <value key="" value="&lt;None&gt;" />
   </enum>
-  
+
   <enum name="RtType">
     <value key="String" value="String" />
     <value key="Bool" value="Boolean"/>

@@ -185,6 +185,19 @@ namespace RazorTransform
                 PrototypeGroups.Add(newOne);
             }
 
+            foreach ( var n in xml.Elements(Constants.NestedGroup))
+            {
+                var ng = TransformModel.Instance.Groups.SingleOrDefault(o => (o is TransformModelArray) && (o as TransformModelArray).ArrayValueName == n.Attribute(Constants.GroupName).Value);
+                if ( ng != null )
+                {
+                    PrototypeGroups.Add(ng);
+                }
+                else
+                {
+                    throw new Exception("Missing group named " + n.Attribute(Constants.NestedGroup).Value);
+                }
+            }
+
             makeKeyFormat(xml);
 
             // overrides not used in arrays -- for now

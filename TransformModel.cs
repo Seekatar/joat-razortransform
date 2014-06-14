@@ -263,7 +263,6 @@ namespace RazorTransform
 
             _enums.Clear();
             _regexes.Clear();
-            //TransformModel.Instance.Customs.Clear();
             Arrays.Clear();
             Groups.Clear();
 
