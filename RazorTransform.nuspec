@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+        <licenseUrl>https://code.google.com/p/joat-razortransform/wiki/License</licenseUrl>
+        <projectUrl>https://code.google.com/p/joat-razortransform/</projectUrl>
+    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>2.0.0.4 Fix for DestinationFolder not triggering Dirty and ADM callback save
+2.0.0.3 Pick up new RtPsHost
+2.0.0.2 First Nuget Package</releaseNotes>
+        <copyright>Copyright © Jim Wallace 2010-2014</copyright>
+        <tags>Razor File Generator Free Deploy Tool</tags>
+        <dependencies>
+            <dependency id="RazorEngine" version="3.4.1" />
+            <dependency id="Microsoft.AspNet.Razor" version="3.2.0" />
+            <dependency id="Extended.Wpf.Toolkit" version="2.2.1" />
+            <dependency id="RtPsHost" version="1.0.1.1" />
+        </dependencies>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework="" />
+            <frameworkAssembly assemblyName="System" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Management" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="" />
+        </frameworkAssemblies>
+  </metadata>
+</package>

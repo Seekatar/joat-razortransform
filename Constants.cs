@@ -59,6 +59,7 @@ namespace RazorTransform
         internal const string CurrentSettings = "CurrentSettings";
         internal const string Root = "Root";
         internal const string Parent = "Parent";
+        internal const string DestinationFolder = "DestinationFolder";
 
         // Version history
         // 2 = switch RtValues to use names instead of value for everything

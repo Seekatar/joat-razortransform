@@ -25,7 +25,7 @@ namespace PSHostGui
         private ConsoleColor _defaultForeground;
         private ConsoleColor _defaultBackground;
 
-        PsHost _psHost = new PsHost();
+        IPsHost _psHost = PsHostFactory.CreateHost();
 
         public static ConsoleColor EchoColor = ConsoleColor.Gray;
         public static ConsoleColor SystemColor = ConsoleColor.Cyan;

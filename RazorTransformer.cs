@@ -148,9 +148,14 @@ namespace RazorTransform
             {
                 // add this to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
-                var dest = _model.Groups[0].Children.Where(o => o.PropertyName == "DestinationFolder").SingleOrDefault();
+                var dest = _model.Groups[0].Children.Where(o => o.PropertyName == Constants.DestinationFolder).SingleOrDefault();
                 if (dest != null)
+                {
+                    if (!dirty && !String.Equals(_settings.OutputFolder, dest.Value, StringComparison.CurrentCultureIgnoreCase))
+                        dirty = true;
                     dest.Value = _settings.OutputFolder;
+
+                }
 
                 var docModel = await RefreshModelAsync(validateModel, dirty);
                 if (docModel.Item1 != null)
@@ -159,7 +164,7 @@ namespace RazorTransform
 
                     if (OnValuesSave != null)
                     {
-                        OnValuesSave(this, docModel.ToString());
+                        OnValuesSave(this, docModel.Item1.ToString());
                     }
                     return docModel.Item2;
                 }

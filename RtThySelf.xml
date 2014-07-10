@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RtObject>
-  <group name="Group" description="Groups for Artie" arrayValueName="group" min="1">
+  <group name="Group" description="Groups for Artie" arrayValueName="group" min="1" key="name">
     <item name="name" displayName="Name" description="Name of member on the Model" type="String" defaultValue=""  />
     <item name="description" displayName="Description" description="Description show in the tooltip in the UI" type="String" defaultValue=""  />
     <item name="arrayValueName" displayName="Array Name" description="If not empty this is an array of items" type="String" defaultValue=""  />
@@ -10,7 +10,7 @@
     <item name="hidden" displayName="Hidden" description="If checked, don't show in the UI" type="Bool" defaultValue="false"  />
     <item name="sort" displayName="Sort" description="If an array sort by the Key" type="Bool" defaultValue="false"  />
 
-    <group name="Item" description="Items in the group" arrayValueName="item" min="0">
+    <group name="Item" description="Items in the group" arrayValueName="item" min="0" key="displayName - type - (name)">
       <item name="name" displayName="Name" description="Name of member on the Model" type="String" defaultValue=""  />
       <item name="displayName" displayName="Display Name" description="Name displayed in the UI" type="String" defaultValue=""  />
       <item name="description" displayName="Description" description="Description show in the tooltip in the UI" type="String" defaultValue=""  />

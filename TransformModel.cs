@@ -486,12 +486,12 @@ namespace RazorTransform
             if (doc.Root.Elements().Count() > 0 &&
                 doc.Root.Elements().First().Elements("item").Where(o => o.Attribute("name").Value == "DestinationFolder").SingleOrDefault() == null)
             {
-                doc.Root.Elements().First().Add(new XElement("item", new XAttribute("name", "DestinationFolder"),
-                                                   new XAttribute("hidden", "true"),
-                                                   new XAttribute("displayName", "Do not use"),
-                                                   new XAttribute("description", "do not use"),
-                                                   new XAttribute("type", "String"),
-                                                   new XAttribute("defaultValue", p)));
+                doc.Root.Elements().First().Add(new XElement("item", new XAttribute("name", Constants.DestinationFolder),
+                                                   new XAttribute(Constants.Hidden, "true"),
+                                                   new XAttribute(Constants.DisplayName, "Do not use"),
+                                                   new XAttribute(Constants.Description, "do not use"),
+                                                   new XAttribute(Constants.Type, "String"),
+                                                   new XAttribute(Constants.DefaultValue, p)));
             }
         }
 
