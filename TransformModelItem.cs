@@ -230,7 +230,7 @@ namespace RazorTransform
                         // show the original value as Value in the model
                         // and filled in one in tooltip
                         var attr = element.Attribute(Constants.Original);
-                        if (attr != null)
+                        if (attr != null && !String.IsNullOrWhiteSpace(attr.Value) && attr.Value.Contains('@') )
                         {
                             ExpandedValue = v;
                             v = attr.Value;

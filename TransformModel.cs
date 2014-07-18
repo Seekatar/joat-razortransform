@@ -435,7 +435,7 @@ namespace RazorTransform
                 if (!String.IsNullOrEmpty(item.ExpandedValue))
                     x = new XElement(item.PropertyName, item.ExpandedValue, new XAttribute(Constants.Original, item.Value ?? ""));
                 else
-                    x = new XElement(item.PropertyName, item.Value ?? "");
+                    x = new XElement(item.PropertyName, item.Value ?? "", new XAttribute(Constants.Original, ""));
 
                 root.Add(x);
             }
