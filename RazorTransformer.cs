@@ -16,7 +16,11 @@ namespace RazorTransform
 
         public event EventHandler<string> OnValuesSave;
 
+        public static RazorTransformer _instance = null;
 
+        public static RazorTransformer Instance { get { return _instance; } }
+
+        public RazorTransformer() { _instance = this;  }
 
         TransformModel _model = new TransformModel(true);
         Settings _settings = new Settings();

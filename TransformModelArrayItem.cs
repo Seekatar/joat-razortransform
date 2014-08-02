@@ -119,6 +119,10 @@ namespace RazorTransform
                 this.Parent = src.Parent;
             this.orig = src.orig;
             _groups.CopyValueFrom(src.Groups);
+            foreach ( var a in _groups.Where( o => o is TransformModelArray ).Select( o => o as TransformModelArray))
+            {
+                a.Parent = this;
+            }
         }
 
         public TransformModelArrayItem()

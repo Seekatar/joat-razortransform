@@ -18,15 +18,16 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( IList<TransformModelGroup> orig, bool showHidden )
+        public bool ShowDialog( IList<TransformModelGroup> orig, bool showHidden, bool isAdd = false )
         {
             var temp = new List<TransformModelGroup>(orig);
             Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            if ((ShowDialog() ?? false) && nvEdit.Dirty)
+            if ((ShowDialog() ?? false) )
             {
-                orig.CopyValueFrom(temp);
-                return true;
+                if ( nvEdit.Dirty)
+                    orig.CopyValueFrom(temp);
+                return isAdd || nvEdit.Dirty;
             }
             return false;
 

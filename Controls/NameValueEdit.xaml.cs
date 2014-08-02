@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using RazorTransform.Controls;
+using System.Threading.Tasks;
 
 namespace RazorTransform
 {
@@ -97,7 +98,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void del_Click(object sender, RoutedEventArgs e)
+        async void del_Click(object sender, RoutedEventArgs e)
         {
             // find it in the list
             var delMe = (sender as Control).Tag as TransformModelArrayItem;
@@ -106,7 +107,8 @@ namespace RazorTransform
                 (delMe.Group as TransformModelArray).ArrayItems.Remove(delMe);
                 TransformModel.Instance.OnItemDeleted(new ItemChangedArgs() { Group = delMe.Group as TransformModelArray, Item = delMe } );
                 setDirty();
-                Reload();
+                await RazorTransformer.Instance.RefreshModelAsync(false, true);
+                reload();
             }
         }
 
@@ -126,7 +128,7 @@ namespace RazorTransform
                 copy.MakeKey();
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = copy.ArrayGroup, Item = copy });
                 setDirty();
-                Reload();
+                reload();
             }
         }
 
@@ -135,33 +137,39 @@ namespace RazorTransform
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void edit_Click(object sender, RoutedEventArgs e)
+        async void edit_Click(object sender, RoutedEventArgs e)
         {
             var existingOne = (sender as Control).Tag as TransformModelArrayItem;
+            foreach ( var x in existingOne.Groups.Where( o => o is TransformModelArray).Select( o => o as TransformModelArray))
+            {
+                x.Parent = existingOne;
+            }
             if (editArrayItem(existingOne.Groups))
             {
-                existingOne.MakeKey();
                 // delete & add for sorting
                 (existingOne.Group as TransformModelArray).ArrayItems.Remove(existingOne);
                 (existingOne.Group as TransformModelArray).AddArrayItem(existingOne);
                 TransformModel.Instance.OnItemChanged(new ItemChangedArgs() { Group = existingOne.ArrayGroup, Item = existingOne });
-                Reload();
+                await RazorTransformer.Instance.RefreshModelAsync(false, true);
+                existingOne.MakeKey();
+                reload();
             }
         }
 
-        void add_Click(object sender, RoutedEventArgs e)
+        private async void add_Click(object sender, RoutedEventArgs e)
         {
             // create a new one from the prototype, set on the tag
-            var parent = ((sender as Control).Tag as TransformModelArrayItem);
-            var newOne = new TransformModelArrayItem(parent);
-            if (editArrayItem(newOne.Groups))
+            var prototype = ((sender as Control).Tag as TransformModelArrayItem);
+            var newOne = new TransformModelArrayItem(prototype);
+            if (editArrayItem(newOne.Groups, true))
             {
                 // add it to the parent array
-                parent.ArrayGroup.AddArrayItem(newOne);
-                newOne.MakeKey();
+                prototype.ArrayGroup.AddArrayItem(newOne);
                 TransformModel.Instance.OnItemAdded(new ItemChangedArgs() { Group = newOne.ArrayGroup, Item = newOne });
                 setDirty();
-                Reload();
+                await RazorTransformer.Instance.RefreshModelAsync(false, true);
+                newOne.MakeKey();
+                reload();
             }
         }
 		
@@ -172,18 +180,18 @@ namespace RazorTransform
         /// </summary>
         /// <param name="orig"></param>
         /// <returns></returns>
-        bool editArrayItem(IList<TransformModelGroup> orig)
+        bool editArrayItem(IList<TransformModelGroup> orig, bool isAdd = false)
         {
             var nve = new ArrayItemEdit();
             nve.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             nve.TrySetOwner(Window.GetWindow(this));
-            bool ret = nve.ShowDialog(orig, TransformModel.Instance.Settings.ShowHidden);
+            bool ret = nve.ShowDialog(orig, TransformModel.Instance.Settings.ShowHidden, isAdd );
             if (ret)
                 setDirty();
             return ret;
         }
 
-        private void Reload()
+        private void reload()
         {
             Load(_groups, TransformModel.Instance.Settings.ShowHidden);
         }

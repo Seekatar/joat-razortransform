@@ -49,7 +49,10 @@ namespace RazorTransform
         /// </summary>
         public TransformModelArrayItem CreatePrototype 
         {
-            get { return new TransformModelArrayItem(PrototypeGroups) { Group = this } ; } 
+            get 
+            { 
+                return new TransformModelArrayItem(PrototypeGroups) { Group = this, Parent = this.Parent } ; 
+            } 
         }
 
         /// <summary>
@@ -335,5 +338,7 @@ namespace RazorTransform
         {
             return ArrayItems.GetEnumerator();
         }
+
+        public TransformModelArrayItem Parent { get; set; }
     }
 }

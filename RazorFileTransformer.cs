@@ -1,4 +1,4 @@
-﻿//#define serial
+﻿#define serial
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -157,7 +157,7 @@ namespace RazorTransform
                     {
                         foreach (var a in (g as TransformModelArray).ArrayItems)
                         {
-                            changeCount += substituteValues(a, cancel, null, depth++, g.DisplayName);
+                            changeCount += substituteValues(a, cancel, null, ++depth, g.DisplayName);
                         }
                     }
                     else
