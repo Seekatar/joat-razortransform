@@ -117,6 +117,15 @@
     <Compile Include="ITransformModelGroup.cs" />
     <Compile Include="ITransformModelItem.cs" />
     <Compile Include="ITransformOutput.cs" />
+    <Compile Include="ModelImpl\Group.cs" />
+    <Compile Include="ModelImpl\Item.cs" />
+    <Compile Include="ModelImpl\ItemList.cs" />
+    <Compile Include="ModelImpl\Model.cs" />
+    <Compile Include="Model\IItemList.cs" />
+    <Compile Include="Model\IGroup.cs" />
+    <Compile Include="Model\IItem.cs" />
+    <Compile Include="Model\IItemBase.cs" />
+    <Compile Include="Model\IModel.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
