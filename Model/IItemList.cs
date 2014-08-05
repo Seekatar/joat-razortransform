@@ -8,7 +8,10 @@ namespace RazorTransform.Model
 {
     public interface IItemList : IItemBase, IList<IModel>
     {
-        IModel ProtoType { get; }
+        string Key { get; }
+        bool Unique { get; }
+        RtSort Sort { get; }
+        IModel Prototype { get; }
         uint Min { get; }
         uint Max { get; }
     }

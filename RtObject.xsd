@@ -55,17 +55,14 @@
   </xs:element>
   <xs:element name="item">
     <xs:complexType>
-      <xs:attribute name="arguments" type="xs:string"/>
       <xs:attribute name="defaultValue" type="xs:string"/>
       <xs:attribute name="description" use="required" type="xs:string"/>
       <xs:attribute name="displayName" use="required" type="xs:string"/>
       <xs:attribute name="hidden" type="dotNetBool"/>
       <xs:attribute name="name" use="required" type="xs:NCName"/>
-      <xs:attribute name="range" type="range"/>
       <xs:attribute name="readOnly" type="dotNetBool"/>
       <xs:attribute name="regex" type="xs:string"/>
       <xs:attribute name="type" use="required" type="xs:NCName"/>
-      <xs:attribute name="valueProvider" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:simpleType name="dotNetBool">

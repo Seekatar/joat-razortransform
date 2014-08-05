@@ -12,7 +12,7 @@ namespace RazorTransform.Model
         IList<string> VisibilityGroups { get; }
 
         RtType Type { get; }
-        string ExpandedValue { get; set; }
+        string ExpandedValueStr { get; set; }
         string ValueStr { get; set; }
         string MinStr { get; set; }
         string MaxStr { get; set; }

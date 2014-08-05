@@ -8,10 +8,14 @@ namespace RazorTransform.Model
 {
     public interface IGroup
     {
-        string Name { get; set; }
+        string DisplayName { get; set; }
+
+        string Description { get; set; }
 
         IList<string> VisibilityGroups { get; }
 
         bool Hidden { get; set; }
+
+        void LoadFromXml(System.Xml.Linq.XElement xmlGroup);
     }
 }

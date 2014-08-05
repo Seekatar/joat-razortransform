@@ -21,6 +21,13 @@ namespace RazorTransform
         Custom
     }
 
+    public enum RtSort
+    {
+        None,
+        Ascending,
+        Descending
+    }
+
     /// <summary>
     /// various constants used in RTValues and RTObjects XML files
     /// </summary>

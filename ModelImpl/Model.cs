@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace RazorTransform.Model
 {
@@ -19,21 +18,32 @@ namespace RazorTransform.Model
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
             // get all the Items in the model
-            var items = xml.Elements(Constants.Group);
+            var xmlGroups = xml.Elements(Constants.Group);
 
-            foreach( var i in items )
+            foreach( var xmlGroup in xmlGroups )
             {
-                Item item = null;
-                if (i.Attribute(Constants.ArrayValueName) != null && !String.IsNullOrEmpty(i.Attribute(Constants.ArrayValueName).Value))
+                IGroup group = new Group();
+                group.LoadFromXml(xmlGroup);
+
+                IItemBase item = null;
+
+                if (xmlGroup.Attribute(Constants.ArrayValueName) != null && !String.IsNullOrEmpty(xmlGroup.Attribute(Constants.ArrayValueName).Value))
                 {
                     item = new ItemList(this);
+                    item.LoadFromXml(xmlGroup, values, overrides, rtValuesVersion);
+                    item.Group = group;
+                    Items.Add(item);
                 }
                 else
                 {
-                    item = new Item(this);
+                    foreach (var xmlItem in xmlGroup.Elements(Constants.Item))
+                    {
+                        item = new Item(this);
+                        item.LoadFromXml(xmlItem, values, overrides, rtValuesVersion);
+                        item.Group = group;
+                        Items.Add(item);
+                    }
                 }
-                item.LoadFromXml(i, values, overrides, rtValuesVersion);
-                Items.Add(item);
             }
 
             // get all the ItemLists in the model

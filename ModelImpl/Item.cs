@@ -10,7 +10,6 @@ namespace RazorTransform.Model
     internal class Item : IItem
     {
         List<string> _visibilityGroups = new List<string>();
-        Group _group = new Group();
         XElement _element;
 
         public Item(IModel parent)
@@ -31,7 +30,7 @@ namespace RazorTransform.Model
             Description = src.Description;
             Type = src.Type;
             OriginalType = src.OriginalType;
-            _group = src._group;
+            Group = src.Group;
             MinStr = src.MinStr;
             MaxStr = src.MaxStr;
             EnumName = src.EnumName;
@@ -75,7 +74,10 @@ namespace RazorTransform.Model
             set;
         }
 
-        string Regex 
+        /// <summary>
+        /// Regular expression validation, may be null
+        /// </summary>
+        public string Regex 
         { 
             get; 
             set; 
@@ -95,7 +97,8 @@ namespace RazorTransform.Model
 
         public IGroup Group
         {
-            get { return _group; }
+            get;
+            set;
         }
 
         public IModel Parent
@@ -217,10 +220,10 @@ namespace RazorTransform.Model
 
             ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
 
-            RegEx = (string)itemXml.Attribute(Constants.RegEx) ?? String.Empty;
-            if (!String.IsNullOrWhiteSpace(RegEx) && !TransformModel.Instance.RegExes.ContainsKey(RegEx))
+            Regex = (string)itemXml.Attribute(Constants.RegEx) ?? String.Empty;
+            if (!String.IsNullOrWhiteSpace(Regex) && !TransformModel.Instance.RegExes.ContainsKey(Regex))
             {
-                throw new Exception(String.Format(Resource.RegExNotFound, RegEx));
+                throw new Exception(String.Format(Resource.RegExNotFound, Regex));
             }
             MinStr = (string)itemXml.Attribute(Constants.Min) ?? String.Empty;
             MaxStr = (string)itemXml.Attribute(Constants.Max) ?? String.Empty;
@@ -229,6 +232,19 @@ namespace RazorTransform.Model
 
             // no sub elements under <item>
         }
+
+        /// <summary>
+        /// grab the default value from the element and set it
+        /// </summary>
+        /// <param name="x"></param>
+        protected virtual void setDefaultValue(XElement x)
+        {
+            if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
+            {
+                ValueStr = x.Attribute(Constants.DefaultValue).Value;
+            }
+        }
+
 
         /// <summary>
         /// create a property name from the display name

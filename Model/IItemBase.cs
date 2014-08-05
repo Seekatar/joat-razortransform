@@ -11,7 +11,7 @@ namespace RazorTransform.Model
     {
         string  Name { get; set; }
         string Description { get; set; }
-        IGroup Group { get; }
+        IGroup Group { get; set; }
         IModel Parent { get; }
         string DisplayName { get; set; }
 
