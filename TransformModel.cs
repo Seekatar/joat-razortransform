@@ -320,10 +320,10 @@ namespace RazorTransform
 
                 custom = Activator.CreateInstance(t) as Custom.ICustomRazorTransformType;
 
-                if (custom == null)
-                    throw new ArgumentException(Resource.ErrorCreatingCustom + className);
-                else
-                    custom.Initialize(this, parms);
+                //if (custom == null)
+                //    throw new ArgumentException(Resource.ErrorCreatingCustom + className);
+                //else
+                //    custom.Initialize(this, parms);
 
                 TransformModel.Instance.Customs[name] = custom;
             }
@@ -441,40 +441,24 @@ namespace RazorTransform
             }
         }
 
+        /// <summary>
+        /// load everything from XML files
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="objectValues">override set of values</param>
+        /// <returns></returns>
         internal bool Load(Settings settings, XElement objectValues = null)
         {
-            _settings = settings;
-            string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            // load the main file
-            var path = Path.Combine(directoryName, _settings.ObjectFile);
-            if (!File.Exists(path))
+            if (objectValues == null && File.Exists(_settings.ValuesFile))
             {
-                // look in appdata folder
-                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RazorTransform", "RtObject.xml");
-                if (!File.Exists(path))
-                    throw new FileNotFoundException(String.Format(Resource.FileNotFound, _settings.ObjectFile));
-
-                // set output to under appdata
-                _settings.ObjectFile = path;
-                _settings.OverrideOutputFolder = Path.Combine(Path.GetDirectoryName(path), "Output");
+                objectValues = XDocument.Load(_settings.ValuesFile).Root;
             }
 
-            path = Path.Combine(directoryName, _settings.ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
-            if (!File.Exists(path))
-            {
-                // set destination to same as obj
-                path = Path.Combine(Path.GetDirectoryName(_settings.ObjectFile), "RtValues.xml");
-            }
+            var objectDefinition = XDocument.Load(_settings.ObjectFile);
 
-            if (objectValues == null && File.Exists(path))
-            {
-                objectValues = XDocument.Load(path).Root;
-            }
+            checkDestinationFolder(objectDefinition, _settings.OutputFolder);
 
-
-            var definitionDoc = XDocument.Load(_settings.ObjectFile);
-            checkDestinationFolder(definitionDoc, _settings.OutputFolder);
-            LoadFromXElement(definitionDoc.Root, objectValues, _settings.Overrides);
+            LoadFromXElement(objectDefinition.Root, objectValues, _settings.Overrides);
 
             OnModelLoaded();
 

@@ -121,11 +121,13 @@
     <Compile Include="ModelImpl\Item.cs" />
     <Compile Include="ModelImpl\ItemList.cs" />
     <Compile Include="ModelImpl\Model.cs" />
+    <Compile Include="ModelImpl\ModelConfig.cs" />
     <Compile Include="Model\IItemList.cs" />
     <Compile Include="Model\IGroup.cs" />
     <Compile Include="Model\IItem.cs" />
     <Compile Include="Model\IItemBase.cs" />
     <Compile Include="Model\IModel.cs" />
+    <Compile Include="Model\IModelConfig.cs" />
     <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />

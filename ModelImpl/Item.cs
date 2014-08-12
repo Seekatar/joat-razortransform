@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,16 +13,17 @@ namespace RazorTransform.Model
         List<string> _visibilityGroups = new List<string>();
         XElement _element;
 
-        public Item(IModel parent)
+        public Item(IModel parent, IGroup group)
         {
             Parent = parent;
+            Group = group;
         }
 
-        public Item(Item src) : this(src, src.ValueStr)
+        public Item(Item src, IGroup group ) : this(src, src.ValueStr, group)
         {
         }
 
-        public Item(Item src, string value) : this(src)
+        public Item(Item src, string value, IGroup group ) : this(src,group)
         {
             ValueStr = value ?? src.ValueStr;
             ExpandedValueStr = src.ExpandedValueStr;
@@ -127,8 +129,17 @@ namespace RazorTransform.Model
             set;
         }
 
-        public string OriginalType { get; private set; }
-        public string EnumName { get; private set; }
+        public string OriginalType 
+        { 
+            get; 
+            private set; 
+        }
+        
+        public string EnumName 
+        { 
+            get; 
+            private set; 
+        }
 
         internal void SetItemValue(XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
@@ -272,6 +283,5 @@ namespace RazorTransform.Model
             }
             return sb.ToString();
         }
-
     }
 }

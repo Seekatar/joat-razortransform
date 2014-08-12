@@ -1,3 +1,4 @@
+using RazorTransform.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -33,7 +34,7 @@ namespace RazorTransform.Custom
 
         public ColorType() { }
 
-        public virtual void Initialize(ITransformModel model, IDictionary<string,string> parms) 
+        public virtual void Initialize(IModelConfig model, IDictionary<string, string> parms) 
         {
             // only one parm now
             _psColors = parms.ContainsKey("psColors") && bool.Parse(parms["psColors"]);
@@ -58,7 +59,7 @@ namespace RazorTransform.Custom
 
     public class PsColorType : ColorType
     {
-        public override void Initialize(ITransformModel model, IDictionary<string, string> parms)
+        public override void Initialize(IModelConfig model, IDictionary<string, string> parms)
         {
             parms["psColors"] = true.ToString();
             base.Initialize(model, parms);

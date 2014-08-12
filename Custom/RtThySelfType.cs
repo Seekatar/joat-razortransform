@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RazorTransform.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -88,7 +89,7 @@ namespace RazorTransform.Custom
         }
 
 
-        public void Initialize(ITransformModel _model, IDictionary<string, string> parms)
+        public void Initialize(IModelConfig _model, IDictionary<string, string> parms)
         {
             _model.ItemAdded += OnItemChanged;
             _model.ItemDeleted += OnItemChanged;

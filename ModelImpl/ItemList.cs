@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace RazorTransform.Model
 {
-    class ItemList : IItemList
+    class ItemList : System.Dynamic.DynamicObject, IItemList
     {
         private List<IModel> _models = new List<IModel>();
 
-        public ItemList(IModel parent)
+        public ItemList(IModel parent, IGroup group)
         {
             Parent = parent;
+            Group = group;
         }
 
         #region IItemList/IItemBase properties

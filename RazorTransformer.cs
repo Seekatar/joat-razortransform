@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using RtPsHost;
 using System.Linq;
+using RazorTransform.Model;
 
 namespace RazorTransform
 {
@@ -22,9 +23,18 @@ namespace RazorTransform
 
         public RazorTransformer() { _instance = this;  }
 
-        TransformModel _model = new TransformModel(true);
+        TransformModel _modelOld = new TransformModel(true);
         Settings _settings = new Settings();
         ITransformOutput _output = null;
+
+        public TransformModel Model { get { return _modelOld; } }
+        public ITransformOutput Output { get { return _output; } }
+        public Settings Settings { get { return _settings; } }
+
+
+
+        IModel _model = new RazorTransform.Model.Model();
+        IModelConfig _modelConfig = new ModelConfig();
 
         /// <summary>
         /// load the settings, model and values from disk
@@ -44,7 +54,14 @@ namespace RazorTransform
                     _output = new GuiProgress(window);
 
                 _settings.Load(overrides);
-                bool ret = _model.Load(_settings);
+
+                bool ret = _modelConfig.Load(_settings);
+                if ( ret )
+                {
+                    _model.LoadFromXml(_modelConfig.Root, _modelConfig.ValuesRoot, overrides, _modelConfig.RtValuesVersion);
+                }
+
+                ret = _modelOld.Load(_settings);
                 if (ret)
                 {
                     // refresh the model to update any @Model values in values file if they changed manually since last save
@@ -71,10 +88,6 @@ namespace RazorTransform
 
             return false;
         }
-
-        public TransformModel Model { get { return _model; } }
-        public ITransformOutput Output { get { return _output; } }
-        public Settings Settings { get { return _settings; } }
 
         internal async Task<TransformResult> DoTransformAsync(bool dirty)
         {
@@ -148,11 +161,11 @@ namespace RazorTransform
         /// <returns></returns>
         internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
-            if (!_settings.Test && !_settings.NoSave && _model.Groups.Count > 0)
+            if (!_settings.Test && !_settings.NoSave && _modelOld.Groups.Count > 0)
             {
                 // add this to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
-                var dest = _model.Groups[0].Children.Where(o => o.PropertyName == Constants.DestinationFolder).SingleOrDefault();
+                var dest = _modelOld.Groups[0].Children.Where(o => o.PropertyName == Constants.DestinationFolder).SingleOrDefault();
                 if (dest != null)
                 {
                     if (!dirty && !String.Equals(_settings.OutputFolder, dest.Value, StringComparison.CurrentCultureIgnoreCase))
@@ -184,7 +197,7 @@ namespace RazorTransform
             {
                 try
                 {
-                    _model.Validate();
+                    _modelOld.Validate();
                 }
                 catch (ValidationException e2)
                 {
@@ -194,13 +207,13 @@ namespace RazorTransform
                 }
             }
 
-            var body = _model.GenerateXml();
+            var body = _modelOld.GenerateXml();
 
             if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
             {
                 try
                 {
-                    modelObject = _model;
+                    modelObject = _modelOld;
                 }
                 catch (ValidationException e)
                 {

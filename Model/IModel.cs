@@ -11,6 +11,8 @@ namespace RazorTransform.Model
     {
         IList<IItemBase> Items { get; }
 
+        IModel Parent { get; }
+
         void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion);
 
     }

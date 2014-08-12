@@ -96,7 +96,7 @@ namespace RazorTransform
             if (_overrides.ContainsKey("PsWorkingDir"))
                 _workingDir = _overrides["PsWorkingDir"];
             _workingDir = System.IO.Path.GetFullPath(_workingDir); // convert .. to path
-            _logFileName = String.Format("{0}_{1}.log", _logFileName, DateTime.Now.ToString("yyMMdd-hhmmss"));
+            _logFileName = String.Format("{0}_{1}.log", _logFileName, DateTime.Now.ToString("yyMMdd-HHmmss"));
 
             _workingDir = Path.GetFullPath(_workingDir);
             _scriptFname = Path.GetFullPath(_scriptFname);

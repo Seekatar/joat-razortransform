@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RazorTransform.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
@@ -18,8 +19,8 @@ namespace RazorTransform
     /// could have used more static class, but eat our own dog food
     public class Settings 
     {
-        private TransformModel _settings;
-        private TransformModelGroup _settingsGroup;
+        private RazorTransform.Model.Model _settings;
+        // private TransformModelGroup _settingsGroup;
         private string _objectFile;
         private string _valuesFile;
 
@@ -36,9 +37,9 @@ namespace RazorTransform
                 result = _extras[name ];
                 return true;
             }
-            if (_settings != null)
-                return TransformModelArrayItem.TryGetMemberFn(name, out result, null, _settings.Groups);
-            else
+            //if (_settings != null)
+                // TODO return TransformModelArrayItem.TryGetMemberFn(name, out result, null, _settings.Groups);
+            //else
                 return false;
         }
 
@@ -57,11 +58,37 @@ namespace RazorTransform
 
             // load the settings
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
-            _settings = new TransformModel();
-            _settings.LoadValuesFromXml(settingsDefinition, this);
+            var config = new ModelConfig();
+            config.Load(this, objectRoot:settingsDefinition);
 
-            _settingsGroup = _settings.Groups[0];
+            _settings = new RazorTransform.Model.Model();
 
+            _settings.LoadFromXml(config.Root, config.ValuesRoot, overrideParms, config.RtValuesVersion);
+
+            // _settingsGroup = _settings.Groups[0];
+
+            string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            // find the object file 
+            var path = Path.Combine(directoryName, ObjectFile);
+            if (!File.Exists(path))
+            {
+                // look in appdata folder
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RazorTransform", "RtObject.xml");
+                if (!File.Exists(path))
+                    throw new FileNotFoundException(String.Format(Resource.FileNotFound, ObjectFile));
+
+                // set output to under appdata
+                ObjectFile = path;
+                OverrideOutputFolder = Path.Combine(Path.GetDirectoryName(path), "Output");
+            }
+
+            ValuesFile = Path.Combine(directoryName, ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
+            if (!File.Exists(ValuesFile))
+            {
+                // set destination to same as obj
+                ValuesFile = Path.Combine(Path.GetDirectoryName(ObjectFile), "RtValues.xml");
+            }
         }
 
         public Settings()
@@ -77,12 +104,12 @@ namespace RazorTransform
         }
 
         // for saving
-        public TransformModelGroup Group { get { return _settingsGroup;  } }
+        public TransformModelGroup Group { get { return null; } }// TODO  _settingsGroup; } }
 
         // for editing
         public IList<TransformModelGroup> ConfigInfo 
         {
-            get { return _settings.Groups; } 
+            get { return null; } // TODO  _settings.Groups; } 
         }
 
         // values saved in values file

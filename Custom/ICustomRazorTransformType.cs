@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RazorTransform.Model;
+using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -34,6 +35,6 @@ namespace RazorTransform.Custom
         /// </summary>
         /// <param name="model">the model that you're being constructed for</param>
         /// <param name="parms">any parameters from your XML</param>
-        void Initialize(ITransformModel model, IDictionary<string, string> parms);
+        void Initialize(IModelConfig model, IDictionary<string, string> parms);
     }
 }
