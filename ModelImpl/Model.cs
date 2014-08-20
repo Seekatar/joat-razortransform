@@ -64,46 +64,51 @@ namespace RazorTransform.Model
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            return TryGetMemberFn(binder, out result, Parent, _items);
+            return TryGetMemberFn(binder, out result, this, _items);
         }
+        #endregion
 
-        internal static bool TrySetMemberFn(SetMemberBinder binder, object value, List<IItemBase> items )
+        #region DynamicObject Implementation
+        internal static bool TrySetMemberFn(SetMemberBinder binder, object value, List<IItemBase> items)
         {
             var list = items.Where(p => p.Name == binder.Name);
             if (list != null)
             {
                 var result = list.FirstOrDefault();
-                if (result is TransformModelItem)
+                if (result is Item)
                 {
-                    var item = (result as TransformModelItem);
-                    item.ExpandedValue = value.ToString();
+                    var item = (result as IItem);
+                    item.ExpandedValueStr = value.ToString();
                     return true;
                 }
             }
             return false;
         }
 
-        internal static bool TryGetMemberFn(GetMemberBinder binder, out object result, object parent, List<IItemBase> items)
+        internal static bool TryGetMemberFn(GetMemberBinder binder, out object result, IModel model, List<IItemBase> items)
         {
-            return TryGetMemberFn(binder.Name, out result, parent, items);
+            return TryGetMemberFn(binder.Name, out result, model, items);
         }
 
-        internal static bool TryGetMemberFn(string name, out object result, object parent, List<IItemBase> items)
+        internal static bool TryGetMemberFn(string name, out object result, IModel model, List<IItemBase> items)
         {
             bool ret = false;
             result = null;
 
             if (name == Constants.Root)
             {
-                result = TransformModel.Instance;
+                var root = model;
+                while (root.Parent != null)
+                    root = root.Parent;
                 return true;
             }
+
             if (name == Constants.Parent)
             {
-                if (parent != null)
-                    result = parent;
+                if (model.Parent != null)
+                    result = model.Parent;
                 else
-                    result = TransformModel.Instance;
+                    result = model;
                 return true;
             }
 
@@ -119,20 +124,24 @@ namespace RazorTransform.Model
             {
                 result = list.FirstOrDefault();
                 ret = true;
-                if (result is TransformModelItem)
+                if (result is IItem)
                 {
-                    var item = (result as TransformModelItem);
-                    if (item.ExpandedValue != null)
-                        result = item.ExpandedValue;
+                    var item = (result as IItem);
+                    if (item.ExpandedValueStr != null)
+                        result = item.ExpandedValueStr;
                     else
-                        result = item.Value;
+                        result = item.ValueStr;
 
                     if (item.Type == RtType.Bool)
                         result = item.GetValue<bool>();
+                    else if (item.Type == RtType.Int16)
+                        result = item.GetValue<Int16>();
                     else if (item.Type == RtType.Int32)
                         result = item.GetValue<Int32>();
+                    else if (item.Type == RtType.Int64)
+                        result = item.GetValue<Int64>();
                 }
-                else if (!(result is TransformModelArray))
+                else if (!(result is IItemList))
                 {
                     if (result != null)
                         throw new Exception("Bad type found for item " + name + " " + result.GetType().Name);

@@ -82,6 +82,19 @@ namespace RazorTransform.Model
             get;
             set;
         }
+
+        public bool Hidden
+        {
+            get;
+            set;
+        }
+
+        public IList<string> VisibilityGroups
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         #region IList Implementation

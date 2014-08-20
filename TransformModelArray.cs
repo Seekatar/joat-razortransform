@@ -143,8 +143,8 @@ namespace RazorTransform
             ArrayValueName = (string)xml.Attribute(Constants.ArrayValueName);
             TransformModel.Instance.Arrays.Add(this);
 
-            Min = (Int32?)xml.Attribute(Constants.Min) ?? 0;
-            Max = (Int32?)xml.Attribute(Constants.Max) ?? Int32.MaxValue;
+            Min = (Int64?)xml.Attribute(Constants.Min) ?? 0;
+            Max = (Int64?)xml.Attribute(Constants.Max) ?? Int64.MaxValue;
 
             PrototypeGroups.Clear();
             Children.Clear();

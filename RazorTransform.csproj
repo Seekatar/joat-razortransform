@@ -113,9 +113,9 @@
     <Compile Include="Custom\RtThyRegEx.cs" />
     <Compile Include="Custom\RtThySelfType.cs" />
     <Compile Include="EventArgs.cs" />
-    <Compile Include="ITransformModel.cs" />
-    <Compile Include="ITransformModelGroup.cs" />
-    <Compile Include="ITransformModelItem.cs" />
+    <None Include="ITransformModel.cs" />
+    <None Include="ITransformModelGroup.cs" />
+    <None Include="ITransformModelItem.cs" />
     <Compile Include="ITransformOutput.cs" />
     <Compile Include="ModelImpl\Group.cs" />
     <Compile Include="ModelImpl\Item.cs" />
@@ -133,10 +133,21 @@
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTemplateUtil.cs" />
     <Compile Include="RazorTransformer.cs" />
-    <Compile Include="TransformModelArray.cs" />
-    <Compile Include="TransformModelArrayItem.cs" />
-    <Compile Include="TransformModelGroup.cs" />
-    <Compile Include="TransformModelItem.cs" />
+    <None Include="TransformModel.cs">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="TransformModelArray.cs">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="TransformModelArrayItem.cs">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="TransformModelGroup.cs">
+      <SubType>Code</SubType>
+    </None>
+    <None Include="TransformModelItem.cs">
+      <SubType>Code</SubType>
+    </None>
     <Compile Include="TransformResult.cs" />
     <Compile Include="UI\GuiProgress.cs" />
     <Compile Include="Controls\ITransformParentWindow.cs" />
@@ -161,7 +172,6 @@
     <Compile Include="UI\ArrayItemEdit.xaml.cs">
       <DependentUpon>ArrayItemEdit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TransformModel.cs" />
     <Compile Include="Controls\BoolInput.xaml.cs">
       <DependentUpon>BoolInput.xaml</DependentUpon>
     </Compile>

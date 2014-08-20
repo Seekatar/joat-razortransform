@@ -19,7 +19,7 @@ namespace RazorTransform.Custom
         /// <param name="parent"></param>
         /// <param name="e">XML for this item being parsed to allow for custom attributes</param>
         /// <returns>an empty object that will load itself</returns>
-        TransformModelItem CreateItem(ITransformModelGroup parent, XElement e);
+        IItem CreateItem(IModel parent, IGroup group, XElement e);
 
         /// <summary>
         /// create the control from the item
@@ -28,7 +28,7 @@ namespace RazorTransform.Custom
         /// <param name="binding">the binding object for the control</param>
         /// <param name="itemChanged"> call when the item has changed to indicate dirty</param>
         /// <returns>the control to show on the screen</returns>
-        Control CreateControl(ITransformModelItem info, Binding binding, Action itemChanged);
+        Control CreateControl(IItem info, Binding binding, Action itemChanged);
 
         /// <summary>
         /// called after the object is constructed

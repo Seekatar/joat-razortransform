@@ -141,6 +141,22 @@ namespace RazorTransform.Model
             private set; 
         }
 
+        public bool Hidden 
+        { 
+            get; 
+            set; 
+        }
+
+        /// <summary>
+        /// gets the value of ValueStr as Type T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetValue<T>()
+        {
+            return (T)Convert.ChangeType(this.ValueStr, typeof(T));
+        }
+
         internal void SetItemValue(XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
             if (overrides != null && overrides.ContainsKey(Name))
@@ -232,7 +248,7 @@ namespace RazorTransform.Model
             ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
 
             Regex = (string)itemXml.Attribute(Constants.RegEx) ?? String.Empty;
-            if (!String.IsNullOrWhiteSpace(Regex) && !TransformModel.Instance.RegExes.ContainsKey(Regex))
+            if (!String.IsNullOrWhiteSpace(Regex) && !ModelConfig.Instance.Regexes.ContainsKey(Regex))
             {
                 throw new Exception(String.Format(Resource.RegExNotFound, Regex));
             }

@@ -1,22 +1,26 @@
-﻿using System;
+﻿using RazorTransform.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RazorTransform
 {
+    /// <summary>
+    /// class for capturing multiple validation exceptions to display to user
+    /// </summary>
     internal class ValidationException : Exception
     {
-        private List<Tuple<ITransformModelGroup,string>> _groups = new List<Tuple<ITransformModelGroup,string>>();
+        private List<Tuple<IGroup,string>> _groups = new List<Tuple<IGroup,string>>();
 
-        public IList<Tuple<ITransformModelGroup,string>> Group { get { return _groups; } }
-        public ITransformModelItem Item  { get; private set; }
+        public IList<Tuple<IGroup,string>> Group { get { return _groups; } }
+        public IItem Item  { get; private set; }
 
-        public ValidationException(string p, ITransformModelGroup g, String currentName = null ) : base(p)
+        public ValidationException(string p, IGroup g, String currentName = null ) : base(p)
         {
-            _groups.Add(new Tuple<ITransformModelGroup,string>(g, currentName));
+            _groups.Add(new Tuple<IGroup,string>(g, currentName));
         }
 
-        public ValidationException(string p, ITransformModelItem i)
+        public ValidationException(string p, IItem i)
             : base(p)
         {
             this.Item = i;
@@ -40,9 +44,9 @@ namespace RazorTransform
             return sb.ToString();
         }
 
-        internal void AddGroup(ITransformModelGroup currentGroup, string currentName)
+        internal void AddGroup(IGroup currentGroup, string currentName)
         {
-            _groups.Add(new Tuple<ITransformModelGroup, string>(currentGroup, currentName));
+            _groups.Add(new Tuple<IGroup, string>(currentGroup, currentName));
         }
     }
 }

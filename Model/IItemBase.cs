@@ -14,6 +14,8 @@ namespace RazorTransform.Model
         IGroup Group { get; set; }
         IModel Parent { get; }
         string DisplayName { get; set; }
+        IList<string> VisibilityGroups { get; }
+        bool Hidden { get; set; }
 
         void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion);
     }

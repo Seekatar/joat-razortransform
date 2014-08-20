@@ -12,12 +12,21 @@ namespace RazorTransform.Model
         IList<string> VisibilityGroups { get; }
 
         RtType Type { get; }
+        string OriginalTypeStr { get; }
         string ExpandedValueStr { get; set; }
         string ValueStr { get; set; }
         string MinStr { get; set; }
         string MaxStr { get; set; }
         bool ReadOnly { get; set; }
         string Regex { get; set; }
+
+
+        /// <summary>
+        /// gets the value of ValueStr as Type T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T GetValue<T>();
 
     }
 }

@@ -12,14 +12,14 @@ namespace RazorTransform.Custom
     /// <summary>
     /// the model of the color
     /// </summary>
-    class ColorItem : TransformModelItem
+    class ColorItem : Item
     {
-        public ColorItem()
+        public ColorItem(IModel parent, IGroup group) : base(parent,group)
         {
         }
 
         public ColorItem(ColorItem src)
-            : base(src)
+            : base(src, src.Group)
         {
         }
 
@@ -40,7 +40,7 @@ namespace RazorTransform.Custom
             _psColors = parms.ContainsKey("psColors") && bool.Parse(parms["psColors"]);
         }
 
-        public Control CreateControl(ITransformModelItem ci, System.Windows.Data.Binding binding,System.Action itemChanged)
+        public Control CreateControl(IItem ci, System.Windows.Data.Binding binding,System.Action itemChanged)
         {
 
             var t = new ColorPicker(ci, _psColors);
@@ -51,9 +51,9 @@ namespace RazorTransform.Custom
             return t;
         }
 
-        public TransformModelItem CreateItem(ITransformModelGroup parent, XElement e)
+        public IItem CreateItem(IModel parent, IGroup group, XElement e)
         {
-            return new ColorItem();
+            return new ColorItem(parent, group);
         }
     }
 
@@ -72,7 +72,7 @@ namespace RazorTransform.Custom
     [System.Windows.Markup.ContentProperty("Color")]
     public partial class ColorPicker : UserControl
     {
-        public ColorPicker(ITransformModelItem ci, bool psColors)
+        public ColorPicker(IItem ci, bool psColors)
         {
             InitializeComponent();
             colorPicker.SelectedColorChanged += OnColorChanged;

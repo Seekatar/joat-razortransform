@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RazorTransform.Model;
+using System;
 using System.Xml.Linq;
 
 namespace RazorTransform
@@ -8,7 +9,9 @@ namespace RazorTransform
     {
         Invalid,
         String,
+        Int16,
         Int32,
+        Int64,
         Password,
         Folder,
         UncPath,
@@ -84,8 +87,12 @@ namespace RazorTransform
             {
                 case "string":
                     return RtType.String;
+                case "int16":
+                    return RtType.Int16;
                 case "int32":
                     return RtType.Int32;
+                case "int64":
+                    return RtType.Int64;
                 case "password":
                     return RtType.Password;
                 case "folder":
@@ -101,9 +108,9 @@ namespace RazorTransform
                 case "hyperlink":
                     return RtType.HyperLink;
                 default:
-                    if (TransformModel.Instance.Enums.ContainsKey(typeName))
+                    if (ModelConfig.Instance.Enums.ContainsKey(typeName))
                         return RtType.Enum;
-                    else if (TransformModel.Instance.Customs.ContainsKey(typeName))
+                    else if (ModelConfig.Instance.CustomTypes.ContainsKey(typeName))
                         return RtType.Custom;
                     else
                         return RtType.Invalid;
@@ -119,7 +126,7 @@ namespace RazorTransform
         public static string GetEnumName(XElement x)
         {
             var s = (String)x.Attribute(Constants.Type) ?? String.Empty;
-            if (TransformModel.Instance.Enums.ContainsKey(s))
+            if (ModelConfig.Instance.Enums.ContainsKey(s))
                 return s;
             else
                 return null;

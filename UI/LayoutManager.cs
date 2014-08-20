@@ -7,19 +7,20 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using RazorTransform.Controls;
 using System.Windows.Documents;
+using RazorTransform.Model;
 
 namespace RazorTransform
 {
     public static class LayoutManager
     {
         /// <summary>
-        /// build a grid view for a group of simple items
+        /// build a grid view for a model of only simple items
         /// </summary>
-        /// <param name="group"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(TransformModelGroup group, bool showHidden, Action itemChanged = null )
+        public static FrameworkElement BuildGridView(IModel model, bool showHidden, Action itemChanged = null )
         {
-            var items = group.Items;
+            var items = model.Items;
 
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
@@ -38,9 +39,8 @@ namespace RazorTransform
 
 
             int i = 0;
-            foreach (var ci in controls)
+            foreach (var ci in controls.Where( o => o is IItem).Select( o => o as IItem ) )
             {
-
                 var l = new MyLabel() { Content = ci.DisplayName };
 
                 l.ToolTip = ci.Description;
@@ -54,7 +54,7 @@ namespace RazorTransform
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
                 Control t = CreateControl(ci, binding, itemChanged);
-                if (!String.IsNullOrWhiteSpace(ci.ExpandedValue))
+                if (!String.IsNullOrWhiteSpace(ci.ExpandedValueStr))
                 {
                     // build a stack panel for the tooltip to look like this:
                     // <description>
@@ -136,13 +136,13 @@ namespace RazorTransform
         /// <param name="editHandler"></param>
         /// <param name="deleteHandler"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(TransformModelArray parent,
+        public static FrameworkElement BuildGridView(IItemList parent,
             Action<object, RoutedEventArgs> addHandler,
             Action<object, RoutedEventArgs> editHandler,
             Action<object, RoutedEventArgs> deleteHandler,
             Action<object, RoutedEventArgs> copyHandler)
         {
-            var items = parent.Items;
+            var items = parent;
 
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
@@ -166,7 +166,7 @@ namespace RazorTransform
                 { 
                     Content = String.Format( Resource.NewItem, parent.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
-                    Tag = parent.CreatePrototype,
+                    Tag = parent.Prototype,
                     Style = Application.Current.FindResource("ArrayNewImageButton") as Style
                 };
             var bitmap = new System.Windows.Media.Imaging.BitmapImage();
@@ -204,13 +204,13 @@ namespace RazorTransform
                     l.Content = parent.DisplayName;
                 }
 
-                l.ToolTip = c.Description;
+                l.ToolTip = parent.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
                 l.Style = Application.Current.FindResource("CfgLabel") as Style;
 
 
-                var t = new EditItemBox(parent.ArrayItems.Count > parent.Min);
+                var t = new EditItemBox(parent.Count > parent.Min);
                 t.EditClicked += (sender, args) =>
                 {
                     editHandler(sender, args);
@@ -243,8 +243,8 @@ namespace RazorTransform
                     };
 
                 t.Tag = c;
-                t.ItemName = c.DisplayName;
-                t.ToolTip = c.Description;
+                t.ItemName = parent.DisplayName;
+                t.ToolTip = parent.Description;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
                 t.Style = Application.Current.FindResource("CfgText") as Style;
@@ -279,43 +279,47 @@ namespace RazorTransform
             return new SolidColorBrush() { Color = (Color)Application.Current.FindResource("DarkColor") };
         }
 
-        private static Control CreateControl(ITransformModelItem info, Binding binding, Action itemChanged )
+        private static Control CreateControl(IItem item, Binding binding, Action itemChanged )
         {
-            switch (info.Type)
+            switch (item.Type)
             {
                 case RtType.Folder:
                 case RtType.UncPath: 
-                    return _Folder(info, binding, itemChanged);
+                    return _Folder(item, binding, itemChanged);
                 case RtType.Guid: 
-                    return _Guid(info, binding, itemChanged);
+                    return _Guid(item, binding, itemChanged);
                 case RtType.Bool: 
-                    return _Bool(info, binding, itemChanged);
-                case RtType.Int32: 
-                    return _Int32(info, binding, itemChanged);
+                    return _Bool(item, binding, itemChanged);
+                case RtType.Int16: 
+                    return _Int(item, binding, itemChanged);
+                case RtType.Int32:
+                    return _Int(item, binding, itemChanged);
+                case RtType.Int64:
+                    return _Int(item, binding, itemChanged);
                 case RtType.Password: 
-                    return _Password(info, binding, itemChanged);
+                    return _Password(item, binding, itemChanged);
                 case RtType.String: 
-                    return _Default(info, binding, itemChanged);
+                    return _Default(item, binding, itemChanged);
                 case RtType.Enum: 
-                    return _ComboBox(info, binding, itemChanged);
+                    return _ComboBox(item, binding, itemChanged);
                 case RtType.HyperLink: 
-                    return _HyperLink(info, binding, itemChanged);
+                    return _HyperLink(item, binding, itemChanged);
                 default:
-                    if (info.Type == RtType.Custom && TransformModel.Instance.Customs.ContainsKey(info.OriginalType))
-                        return TransformModel.Instance.Customs[info.OriginalType].CreateControl(info, binding, itemChanged);
+                    if (item.Type == RtType.Custom && ModelConfig.Instance.CustomTypes.ContainsKey(item.OriginalTypeStr))
+                        return ModelConfig.Instance.CustomTypes[item.OriginalTypeStr].CreateControl(item, binding, itemChanged);
                     else
-                        return _Default(info, binding, itemChanged);
+                        return _Default(item, binding, itemChanged);
             }
         }
 
 
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Folder = (ci, binding, itemChanged) =>
+        private static Control _Folder ( IItem ci, Binding binding, Action itemChanged) 
         {
             return _UncPath(ci, binding, itemChanged);
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _UncPath = (ci, binding, itemChanged) =>
+        private static Control _UncPath (IItem ci, Binding binding, Action itemChanged) 
         {
             var t = new FolderInputBox(ci.DisplayName, true);
             if (ci.ReadOnly)
@@ -325,9 +329,9 @@ namespace RazorTransform
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
             t.FolderNameChanged += (o, e) => { itemChanged(); };
             return t;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Guid = (ci, binding, itemChanged) =>
+        private static Control _Guid (IItem ci, Binding binding, Action itemChanged) 
         {
             var t = new GuidInput();
             if (ci.ReadOnly)
@@ -337,9 +341,9 @@ namespace RazorTransform
             t.SetBinding(GuidInput.GuidStrProperty, binding);
             t.GuidStrChanged += (o, e) => { itemChanged(); };
             return t;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Bool = (ci, binding, itemChanged) =>
+        private static Control _Bool (IItem ci, Binding binding, Action itemChanged) 
         {
             var bib = new BoolInput();
             if (ci.ReadOnly)
@@ -349,9 +353,9 @@ namespace RazorTransform
             bib.SetBinding(BoolInput.BoolProperty, binding);
             bib.BoolChanged += (o, e) => { itemChanged(); };
             return bib;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, ComboBoxInput> _ComboBox = (ci, binding, itemChanged) =>
+        private static ComboBoxInput _ComboBox (IItem ci, Binding binding, Action itemChanged) 
         {
             var bib = new ComboBoxInput();
             if (ci.ReadOnly)
@@ -361,34 +365,34 @@ namespace RazorTransform
             bib.SetBinding(ComboBoxInput.ComboBoxProperty, binding);
 
             var listBinding = new Binding();
-            listBinding.Source = TransformModel.Instance.Enums[ci.EnumName];
+            listBinding.Source = ModelConfig.Instance.Enums[ci.OriginalTypeStr];
             listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             bib.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
 
             bib.ComboBoxChanged += (o, e) => { itemChanged(); };
             return bib;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Hyperlink> _HyperLink = (ci, binding, itemChanged) =>
+        private static Hyperlink _HyperLink (IItem ci, Binding binding, Action itemChanged) 
         {
             var bib = new Hyperlink();
 
             try
             {
-                bib.NavigateUri = new System.Uri(ci.Value);
+                bib.NavigateUri = new System.Uri(ci.ValueStr);
                 if ( String.IsNullOrWhiteSpace(ci.Description))
-                    bib.Text = ci.Value;
+                    bib.Text = ci.ValueStr;
                 else
                     bib.Text = ci.Description;
             }
             catch
             {
-                bib.Text = Resource.InvalidUri + ci.Value;
+                bib.Text = Resource.InvalidUri + ci.ValueStr;
             }
             return bib;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Default = (ci, binding, itemChanged) =>
+        private static Control _Default (IItem ci, Binding binding, Action itemChanged) 
         {
             var t = new TextBox();
             if (ci.ReadOnly)
@@ -398,38 +402,38 @@ namespace RazorTransform
             t.SetBinding(TextBox.TextProperty, binding);
             t.TextChanged += (o, e) => { itemChanged(); }; 
             return t;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Password = (ci, binding, itemChanged) =>
+        private static Control _Password (IItem ci, Binding binding, Action itemChanged) 
         {
             var t = new PasswordBox();
             if (ci.ReadOnly)
                 t.IsEnabled = false;
 
             t.MinWidth = 150;
-            var value = ci.Value;
+            var value = ci.ValueStr;
             (ci as PasswordTransformModelItem).PasswordBox = t;
             t.Password = value;
             t.PasswordChanged += (o, e) => { itemChanged(); };
             return t;
-        };
+        }
 
-        private static Func<ITransformModelItem, Binding, Action, Control> _Int32 = (ci, binding, itemChanged ) =>
+        private static Control _Int (IItem ci, Binding binding, Action itemChanged )
         {
-            var t = new Xceed.Wpf.Toolkit.IntegerUpDown();
+            var t = new Xceed.Wpf.Toolkit.LongUpDown();
             if (ci.ReadOnly)
                 t.IsEnabled = false;
 
-            t.Minimum = ci.MinInt;
-            t.Maximum = ci.MaxInt;
+            t.Minimum = Int64.Parse(ci.MinStr);
+            t.Maximum = Int64.Parse(ci.MaxStr);
 
             t.TextAlignment = TextAlignment.Left;
-            t.Value = Int32.Parse(ci.Value ?? "0");
+            t.Value = Int64.Parse(ci.ValueStr ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
             t.ValueChanged += (o, e) => { itemChanged();  };
             return t;
-        };
+        }
 
     }
 }

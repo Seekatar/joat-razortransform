@@ -22,14 +22,14 @@ namespace RazorTransform.Custom
         #region EventHandlers
         void OnItemChanged(object sender, ItemChangedArgs arg)
         {
-            var model = sender as TransformModel;
+            var model = sender as IModel;
 
             if (arg.Group.ArrayValueName == enumTag || arg.Group.ArrayValueName == customTag)
             {
                 // remove all the existing ones
-                if (model.Enums.ContainsKey(rtType) && model.Enums[rtType] != null)
+                if (ModelConfig.Instance.Enums.ContainsKey(rtType) && ModelConfig.Instance.Enums[rtType] != null)
                 {
-                    var rtTypes = model.Enums[rtType];
+                    var rtTypes = ModelConfig.Instance.Enums[rtType];
                     var delMe = rtTypes.Where(o => o.Value.StartsWith(enumPrefix) || o.Value.StartsWith(customPrefix)).Select( o => o.Key ).ToList();
                     foreach (var d in delMe)
                     {
@@ -44,14 +44,14 @@ namespace RazorTransform.Custom
 
         void OnModelLoaded(object sender, ModelChangedArgs e)
         {
-            var model = sender as TransformModel;
+            var model = sender as IModel;
 
             // add the custom and the enums to a type enum, if it exists
-            if (model.Enums.ContainsKey(rtType) && model.Enums[rtType] != null)
+            if (ModelConfig.Instance.Enums.ContainsKey(rtType) && ModelConfig.Instance.Enums[rtType] != null)
             {
-                var rtTypes = model.Enums[rtType];
+                var rtTypes = ModelConfig.Instance.Enums[rtType];
 
-                var enums = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == enumTag).SingleOrDefault();
+                var enums = model.Items.Where(o => o.Group.DisplayName == enumTag).SingleOrDefault();
                 if (enums != null)
                 {
                     foreach (var r in enums.Items.Select(o => o.DisplayName))
@@ -76,13 +76,13 @@ namespace RazorTransform.Custom
         public RtThySelfType()
         { }
 
-        public TransformModelItem CreateItem(ITransformModelGroup parent, System.Xml.Linq.XElement e)
+        public IItem CreateItem(IModel parent, IGroup group, System.Xml.Linq.XElement e)
         {
             // never needed to be called
             throw new NotImplementedException();
         }
 
-        public System.Windows.Controls.Control CreateControl(ITransformModelItem info, System.Windows.Data.Binding binding, System.Action itemChanged)
+        public System.Windows.Controls.Control CreateControl(IItem info, System.Windows.Data.Binding binding, System.Action itemChanged)
         {
             // never needed to be called
             throw new NotImplementedException();

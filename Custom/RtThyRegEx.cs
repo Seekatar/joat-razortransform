@@ -20,14 +20,14 @@ namespace RazorTransform.Custom
         #region EventHandlers
         void OnItemChanged(object sender, ItemChangedArgs arg)
         {
-            var model = sender as TransformModel;
+            var model = sender as IModel;
 
             if (arg.Group.ArrayValueName == regexTag) // changing the regex group?
             {
                 // remove all the existing ones
-                if (model.Enums.ContainsKey(rtRegEx) && model.Enums[rtRegEx] != null)
+                if (ModelConfig.Instance.Enums.ContainsKey(rtRegEx) && ModelConfig.Instance.Enums[rtRegEx] != null)
                 {
-                    var rtTypes = model.Enums[rtRegEx];
+                    var rtTypes = ModelConfig.Instance.Enums[rtRegEx];
                     var delMe = rtTypes.Where(o => !String.IsNullOrEmpty(o.Key)).Select(o => o.Key).ToList(); // <None> has empty key
                     foreach (var d in delMe)
                     {
@@ -42,17 +42,17 @@ namespace RazorTransform.Custom
 
         void OnModelLoaded(object sender, ModelChangedArgs e)
         {
-            var model = sender as TransformModel;
+            var model = sender as IModel;
 
             // add the custom and the enums to a type enum, if it exists
-            if (model.Enums.ContainsKey(rtRegEx) && model.Enums[rtRegEx] != null)
+            if (ModelConfig.Instance.Enums.ContainsKey(rtRegEx) && ModelConfig.Instance.Enums[rtRegEx] != null)
             {
-                var rtTypes = model.Enums[rtRegEx];
+                var rtTypes = ModelConfig.Instance.Enums[rtRegEx];
 
-                var regexes = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == regexTag).SingleOrDefault();
+                var regexes = model.Items.Where(o => o.Group.DisplayName == regexTag);
                 if (regexes != null)
                 {
-                    foreach (var r in regexes.Items.Select(o => o.DisplayName))
+                    foreach (var r in regexes.Select(o => o.Name))
                     {
                         if (!rtTypes.ContainsKey(r))
                             rtTypes.Add(r, r);
@@ -65,13 +65,13 @@ namespace RazorTransform.Custom
         public RtThySelfRegEx()
         { }
 
-        public TransformModelItem CreateItem(ITransformModelGroup parent, System.Xml.Linq.XElement e)
+        public IItem CreateItem(IModel parent, IGroup group, System.Xml.Linq.XElement e)
         {
             // never needed to be called
             throw new NotImplementedException();
         }
 
-        public System.Windows.Controls.Control CreateControl(ITransformModelItem info, System.Windows.Data.Binding binding, System.Action itemChanged)
+        public System.Windows.Controls.Control CreateControl(IItem info, System.Windows.Data.Binding binding, System.Action itemChanged)
         {
             // never needed to be called
             throw new NotImplementedException();
