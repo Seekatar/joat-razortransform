@@ -91,6 +91,8 @@ namespace RazorTransform
             }
         }
 
+        public static Settings Instance { get; private set; }
+
         public Settings()
         {
             Overrides = null;
@@ -101,16 +103,12 @@ namespace RazorTransform
             OverrideOutputFolder = null;
             OverrideTemplateFolder = null;
             LogFile = "RazorTransform.log";
+
+            Instance = this;
         }
 
-        // for saving
-        public TransformModelGroup Group { get { return null; } }// TODO  _settingsGroup; } }
-
-        // for editing
-        public IList<TransformModelGroup> ConfigInfo 
-        {
-            get { return null; } // TODO  _settings.Groups; } 
-        }
+        // for saving and editing
+        public IModel Model { get { return _settings; } }
 
         // values saved in values file
         public string Title { get { return this["RTSettings_Title"]; } set { this["RTSettings_Title"] = value; } }
@@ -226,7 +224,7 @@ namespace RazorTransform
             }
         }
 
-        internal string ToString(TransformModel model)
+        internal string ToString(IModel model)
         {
             var sb = new StringBuilder();
             var t = GetType();
@@ -247,7 +245,7 @@ namespace RazorTransform
                 sb.AppendLine("  Overrides:");
                 foreach (var o in Overrides)
                 {
-                    var m = model.Groups.FindRecursive(p => p.PropertyName == o.Key).FirstOrDefault();
+                    var m = model.Items.FindRecursive(p => p.Name == o.Key).FirstOrDefault();
                     if ( m != null )
                     {
                         if ( m.Type == RtType.Password )
@@ -281,5 +279,19 @@ namespace RazorTransform
             }
         }
 
+
+        public string TitleSuffix
+        {
+            get
+            {
+                string TitleSuffix = String.Empty;
+                if (!String.IsNullOrWhiteSpace(Title))
+                    TitleSuffix = " " + Title;
+
+                TitleSuffix += " -> " + OutputFolder;
+
+                return TitleSuffix;
+            }
+        }
     }
 }

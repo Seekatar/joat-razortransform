@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RazorTransform.Model;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace RazorTransform
@@ -18,9 +19,9 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( IList<TransformModelGroup> orig, bool showHidden, bool isAdd = false )
+        public bool ShowDialog( IItemList orig, bool showHidden, bool isAdd = false )
         {
-            var temp = new List<TransformModelGroup>(orig);
+            var temp = new ItemList(orig);
             Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((ShowDialog() ?? false) )
@@ -33,9 +34,10 @@ namespace RazorTransform
 
         }
 
-        public void Load(IEnumerable<TransformModelGroup> info, bool showHidden)
+        public void Load(IItemList info, bool showHidden)
         {
-            nvEdit.Load(info, showHidden);
+            // I don't think this is correct first parm
+            nvEdit.Load(info.Parent, showHidden); 
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)

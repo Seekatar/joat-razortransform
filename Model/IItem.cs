@@ -9,8 +9,6 @@ namespace RazorTransform.Model
 {
     public interface IItem : IItemBase
     {
-        IList<string> VisibilityGroups { get; }
-
         RtType Type { get; }
         string OriginalTypeStr { get; }
         string ExpandedValueStr { get; set; }
@@ -19,6 +17,7 @@ namespace RazorTransform.Model
         string MaxStr { get; set; }
         bool ReadOnly { get; set; }
         string Regex { get; set; }
+        bool IsPassword { get; set; }
 
 
         /// <summary>

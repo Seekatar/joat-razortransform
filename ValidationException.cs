@@ -8,21 +8,23 @@ namespace RazorTransform
     /// <summary>
     /// class for capturing multiple validation exceptions to display to user
     /// </summary>
-    internal class ValidationException : Exception
+    public class ValidationError
     {
         private List<Tuple<IGroup,string>> _groups = new List<Tuple<IGroup,string>>();
 
         public IList<Tuple<IGroup,string>> Group { get { return _groups; } }
         public IItem Item  { get; private set; }
+        public string Message { get; private set; }
 
-        public ValidationException(string p, IGroup g, String currentName = null ) : base(p)
+        public ValidationError(string p, IGroup g, String currentName = null ) 
         {
+            Message = p;
             _groups.Add(new Tuple<IGroup,string>(g, currentName));
         }
 
-        public ValidationException(string p, IItem i)
-            : base(p)
+        public ValidationError(string p, IItem i)
         {
+            Message = p;
             this.Item = i;
         }
 

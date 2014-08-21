@@ -128,7 +128,6 @@
     <Compile Include="Model\IItemBase.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelConfig.cs" />
-    <Compile Include="PasswordTransformModelItem.cs" />
     <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTemplateUtil.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="Controls\MainEdit.xaml.cs">
       <DependentUpon>MainEdit.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IValueProvider.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UI\LayoutManager.cs" />
     <Compile Include="Util\ExceptionExtension.cs" />

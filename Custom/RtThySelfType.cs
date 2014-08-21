@@ -24,7 +24,7 @@ namespace RazorTransform.Custom
         {
             var model = sender as IModel;
 
-            if (arg.Group.ArrayValueName == enumTag || arg.Group.ArrayValueName == customTag)
+            if (arg.List.Name == enumTag || arg.List.Name == customTag)
             {
                 // remove all the existing ones
                 if (ModelConfig.Instance.Enums.ContainsKey(rtType) && ModelConfig.Instance.Enums[rtType] != null)
@@ -51,19 +51,19 @@ namespace RazorTransform.Custom
             {
                 var rtTypes = ModelConfig.Instance.Enums[rtType];
 
-                var enums = model.Items.Where(o => o.Group.DisplayName == enumTag).SingleOrDefault();
+                var enums = model.Items.Where(o => o.Group.DisplayName == enumTag);
                 if (enums != null)
                 {
-                    foreach (var r in enums.Items.Select(o => o.DisplayName))
+                    foreach (var r in enums.Select(o => o.DisplayName))
                     {
                         if (!rtTypes.ContainsKey(r))
                             rtTypes.Add(r, enumPrefix + r);
                     }
                 }
-                var customs = model.Groups.Where(o => o is TransformModelArray && (o as TransformModelArray).ArrayValueName == customTag).SingleOrDefault();
+                var customs = model.Items.Where(o => o.Name == customTag ).OfType<IItemList>().SingleOrDefault();
                 if (customs != null)
                 {
-                    foreach (var r in customs.Items.Select(o => o.DisplayName))
+                    foreach (var r in customs.Select(o => customs.ModelKeyName(o)))
                     {
                         if (!rtTypes.ContainsKey(r))
                             rtTypes.Add(r, customPrefix + r);

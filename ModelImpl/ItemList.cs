@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
     class ItemList : System.Dynamic.DynamicObject, IItemList
     {
         private List<IModel> _models = new List<IModel>();
+
+        public ItemList(IItemList src)
+        {
+            throw new NotImplementedException();
+        }
 
         public ItemList(IModel parent, IGroup group)
         {
@@ -47,7 +53,7 @@ namespace RazorTransform.Model
             private set;
         }
 
-        public string Key
+        public string KeyFormat
         {
             get;
             private set;
@@ -65,13 +71,13 @@ namespace RazorTransform.Model
             private set;
         }
 
-        public uint Min
+        public UInt16 Min
         {
             get;
             set;
         }
 
-        public uint Max
+        public UInt16 Max
         {
             get;
             set;
@@ -93,6 +99,61 @@ namespace RazorTransform.Model
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region IItemList methods
+        /// <summary>
+        /// Make the key name for a given model
+        /// </summary>
+        /// <param name="model">the model that is part of the list</param>
+        /// <returns>the display name for the UI, or &lt;Unknown&gt; if an error occurred</returns>
+        public string ModelKeyName(IModel model)
+        {
+            // var ret = "<Unknown>";
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// validate the model.
+        /// </summary>
+        /// <param name="errors">collection to be populated</param>
+        public void Validate(ICollection<ValidationError> errors)
+        {
+            if (Count < Min)
+            {
+                errors.Add(new ValidationError(String.Format(Resource.MinCount, DisplayName, Min), Group));
+            }
+            else if (Count > Max)
+            {
+                errors.Add(new ValidationError(string.Format(Resource.MaxCount, DisplayName, Max), Group));
+            }
+            if (Unique)
+            {
+                for (int j = 0; j < (Count - 1); j++)
+                {
+                    if (this.Skip(j + 1).Any(o => ModelKeyName(o).Equals(ModelKeyName(this.ElementAt(j)))))
+                    {
+                        errors.Add(new ValidationError(String.Format(Resource.UniqueViolation, ModelKeyName(this.ElementAt(j))), this.Group));
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Generate the RtValues XML adding it under the root XML passed in
+        /// </summary>
+        /// <param name="root"></param>
+        public void GenerateXml(XElement root)
+        {
+            var x = new XElement(Name);
+            root.Add(x);
+            foreach( var m in this )
+            {
+                m.GenerateXml(root);
+            }
         }
 
         #endregion
@@ -127,7 +188,20 @@ namespace RazorTransform.Model
 
         public void Add(IModel item)
         {
-            _models.Add(item);
+            if (Sort != RtSort.None)
+            {
+                int i = 0;
+                for (; i < _models.Count; i++)
+                {
+                    var key = ModelKeyName(item);
+                    if ((Sort == RtSort.Ascending && String.Compare(ModelKeyName(_models[i]), key) >= 0) || // ascending
+                                                      String.Compare(ModelKeyName(_models[i]), key) <= 0)    // descending
+                        break;
+                }
+                _models.Insert(i, item);
+            }
+            else
+                _models.Add(item);
         }
 
         public void Clear()
@@ -142,7 +216,7 @@ namespace RazorTransform.Model
 
         public void CopyTo(IModel[] array, int arrayIndex)
         {
-            _models.CopyTo(array,arrayIndex);
+            _models.CopyTo(array, arrayIndex);
         }
 
         public int Count
@@ -174,10 +248,10 @@ namespace RazorTransform.Model
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
             // load the arrray meta data
-            Name = (string)xml.Attribute(Constants.ArrayValueName) ?? "";
-            Key = (string)xml.Attribute(Constants.Key) ?? "";
-            Min = (uint?)xml.Attribute(Constants.Min) ?? UInt32.MinValue;
-            Max = (uint?)xml.Attribute(Constants.Max) ?? UInt32.MaxValue;
+            Name = (string)xml.Attribute(Constants.ArrayValueName) ?? String.Empty;
+            KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
+            Min = (UInt16)((UInt32?)xml.Attribute(Constants.Min) ?? (UInt32)UInt16.MinValue);
+            Max = (UInt16)((UInt32?)xml.Attribute(Constants.Max) ?? (UInt32)UInt16.MaxValue);
             Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
             var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
 
@@ -203,6 +277,25 @@ namespace RazorTransform.Model
             // load the values for each item in the array 
             loadValues(values, overrides, rtValuesVersion);
         }
+
+        /// <summary>
+        /// deep copy the array
+        /// </summary>
+        /// <param name="groupTo"></param>
+        /// <param name="groupFrom"></param>
+        public void CopyValueFrom(IItemList groupFrom)
+        {
+            if (!Type.ReferenceEquals(this, groupFrom))
+            {
+                Clear();
+                foreach (var g in groupFrom)
+                {
+                    var newOne = (IModel)Activator.CreateInstance(g.GetType(), g);
+                    Add(newOne);
+                }
+            }
+        }
+
 
         private void loadValues(System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {

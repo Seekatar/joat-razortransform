@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
@@ -16,18 +17,52 @@ namespace RazorTransform.Model
             get { return _items; }
         }
 
+        public Model()
+        {
+        }
+
+        public Model(IModel src)
+        {
+            throw new NotImplementedException();
+        }
+
+        #region MyRegion
         public IModel Parent
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// get the root model
+        /// </summary>
+        /// <returns></returns>
+        public IModel Root
+        {
+            get
+            {
+                IModel ret = this;
+                while (ret.Parent != null)
+                    ret = ret.Parent;
+                return ret;
+            }
+        }
+
+        #endregion
+
+        #region IModel methods
+        public IItemList GetList()
+        {
+            return Items.FirstOrDefault() as IItemList;
+        }
+        #endregion
+
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
             // get all the Items in the model
             var xmlGroups = xml.Elements(Constants.Group);
 
-            foreach( var xmlGroup in xmlGroups )
+            foreach (var xmlGroup in xmlGroups)
             {
                 IGroup group = new Group();
                 group.LoadFromXml(xmlGroup);
@@ -44,7 +79,7 @@ namespace RazorTransform.Model
                 {
                     foreach (var xmlItem in xmlGroup.Elements(Constants.Item))
                     {
-                        item = new Item(this,group);
+                        item = new Item(this, group);
                         item.LoadFromXml(xmlItem, values, overrides, rtValuesVersion);
                         Items.Add(item);
                     }
@@ -54,6 +89,52 @@ namespace RazorTransform.Model
             // get all the ItemLists in the model
             var lists = xml.Elements(Constants.Group).Where(o => o.Attribute(Constants.ArrayValueName) != null && !String.IsNullOrEmpty(o.Attribute(Constants.ArrayValueName).Value));
 
+        }
+
+        /// <summary>
+        /// generate the RtValues XML for the model
+        /// </summary>
+        /// <returns></returns>
+        public void GenerateXml(XElement root)
+        {
+            var groups = Items.GroupBy(o => o.Group);
+
+            saveGroups(root, groups);
+        }
+
+        /// <summary>
+        /// validate the model. 
+        /// </summary>
+        public void Validate(ICollection<ValidationError> errors)
+        {
+            try
+            {
+                ModelConfig.Instance.OnModelValidate();
+            }
+            catch (Exception)
+            {
+            }
+            validate(Items, errors);
+        }
+
+        private void validate(IEnumerable<IItemBase> items, ICollection<ValidationError> errors)
+        {
+            foreach (var g in items)
+            {
+                g.Validate(errors);
+            }
+        }
+
+        private void saveGroups(XElement root, IEnumerable<IGrouping<IGroup, IItemBase>> groups)
+        {
+            foreach (var g in groups)
+            {
+                foreach (var item in g)
+                {
+                    if (!(item is IItem) || !(item as IItem).IsPassword)
+                        item.GenerateXml(root);
+                }
+            }
         }
 
         #region DynamicObject Overrides
@@ -97,9 +178,7 @@ namespace RazorTransform.Model
 
             if (name == Constants.Root)
             {
-                var root = model;
-                while (root.Parent != null)
-                    root = root.Parent;
+                result = model.Root;
                 return true;
             }
 

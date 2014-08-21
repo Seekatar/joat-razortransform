@@ -10,6 +10,7 @@ using System.Web;
 using RtPsHost;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using RazorTransform.Model;
 
 namespace RazorTransform
 {
@@ -49,7 +50,7 @@ namespace RazorTransform
                 Parallel.ForEach(fileList, f =>
 #else
                 foreach (var f in fileList)
-#endif				
+#endif
                 {
                     Interlocked.Increment(ref i);
                     currentFile = f;
@@ -73,7 +74,7 @@ namespace RazorTransform
                 }
 #if USE_PARALLEL				
 				);
-#endif				
+#endif
                 sw.Stop();
                 if (progress != null) progress.Report(new ProgressInfo(String.Format(Resource.Success, count, outputFolder, sw.Elapsed.TotalSeconds), percentComplete: 100));
 
@@ -86,14 +87,14 @@ namespace RazorTransform
                 {
                     sb.AppendLine(String.Format("   {0} at line {1}({2})", ee.ErrorText, ee.Line, ee.Column));
                 }
-                var fname = Path.Combine( System.IO.Path.GetTempPath(), "RazorTransform.xml");
-                try 
+                var fname = Path.Combine(System.IO.Path.GetTempPath(), "RazorTransform.xml");
+                try
                 {
                     System.IO.File.WriteAllText(fname, e.SourceCode);
                     sb.AppendLine("    Output written to " + fname);
                 }
-                catch(Exception) {}
-                
+                catch (Exception) { }
+
                 throw new Exception(sb.ToString());
             }
             catch (OperationCanceledException)
@@ -108,7 +109,7 @@ namespace RazorTransform
             }
             finally
             {
-                if (progress != null) 
+                if (progress != null)
                     progress.Report(new ProgressInfo(String.Empty, percentComplete: 100));
             }
             return count;
@@ -126,11 +127,11 @@ namespace RazorTransform
         /// </summary>
         private IDictionary<string, string> _substituteMapping = new Dictionary<string, string>();
 
-        private int substituteValues(TransformModelArrayItem model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null )
+        private int substituteValues(IModel model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null)
         {
             Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
 
-            int max = Math.Max(1, model.Groups.Count);
+            int max = Math.Max(1, model.Items.Count);
             int changeCount = 0;
             int count = 0;
 
@@ -143,7 +144,7 @@ namespace RazorTransform
             try
             {
 #if serial
-                foreach (var g in model.Groups)
+                foreach (var g in model.Items)
 #else
                 Parallel.ForEach( model.Groups, g =>
 #endif
@@ -153,54 +154,52 @@ namespace RazorTransform
                         progress.Report(new ProgressInfo(scanning, currentOperation: g.DisplayName, percentComplete: (count * 100 / max)));
                     }
 
-                    if (g is TransformModelArray)
+                    if (g is IItemList)
                     {
-                        foreach (var a in (g as TransformModelArray).ArrayItems)
+                        foreach (var a in (g as IItemList))
                         {
                             changeCount += substituteValues(a, cancel, null, ++depth, g.DisplayName);
                         }
                     }
-                    else
+                    else if ( g is IItem )
                     {
-                        foreach (var i in g.Children)
+                        var i = g as IItem;
                         {
+                            var subst = i.ValueStr != null ? i.ValueStr : String.Empty;
+
+                            var matches = r.Matches(subst);
+                            if (matches.Count > 0)
                             {
-                                var subst = i.Value != null ? i.Value.ToString() : String.Empty;
-
-                                var matches = r.Matches(subst);
-                                if (matches.Count > 0)
+                                foreach (Match match in r.Matches(subst))
                                 {
-                                    foreach (Match match in r.Matches(subst))
-                                    {
-                                        string errorMessage = null;
+                                    string errorMessage = null;
 
-                                        string result = null;
+                                    string result = null;
+                                    lock (_substituteMapping)
+                                    {
+                                        if (_substituteMapping.ContainsKey(match.Value))
+                                            result = _substituteMapping[match.Value];
+                                    }
+                                    if (result == null)
+                                    {
+                                        result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage, match.Value);
+                                        if (!String.IsNullOrEmpty(errorMessage))
+                                        {
+                                            throw new Exception(errorMessage);
+                                        }
                                         lock (_substituteMapping)
                                         {
-                                            if (_substituteMapping.ContainsKey(match.Value))
-                                                result = _substituteMapping[match.Value];
+                                            if (match.Value.Contains(".Root.") || depth == 0)
+                                                _substituteMapping[match.Value] = result;
                                         }
-                                        if (result == null)
-                                        {
-                                            result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage,match.Value);
-                                            if (!String.IsNullOrEmpty(errorMessage))
-                                            {
-                                                throw new Exception(errorMessage);
-                                            }
-                                            lock (_substituteMapping)
-                                            {
-                                                if ( match.Value.Contains(".Root.") || depth == 0 )
-                                                    _substituteMapping[match.Value] = result;
-                                            }
-                                        }
-                                        if (result != null)
-                                            subst = subst.Replace(match.Value, result);
-
                                     }
-                                    i.ExpandedValue = subst;
-                                }
+                                    if (result != null)
+                                        subst = subst.Replace(match.Value, result);
 
+                                }
+                                i.ExpandedValueStr = subst;
                             }
+
                         }
                     }
                     Interlocked.Increment(ref count);
@@ -245,8 +244,9 @@ namespace RazorTransform
                 // first do any values that have @Model in them
                 for (int i = 0; i < 5; i++) // allow 5 levels of nesting
                 {
-                    var model = new TransformModelArrayItem();
-                    model.Groups.AddRange((_model as TransformModel).Groups);
+                    var model = new RazorTransform.Model.Model();
+                    foreach( var j in _model.Items)
+                        model.Items.Add(j);
                     if (substituteValues(model, cancel, progress) == 0)
                         break;
                 }

@@ -1,20 +1,21 @@
 ﻿
+using RazorTransform.Model;
 namespace RazorTransform
 {
     /// <summary>
-    /// event args for something changing, adding, deleting
+    /// event args for something changing, adding, deleting in a list
     /// </summary>
     public class ItemChangedArgs : System.EventArgs
     {
         /// <summary>
         /// the group of the item in question
         /// </summary>
-        public TransformModelArray Group { get; set; }
+        public IItemList List { get; set; }
 
         /// <summary>
         /// the item changed, added, deleted
         /// </summary>
-        public TransformModelArrayItem Item { get; set; }
+        public IModel Item { get; set; }
     }
 
     /// <summary>

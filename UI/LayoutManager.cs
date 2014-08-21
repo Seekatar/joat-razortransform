@@ -8,20 +8,19 @@ using System.Windows.Shapes;
 using RazorTransform.Controls;
 using System.Windows.Documents;
 using RazorTransform.Model;
+using System.Collections.Generic;
 
 namespace RazorTransform
 {
     public static class LayoutManager
     {
         /// <summary>
-        /// build a grid view for a model of only simple items
+        /// build a grid view for a model of only simple items, usually this is a tab of items
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(IModel model, bool showHidden, Action itemChanged = null )
+        public static FrameworkElement BuildGridView(IEnumerable<IItemBase> items, bool showHidden, Action itemChanged = null )
         {
-            var items = model.Items;
-
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
             grid.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -39,7 +38,7 @@ namespace RazorTransform
 
 
             int i = 0;
-            foreach (var ci in controls.Where( o => o is IItem).Select( o => o as IItem ) )
+            foreach (var ci in controls.OfType<IItem>())
             {
                 var l = new MyLabel() { Content = ci.DisplayName };
 
@@ -412,7 +411,6 @@ namespace RazorTransform
 
             t.MinWidth = 150;
             var value = ci.ValueStr;
-            (ci as PasswordTransformModelItem).PasswordBox = t;
             t.Password = value;
             t.PasswordChanged += (o, e) => { itemChanged(); };
             return t;

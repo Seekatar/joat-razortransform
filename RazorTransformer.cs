@@ -8,6 +8,8 @@ using System.Windows;
 using RtPsHost;
 using System.Linq;
 using RazorTransform.Model;
+using System.Xml.Linq;
+using System.Text;
 
 namespace RazorTransform
 {
@@ -23,15 +25,12 @@ namespace RazorTransform
 
         public RazorTransformer() { _instance = this;  }
 
-        TransformModel _modelOld = new TransformModel(true);
         Settings _settings = new Settings();
         ITransformOutput _output = null;
 
-        public TransformModel Model { get { return _modelOld; } }
+        public IModel Model { get { return _model; } }
         public ITransformOutput Output { get { return _output; } }
         public Settings Settings { get { return _settings; } }
-
-
 
         IModel _model = new RazorTransform.Model.Model();
         IModelConfig _modelConfig = new ModelConfig();
@@ -61,7 +60,6 @@ namespace RazorTransform
                     _model.LoadFromXml(_modelConfig.Root, _modelConfig.ValuesRoot, overrides, _modelConfig.RtValuesVersion);
                 }
 
-                ret = _modelOld.Load(_settings);
                 if (ret)
                 {
                     // refresh the model to update any @Model values in values file if they changed manually since last save
@@ -135,11 +133,11 @@ namespace RazorTransform
             {
                 _output.ShowMessage(Resource.Canceled, MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (ValidationException ve)
-            {
-                _output.ShowMessage(ve.ToString(), MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            //catch (ValidationError ve)
+            //{
+            //    _output.ShowMessage(ve.ToString(), MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
-            }
+            //}
             catch (Exception ee)
             {
                 _output.ShowMessage(String.Format(Resource.ExceptionFormat, ee.BuildMessage()), MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -161,16 +159,16 @@ namespace RazorTransform
         /// <returns></returns>
         internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
-            if (!_settings.Test && !_settings.NoSave && _modelOld.Groups.Count > 0)
+            if (!_settings.Test && !_settings.NoSave && _model.Items.Any() )
             {
-                // add this to the model since we sneak it in for transforms.  That way if someone needs it
+                // add destinationFolder to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
-                var dest = _modelOld.Groups[0].Children.Where(o => o.PropertyName == Constants.DestinationFolder).SingleOrDefault();
+                var dest = _model.Items.SingleOrDefault(o => o is IItem && o.Name == Constants.DestinationFolder) as IItem;
                 if (dest != null)
                 {
-                    if (!dirty && !String.Equals(_settings.OutputFolder, dest.Value, StringComparison.CurrentCultureIgnoreCase))
+                    if (!dirty && !String.Equals(_settings.OutputFolder, dest.ValueStr, StringComparison.CurrentCultureIgnoreCase))
                         dirty = true;
-                    dest.Value = _settings.OutputFolder;
+                    dest.ValueStr = _settings.OutputFolder;
 
                 }
 
@@ -189,37 +187,46 @@ namespace RazorTransform
             return null;
         }
 
+        // generate the RtValues Xml for the model, with Settings on the front.
+        string generateXml()
+        {
+            var doc = XDocument.Parse(String.Format("<RtValues {0}=\"{1}\"/>", Constants.Version, Constants.CurrentRtValuesVersion));
+            var root = doc.Root;
+
+            _settings.Model.GenerateXml(root);
+
+            _model.GenerateXml(root);
+
+            ModelConfig.Instance.OnModelSaved();
+
+            return doc.ToString();
+        }
+
         internal async Task<Tuple<System.Xml.Linq.XDocument, object>> RefreshModelAsync(bool validateModel, bool dirty)
         {
             object modelObject = null;
 
             if (validateModel)
             {
-                try
+                var errors = new List<ValidationError>();
+                _model.Validate(errors);
+                if ( errors.Any())
                 {
-                    _modelOld.Validate();
-                }
-                catch (ValidationException e2)
-                {
-                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: e2.ToString(), messageBoxImage: MessageBoxImage.Asterisk);
+                    var sb = new StringBuilder();
+                    foreach( var e in errors)
+                    {
+                        sb.AppendLine(e.ToString());
+                    }
+                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: sb.ToString(), messageBoxImage: MessageBoxImage.Asterisk);
                     return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
-
                 }
             }
 
-            var body = _modelOld.GenerateXml();
+            var body = generateXml();
 
             if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
             {
-                try
-                {
-                    modelObject = _modelOld;
-                }
-                catch (ValidationException e)
-                {
-                    Output.ShowMessage(Resource.ValidationError, MessageBoxButton.OK, MessageBoxImage.Asterisk, String.Format(Resource.ValidationMessage, e.ToString()));
-                    return null;
-                }
+                modelObject = _model;
 
                 RazorFileTransformer rf = new RazorFileTransformer(modelObject);
                 if (dirty)

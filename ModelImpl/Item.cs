@@ -19,11 +19,13 @@ namespace RazorTransform.Model
             Group = group;
         }
 
-        public Item(Item src, IGroup group ) : this(src, src.ValueStr, group)
+        public Item(Item src, IGroup group)
+            : this(src, src.ValueStr, group)
         {
         }
 
-        public Item(Item src, string value, IGroup group ) : this(src,group)
+        public Item(Item src, string value, IGroup group)
+            : this(src, group)
         {
             ValueStr = value ?? src.ValueStr;
             ExpandedValueStr = src.ExpandedValueStr;
@@ -38,8 +40,10 @@ namespace RazorTransform.Model
             EnumName = src.EnumName;
             Regex = src.Regex;
             Parent = src.Parent;
+            IsPassword = src.IsPassword;
         }
 
+        #region IItem/IItemBase properties
         public IList<string> VisibilityGroups
         {
             get { return _visibilityGroups; }
@@ -79,10 +83,10 @@ namespace RazorTransform.Model
         /// <summary>
         /// Regular expression validation, may be null
         /// </summary>
-        public string Regex 
-        { 
-            get; 
-            set; 
+        public string Regex
+        {
+            get;
+            set;
         }
 
         public string MinStr
@@ -112,7 +116,7 @@ namespace RazorTransform.Model
 
         public RtType Type
         {
-            get; 
+            get;
             private set;
         }
 
@@ -129,23 +133,32 @@ namespace RazorTransform.Model
             set;
         }
 
-        public string OriginalType 
-        { 
-            get; 
-            private set; 
-        }
-        
-        public string EnumName 
-        { 
-            get; 
-            private set; 
+        public string OriginalType
+        {
+            get;
+            private set;
         }
 
-        public bool Hidden 
-        { 
-            get; 
-            set; 
+        public string EnumName
+        {
+            get;
+            private set;
         }
+
+        public bool Hidden
+        {
+            get;
+            set;
+        }
+
+        public bool IsPassword
+        {
+            get;
+            set;
+        }
+        #endregion
+
+        #region IItem/IItemBase methods
 
         /// <summary>
         /// gets the value of ValueStr as Type T
@@ -156,6 +169,77 @@ namespace RazorTransform.Model
         {
             return (T)Convert.ChangeType(this.ValueStr, typeof(T));
         }
+
+        /// <summary>
+        /// validate the model.
+        /// </summary>
+        /// <param name="errors">collection to be populated</param>
+        public void Validate(ICollection<ValidationError> errors)
+        {
+            string value = (ValueStr ?? String.Empty).Trim();
+            Int64 min, max;
+            if (!Int64.TryParse(MinStr, out min))
+                min = Int64.MinValue;
+            if (!Int64.TryParse(MaxStr, out max))
+                max = Int64.MaxValue;
+
+            switch (Type)
+            {
+                case RtType.String:
+                    if (!String.IsNullOrWhiteSpace(Regex) && !System.Text.RegularExpressions.Regex.IsMatch(value, ModelConfig.Instance.Regexes[Regex]))
+                    {
+                        errors.Add(new ValidationError(String.Format(Resource.RegExViolation, DisplayName, Regex), Group));
+                    }
+                    if (value.Length < min)
+                    {
+                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, min), Group));
+                    }
+                    if (value.Length > max)
+                    {
+                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, max), Group));
+                    }
+                    break;
+
+                case RtType.Int16:
+                case RtType.Int32:
+                case RtType.Int64:
+                    Int32 v;
+                    if (Int32.TryParse(ValueStr, out v))
+                    {
+                        if (v < min)
+                        {
+                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, min), Group));
+                        }
+                        if (v > max)
+                        {
+                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, max), Group));
+                        }
+                    }
+                    else
+                    {
+                        errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, ValueStr), Group));
+                    }
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// Generate the RtValues XML adding it under the root XML passed in
+        /// </summary>
+        /// <param name="root"></param>
+        public void GenerateXml(XElement root)
+        {
+            XElement x = null;
+            if (!String.IsNullOrEmpty(ExpandedValueStr))
+                x = new XElement(Name, ExpandedValueStr, new XAttribute(Constants.Original, ValueStr ?? String.Empty));
+            else
+                x = new XElement(Name, ValueStr ?? String.Empty, new XAttribute(Constants.Original, String.Empty));
+
+            root.Add(x);
+        }
+        #endregion
+
 
         internal void SetItemValue(XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
         {
@@ -231,14 +315,20 @@ namespace RazorTransform.Model
             if (Type == RtType.HiddenString) // old files have hidden as type to indicate hidden string
             {
                 Type = RtType.String;
-                Group.Hidden = true;
+                Hidden = true;
             }
             else if (Type == RtType.Enum)
             {
                 EnumName = Constants.GetEnumName(itemXml);
             }
+            else if (Type == RtType.Password)
+            {
+                IsPassword = true;
+            }
             else
-                Group.Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
+            {
+                Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
+            }
 
             if (Type == RtType.Invalid)
             {
@@ -299,5 +389,12 @@ namespace RazorTransform.Model
             }
             return sb.ToString();
         }
+
+
+        public string OriginalTypeStr
+        {
+            get { throw new NotImplementedException(); }
+        }
+
     }
 }

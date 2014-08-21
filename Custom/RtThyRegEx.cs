@@ -22,7 +22,7 @@ namespace RazorTransform.Custom
         {
             var model = sender as IModel;
 
-            if (arg.Group.ArrayValueName == regexTag) // changing the regex group?
+            if (arg.List.Name == regexTag) // changing the regex group?
             {
                 // remove all the existing ones
                 if (ModelConfig.Instance.Enums.ContainsKey(rtRegEx) && ModelConfig.Instance.Enums[rtRegEx] != null)

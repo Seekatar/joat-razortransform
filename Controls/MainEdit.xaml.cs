@@ -8,13 +8,15 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using RtPsHost;
+using RazorTransform.Model;
+using System.Linq;
 
 namespace RazorTransform
 {
     /// <summary>
     /// Interaction logic for MainEdit.xaml
     /// </summary>
-    public partial class MainEdit : UserControl,  IDisposable
+    public partial class MainEdit : UserControl, IDisposable
     {
         private RazorTransformer _transformer = new RazorTransformer();
         private IDictionary<string, object> _parms;
@@ -65,7 +67,7 @@ namespace RazorTransform
         {
             get
             {
-                return _transformer.Model.TitleSuffix;
+                return Settings.Instance.TitleSuffix;
             }
         }
 
@@ -73,9 +75,9 @@ namespace RazorTransform
         /// load all the data from the model
         /// </summary>
         /// <param name="list"></param>
-        internal void Load(List<TransformModelGroup> list)
+        internal void Load(IModel model)
         {
-            editControl.Load(list, _transformer.Settings.ShowHidden );
+            editControl.Load(model, _transformer.Settings.ShowHidden);
         }
 
         public void Initalize(ITransformParentWindow parent, IDictionary<string, object> parms, IDictionary<string, string> overrides, bool embedded = false, bool runPowerShell = false)
@@ -117,7 +119,7 @@ namespace RazorTransform
                     });
                 }));
         }
-		
+
         private async Task<ProcessingResult> doTransforms(bool sentFromOk)
         {
             setButtonStates(ProcessingState.transforming);
@@ -125,14 +127,14 @@ namespace RazorTransform
             RanTransformOk = false;
             TransformResult transformResult = new TransformResult();
             transformResult.Result = ProcessingResult.ok;
-             
+
             if (!_overrides.ContainsKey("PsSkipTransform"))
             {
                 transformResult = await _transformer.DoTransformAsync(editControl.Dirty);
                 editControl.Dirty = false;
             }
 
-            if (transformResult.Result == ProcessingResult.ok )
+            if (transformResult.Result == ProcessingResult.ok)
             {
                 RanTransformOk = true;
                 if (sentFromOk)
@@ -157,7 +159,7 @@ namespace RazorTransform
             if (RanTransformOk && _runPowerShell)
             {
                 RanTransformOk = false;
-                psConsole.WriteLine("",WriteType.Host);
+                psConsole.WriteLine("", WriteType.Host);
                 psConsole.WriteSystemMessage(Resource.RunningPowerShell);
                 _parent.SendData(new Dictionary<string, string>
                 {
@@ -252,7 +254,7 @@ namespace RazorTransform
         /// <param name="startWidth"></param>
         /// <param name="endWidth"></param>
         /// <param name="durationMs"></param>
-        private void zoomConsole(double startHeight, double endHeight, double startWidth, double endWidth, double durationMs = 300 )
+        private void zoomConsole(double startHeight, double endHeight, double startWidth, double endWidth, double durationMs = 300)
         {
             if (psConsole.ActualWidth == endWidth && psConsole.ActualHeight == endHeight)
                 return;
@@ -311,28 +313,25 @@ namespace RazorTransform
             {
                 dict["instanceDbName"] = _overrides["InstanceDbName"];
             }
-            variableItems(_transformer.Model.Groups, dict);
+            variableItems(_transformer.Model.Items, dict);
 
             return dict;
         }
 
-        private void variableItems(IEnumerable<TransformModelGroup> parent, Dictionary<string, object> dict)
+        private void variableItems(IEnumerable<IItemBase> items, Dictionary<string, object> dict)
         {
-            foreach (var i in parent)
+            foreach (var i in items.OfType<IItem>())
             {
-                if ( i.Children != null )
+                if (i.IsPassword)
+                    dict[i.Name] = i.ValueStr;
+                else if (i.Name == "SQLServer" || i.Name == "InstanceName")
+                    dict[i.Name] = i.ValueStr;
+            }
+            foreach (var i in items.OfType<IItemList>())
+            {
+                foreach (var m in i)
                 {
-                    foreach (var c in i.Children)
-                    {
-                        if (c is PasswordTransformModelItem)
-                            dict[c.PropertyName] = c.Value;
-                        else if ((c is TransformModelItem) && (c.PropertyName == "SQLServer" || c.PropertyName == "InstanceName" ))
-                            dict[c.PropertyName] = c.Value;
-                        else if (c is TransformModelArrayItem)
-                        {
-                            variableItems((c as TransformModelArrayItem).Groups, dict);
-                        }
-                    }
+                    variableItems(m.Items, dict);
                 }
             }
         }
@@ -383,7 +382,7 @@ namespace RazorTransform
         private async void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             btnCancel.IsEnabled = false;
-            if (_currentState == ProcessingState.shellExecuting )
+            if (_currentState == ProcessingState.shellExecuting)
             {
                 psConsole.Cancel(); // this is async
             }
@@ -394,24 +393,24 @@ namespace RazorTransform
             else if (!_transformer.Cancel())
             {
                 bool okToClose = true;
-                if (editControl.Dirty )
+                if (editControl.Dirty)
                 {
                     var resp = _transformer.Output.ShowMessage(String.Format(Resource.IsDirty, _transformer.Settings.ValuesFile), MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                     if (resp == MessageBoxResult.Yes)
                     {
-                        if ((await _transformer.SaveAsync(true,editControl.Dirty)) == null)  // failed validation don't exit
+                        if ((await _transformer.SaveAsync(true, editControl.Dirty)) == null)  // failed validation don't exit
                         {
                             okToClose = false;
                         }
                     }
                     else if (resp == MessageBoxResult.Cancel)
-                        okToClose = false; 
+                        okToClose = false;
 
                     // else No, so close window without saving
                 }
-                
-                if ( okToClose)
+
+                if (okToClose)
                     _parent.ProcessingComplete(RanTransformOk ? ProcessingResult.close : ProcessingResult.canceled);
                 else
                     btnCancel.IsEnabled = true;
@@ -441,7 +440,7 @@ namespace RazorTransform
         private async void btnOkAndClose_Click(object sender, RoutedEventArgs e)
         {
             var ret = await doTransforms(false);
-            if ( ret == ProcessingResult.ok && !_runPowerShell)
+            if (ret == ProcessingResult.ok && !_runPowerShell)
                 _parent.ProcessingComplete(ret);
         }
 
@@ -454,7 +453,7 @@ namespace RazorTransform
         {
             var aie = new ArrayItemEdit();
             aie.TrySetOwner(Window.GetWindow(this));
-            aie.ShowDialog(_transformer.Settings.ConfigInfo,_transformer.Settings.ShowHidden);
+            aie.ShowDialog(_transformer.Settings.Model.GetList(), _transformer.Settings.ShowHidden);
             if (aie.Dirty)
                 editControl.Dirty = true;
         }
@@ -487,7 +486,7 @@ namespace RazorTransform
                     psConsole.SetColors((Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSForeground"]), (Color)ColorConverter.ConvertFromString(_transformer.Settings["RTSettings_PSBackground"]));
                 }
                 await _transformer.InitializeAsync(_parms, _overrides, this); // reinit after running pre script
-                editControl.Load(_transformer.Model.Groups, _transformer.Settings.ShowHidden );
+                editControl.Load(_transformer.Model, _transformer.Settings.ShowHidden);
                 setButtonStates(ProcessingState.idle);
                 _parent.SetTitle(TitleSuffix);
 
@@ -521,7 +520,7 @@ namespace RazorTransform
         private async void btnSave_Click(object sender, RoutedEventArgs e)
         {
             setButtonStates(ProcessingState.transforming);
-            if ( await _transformer.SaveAsync(true,editControl.Dirty) != null )
+            if (await _transformer.SaveAsync(true, editControl.Dirty) != null)
                 editControl.Dirty = false;
             setButtonStates(ProcessingState.idle);
         }
@@ -535,7 +534,7 @@ namespace RazorTransform
         {
             await _transformer.RefreshModelAsync(false, true);
             // reload 
-            editControl.Load(_transformer.Model.Groups, _transformer.Settings.ShowHidden);
+            editControl.Load(_transformer.Model, _transformer.Settings.ShowHidden);
         }
 
         public void Dispose()
