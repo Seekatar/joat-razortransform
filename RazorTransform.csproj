@@ -132,21 +132,6 @@
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTemplateUtil.cs" />
     <Compile Include="RazorTransformer.cs" />
-    <None Include="TransformModel.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="TransformModelArray.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="TransformModelArrayItem.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="TransformModelGroup.cs">
-      <SubType>Code</SubType>
-    </None>
-    <None Include="TransformModelItem.cs">
-      <SubType>Code</SubType>
-    </None>
     <Compile Include="TransformResult.cs" />
     <Compile Include="UI\GuiProgress.cs" />
     <Compile Include="Controls\ITransformParentWindow.cs" />
