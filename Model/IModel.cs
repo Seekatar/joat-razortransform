@@ -46,5 +46,11 @@ namespace RazorTransform.Model
         /// generate the RtValues XML for the model
         /// </summary>
         void GenerateXml(XElement root);
+
+        /// <summary>
+        /// copy all the values from an existing item
+        /// </summary>
+        /// <param name="src"></param>
+        void CopyValuesFrom(IModel src);
     }
 }

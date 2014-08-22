@@ -323,9 +323,9 @@ namespace RazorTransform
             foreach (var i in items.OfType<IItem>())
             {
                 if (i.IsPassword)
-                    dict[i.Name] = i.ValueStr;
+                    dict[i.Name] = i.Value;
                 else if (i.Name == "SQLServer" || i.Name == "InstanceName")
-                    dict[i.Name] = i.ValueStr;
+                    dict[i.Name] = i.Value;
             }
             foreach (var i in items.OfType<IItemList>())
             {
@@ -453,7 +453,7 @@ namespace RazorTransform
         {
             var aie = new ArrayItemEdit();
             aie.TrySetOwner(Window.GetWindow(this));
-            aie.ShowDialog(_transformer.Settings.Model.GetList(), _transformer.Settings.ShowHidden);
+            aie.ShowDialog(_transformer.Settings.Model, _transformer.Settings.ShowHidden);
             if (aie.Dirty)
                 editControl.Dirty = true;
         }

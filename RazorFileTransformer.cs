@@ -165,7 +165,7 @@ namespace RazorTransform
                     {
                         var i = g as IItem;
                         {
-                            var subst = i.ValueStr != null ? i.ValueStr : String.Empty;
+                            var subst = i.Value != null ? i.Value : String.Empty;
 
                             var matches = r.Matches(subst);
                             if (matches.Count > 0)
@@ -197,7 +197,7 @@ namespace RazorTransform
                                         subst = subst.Replace(match.Value, result);
 
                                 }
-                                i.ExpandedValueStr = subst;
+                                i.ExpandedValue = subst;
                             }
 
                         }

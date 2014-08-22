@@ -19,25 +19,24 @@ namespace RazorTransform
         /// </summary>
         /// <param name="info"></param>
         /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( IItemList orig, bool showHidden, bool isAdd = false )
+        public bool ShowDialog( IModel orig, bool showHidden, bool isAdd = false )
         {
-            var temp = new ItemList(orig);
+            var temp = new RazorTransform.Model.Model(orig,null);
             Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((ShowDialog() ?? false) )
             {
                 if ( nvEdit.Dirty)
-                    orig.CopyValueFrom(temp);
+                    orig.CopyValuesFrom(temp);
                 return isAdd || nvEdit.Dirty;
             }
             return false;
 
         }
 
-        public void Load(IItemList info, bool showHidden)
+        public void Load(IModel info, bool showHidden)
         {
-            // I don't think this is correct first parm
-            nvEdit.Load(info.Parent, showHidden); 
+            nvEdit.Load(info, showHidden); 
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)

@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RtObject>
   <group name="Hello" description="Welcome to Artie" hidden="false">
-    <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="String" readOnly="true" />
-    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="String" readOnly="true" />
-    <item name="w3" displayName="Go!" description="Welcome String3" defaultValue="Click the play button to transform these values into output" type="String" readOnly="true" />
-    <item name="w4" displayName="Where?" description="Welcome String4" defaultValue="&lt;user&gt;\LocalAppData\RazorTransform has these sample files" type="String" readOnly="true" />
-    <item name="w5" displayName="Output?" description="Welcome String5" defaultValue="After running, output is in the folder shown in the title bar" type="String" readOnly="true" />
+    <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
+    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" />
+    <item name="w3" displayName="Go!" description="Welcome String3" defaultValue="Click the play button to transform these values into output" type="Label" />
+    <item name="w4" displayName="Where?" description="Welcome String4" defaultValue="&lt;user&gt;\LocalAppData\RazorTransform has these sample files" type="Label" />
+    <item name="w5" displayName="Output?" description="Welcome String5" defaultValue="After running, output is in the folder shown in the title bar" type="Label" />
     <item name="w7" displayName="Using Guide" description="" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/" />
   </group>
   <group name="Sampler" description="One of each" hidden="false">
-    <item name="s1" displayName="Sampler" description="Sample string" defaultValue="This tab has one of each simple type." type="String" readOnly="true" />
+    <item name="s1" displayName="Sampler" description="Sample string" defaultValue="This tab has one of each simple type." type="Label" />
     <item name="colorS1" displayName="Color" description="pick a color.  This is a custom control" defaultValue="Blue" type="ColorType" />
     <item name="stringS1" displayName="String" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20" />
     <item name="boolS1" displayName="Boolean" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
@@ -22,7 +22,7 @@
   </group>
 
   <group name="Strings" description="A few strings" hidden="false">
-    <item name="s2" displayName="Strings" description="Sample string" defaultValue="This tab has strings with differnt size ranges." type="String" readOnly="true" />
+    <item name="s2" displayName="Strings" description="Sample string" defaultValue="This tab has strings with differnt size ranges." type="Label" />
     <item name="stringA1" displayName="String Range 10-20" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
     <item name="stringA2" displayName="String Min 10" description="String with min size of 10." defaultValue="another default value" type="String" hidden="false" min="10" />
     <item name="stringA3" displayName="String Max 10" description="String with max size of 10." defaultValue="test" type="String" hidden="false" max="10" />
@@ -31,7 +31,7 @@
   </group>
 
   <group name="Ints" description="Some integers" hidden="false" >
-    <item name="s4" displayName="Ints" description="Sample string" defaultValue="This tab has ints with different limits." type="String" readOnly="true" />
+    <item name="s4" displayName="Ints" description="Sample string" defaultValue="This tab has ints with different limits." type="Label" />
     <item name="intA1" displayName="Int32 10-20" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
     <item name="intA2" displayName="Int32 &gt; 10" description="Int32 with min of 10." defaultValue="12" type="Int32" hidden="false" min="10" />
     <item name="intA3" displayName="Int32 &lt; 10" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" />
@@ -75,7 +75,7 @@
   </group>
 
   <group name="R/O" description="One of each read only " hidden="false">
-    <item name="s7" displayName="Read onlys" description="Read only fields" defaultValue="This tab has different types, all read-only" type="String" readOnly="true" />
+    <item name="s7" displayName="Read onlys" description="Read only fields" defaultValue="This tab has different types, all read-only" type="Label" />
     <item readOnly="true" name="RostringS1" displayName="String #1" description="String with a size range of 10-20" defaultValue="defaultValue" type="String" hidden="false" min="10" max="20" />
     <item readOnly="true" name="RoboolS1" displayName="Boolean #1" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
     <item readOnly="true" name="RointS1" displayName="Int32 #1" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />

@@ -53,7 +53,7 @@ namespace RazorTransform
                 binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
                 Control t = CreateControl(ci, binding, itemChanged);
-                if (!String.IsNullOrWhiteSpace(ci.ExpandedValueStr))
+                if (!String.IsNullOrWhiteSpace(ci.ExpandedValue))
                 {
                     // build a stack panel for the tooltip to look like this:
                     // <description>
@@ -280,30 +280,40 @@ namespace RazorTransform
 
         private static Control CreateControl(IItem item, Binding binding, Action itemChanged )
         {
-            switch (item.Type)
+            if (item.Type == RtType.Custom && ModelConfig.Instance.CustomTypes.ContainsKey(item.OriginalTypeStr))
             {
-                case RtType.Folder:
-                case RtType.UncPath: 
-                    return _Folder(item, binding, itemChanged);
-                case RtType.Guid: 
-                    return _Guid(item, binding, itemChanged);
-                case RtType.Bool: 
-                    return _Bool(item, binding, itemChanged);
-                case RtType.Int:
-                    return _Int(item, binding, itemChanged);
-                case RtType.Password: 
-                    return _Password(item, binding, itemChanged);
-                case RtType.String: 
-                    return _Default(item, binding, itemChanged);
-                case RtType.Enum: 
-                    return _ComboBox(item, binding, itemChanged);
-                case RtType.HyperLink: 
-                    return _HyperLink(item, binding, itemChanged);
-                default:
-                    if (item.Type == RtType.Custom && ModelConfig.Instance.CustomTypes.ContainsKey(item.OriginalTypeStr))
-                        return ModelConfig.Instance.CustomTypes[item.OriginalTypeStr].CreateControl(item, binding, itemChanged);
-                    else
+                return ModelConfig.Instance.CustomTypes[item.OriginalTypeStr].CreateControl(item, binding, itemChanged);
+            }
+            else if (item.ReadOnly)
+            {
+                return _Default(item, binding, itemChanged);
+            }
+            else
+            {
+                switch (item.Type)
+                {
+                    case RtType.Folder:
+                    case RtType.UncPath:
+                        return _Folder(item, binding, itemChanged);
+                    case RtType.Guid:
+                        return _Guid(item, binding, itemChanged);
+                    case RtType.Label:
+                        return _Label(item);
+                    case RtType.Bool:
+                        return _Bool(item, binding, itemChanged);
+                    case RtType.Int:
+                        return _Int(item, binding, itemChanged);
+                    case RtType.Password:
+                        return _Password(item, binding, itemChanged);
+                    case RtType.String:
                         return _Default(item, binding, itemChanged);
+                    case RtType.Enum:
+                        return _ComboBox(item, binding, itemChanged);
+                    case RtType.HyperLink:
+                        return _HyperLink(item, binding, itemChanged);
+                    default:
+                        return _Default(item, binding, itemChanged);
+                }
             }
         }
 
@@ -374,24 +384,36 @@ namespace RazorTransform
 
             try
             {
-                bib.NavigateUri = new System.Uri(ci.ValueStr);
+                bib.NavigateUri = new System.Uri(ci.Value);
                 if ( String.IsNullOrWhiteSpace(ci.Description))
-                    bib.Text = ci.ValueStr;
+                    bib.Text = ci.Value;
                 else
                     bib.Text = ci.Description;
             }
             catch
             {
-                bib.Text = Resource.InvalidUri + ci.ValueStr;
+                bib.Text = Resource.InvalidUri + ci.Value;
             }
             return bib;
+        }
+
+
+        private static Control _Label(IItem ci)
+        {
+            Control t = null;
+            t = new Label() { Content = ci.ExpandedValue != null ? ci.ExpandedValue : ci.Value };
+            t.MinWidth = 150;
+            return t;
         }
 
         private static Control _Default (IItem ci, Binding binding, Action itemChanged) 
         {
             var t = new TextBox();
             if (ci.ReadOnly)
+            {
                 t.IsReadOnly = true;
+                t.IsEnabled = false;
+            }
 
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
@@ -406,7 +428,7 @@ namespace RazorTransform
                 t.IsEnabled = false;
 
             t.MinWidth = 150;
-            var value = ci.ValueStr;
+            var value = ci.Value;
             t.Password = value;
             t.PasswordChanged += (o, e) => { itemChanged(); };
             return t;
@@ -422,7 +444,7 @@ namespace RazorTransform
             t.Maximum = ci.Max;
 
             t.TextAlignment = TextAlignment.Left;
-            t.Value = Int64.Parse(ci.ValueStr ?? "0");
+            t.Value = Int64.Parse(ci.Value ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
             t.ValueChanged += (o, e) => { itemChanged();  };

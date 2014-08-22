@@ -21,22 +21,26 @@ namespace RazorTransform.Model
         {
         }
 
-        public Model(IModel src, IModel parent = null)
+        public Model(IModel parent)
         {
+            Parent = parent;
+        }
+
+        /// <summary>
+        /// copy constructor
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="parent"></param>
+        public Model(IModel src, IModel parent )
+        {
+            CopyValuesFrom(src);
             if (parent != null)
                 Parent = parent;
             else
                 Parent = src.Parent;
-
-            foreach ( var i in src.Items )
-            {
-                // copy constructor, with parent
-                var newOne = (IItemBase)Activator.CreateInstance(i.GetType(), i, this);
-                Items.Add(newOne);
-            }
         }
 
-        #region MyRegion
+        #region IModel Properties
         public IModel Parent
         {
             get;
@@ -65,7 +69,25 @@ namespace RazorTransform.Model
         {
             return Items.FirstOrDefault() as IItemList;
         }
-        #endregion
+
+        /// <summary>
+        /// copy all the values from an existing item
+        /// </summary>
+        /// <param name="temp"></param>
+        public void CopyValuesFrom(IModel src)
+        {
+            if ( !Object.ReferenceEquals( this, src ) )
+            {
+                Parent = src.Parent;
+
+                foreach (var i in src.Items)
+                {
+                    // copy constructor, with parent
+                    var newOne = (IItemBase)Activator.CreateInstance(i.GetType(), i, this);
+                    Items.Add(newOne);
+                }
+            }
+        }
 
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides)
         {
@@ -126,6 +148,7 @@ namespace RazorTransform.Model
             }
             validate(Items, errors);
         }
+        #endregion
 
         private void validate(IEnumerable<IItemBase> items, ICollection<ValidationError> errors)
         {
@@ -169,7 +192,7 @@ namespace RazorTransform.Model
                 if (result is Item)
                 {
                     var item = (result as IItem);
-                    item.ExpandedValueStr = value.ToString();
+                    item.ExpandedValue = value.ToString();
                     return true;
                 }
             }
@@ -202,24 +225,24 @@ namespace RazorTransform.Model
             }
 
             // find in all the items with this name
-            var list = items.Where(p => p.Name == name && p is Item);
+            var list = items.Where(p => p.Name == name && p is Item).FirstOrDefault();
             var arrays = items.Where(p => p.Name == name && p is ItemList);
-            if (arrays != null)
+            if (arrays != null && arrays.Count() > 0)
             {
                 ret = true;
                 result = arrays;
             }
-            else if (list != null)
+            else if (list != null )
             {
-                result = list.FirstOrDefault();
+                result = list;
                 ret = true;
                 if (result is IItem)
                 {
                     var item = (result as IItem);
-                    if (item.ExpandedValueStr != null)
-                        result = item.ExpandedValueStr;
+                    if (item.ExpandedValue != null)
+                        result = item.ExpandedValue;
                     else
-                        result = item.ValueStr;
+                        result = item.Value;
 
                     if (item.Type == RtType.Bool)
                         result = item.GetValue<bool>();

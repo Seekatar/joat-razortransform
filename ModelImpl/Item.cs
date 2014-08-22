@@ -26,7 +26,7 @@ namespace RazorTransform.Model
         }
 
         public Item(Item src, IGroup group)
-            : this(src, src.ValueStr, group)
+            : this(src, src.Value, group)
         {
         }
 
@@ -37,8 +37,8 @@ namespace RazorTransform.Model
 
         void copyValuesFrom( Item src, string value = null, IGroup group = null, IModel parent = null )
         {
-            ValueStr = value ?? src.ValueStr;
-            ExpandedValueStr = src.ExpandedValueStr;
+            Value = value ?? src.Value;
+            ExpandedValue = src.ExpandedValue;
             Group = group ?? src.Group;
             Parent = parent ?? src.Parent;
 
@@ -60,13 +60,13 @@ namespace RazorTransform.Model
             get { return _visibilityGroups; }
         }
 
-        public string ValueStr
+        public string Value
         {
             get;
             set;
         }
 
-        public string ExpandedValueStr
+        public string ExpandedValue
         {
             get;
             set;
@@ -172,13 +172,13 @@ namespace RazorTransform.Model
         #region IItem/IItemBase methods
 
         /// <summary>
-        /// gets the value of ValueStr as Type T
+        /// gets the value of Value as Type T
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetValue<T>()
         {
-            return (T)Convert.ChangeType(this.ValueStr, typeof(T));
+            return (T)Convert.ChangeType(this.Value, typeof(T));
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace RazorTransform.Model
         /// <param name="errors">collection to be populated</param>
         public void Validate(ICollection<ValidationError> errors)
         {
-            string value = (ValueStr ?? String.Empty).Trim();
+            string value = (Value ?? String.Empty).Trim();
 
             switch (Type)
             {
@@ -208,7 +208,7 @@ namespace RazorTransform.Model
 
                 case RtType.Int:
                     Int64 v;
-                    if (Int64.TryParse(ValueStr, out v))
+                    if (Int64.TryParse(Value, out v))
                     {
                         if (v < Min)
                         {
@@ -221,7 +221,7 @@ namespace RazorTransform.Model
                     }
                     else
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, ValueStr), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, Value), Group));
                     }
                     break;
             }
@@ -235,10 +235,10 @@ namespace RazorTransform.Model
         public void GenerateXml(XElement root)
         {
             XElement x = null;
-            if (!String.IsNullOrEmpty(ExpandedValueStr))
-                x = new XElement(Name, ExpandedValueStr, new XAttribute(Constants.Original, ValueStr ?? String.Empty));
+            if (!String.IsNullOrEmpty(ExpandedValue))
+                x = new XElement(Name, ExpandedValue, new XAttribute(Constants.Original, Value ?? String.Empty));
             else
-                x = new XElement(Name, ValueStr ?? String.Empty, new XAttribute(Constants.Original, String.Empty));
+                x = new XElement(Name, Value ?? String.Empty, new XAttribute(Constants.Original, String.Empty));
 
             root.Add(x);
         }
@@ -249,7 +249,7 @@ namespace RazorTransform.Model
         {
             if (overrides != null && overrides.ContainsKey(Name))
             {
-                ValueStr = overrides[Name];
+                Value = overrides[Name];
             }
             else if (values != null)
             {
@@ -270,7 +270,7 @@ namespace RazorTransform.Model
                     {
                         var a = val.Attribute(Constants.Value);
                         if (a != null)
-                            ValueStr = val.Attribute(Constants.Value).Value;
+                            Value = val.Attribute(Constants.Value).Value;
                         else
                             throw new Exception("Missing value on element " + v.ToString());
                     }
@@ -287,13 +287,13 @@ namespace RazorTransform.Model
                         var attr = element.Attribute(Constants.Original);
                         if (attr != null && !String.IsNullOrWhiteSpace(attr.Value) && attr.Value.Contains('@'))
                         {
-                            ExpandedValueStr = v;
+                            ExpandedValue = v;
                             v = attr.Value;
                         }
                     }
                 }
                 if (v != null)
-                    ValueStr = v;
+                    Value = v;
             }
         }
 
@@ -363,7 +363,7 @@ namespace RazorTransform.Model
         {
             if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
             {
-                ValueStr = x.Attribute(Constants.DefaultValue).Value;
+                Value = x.Attribute(Constants.DefaultValue).Value;
             }
         }
 

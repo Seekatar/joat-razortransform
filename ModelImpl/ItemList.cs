@@ -8,6 +8,9 @@ using System.Xml.XPath;
 
 namespace RazorTransform.Model
 {
+    /// <summary>
+    /// implementation of IItemList
+    /// </summary>
     class ItemList : System.Dynamic.DynamicObject, IItemList
     {
         private List<string> _keyReplacements = new List<string>();
@@ -16,7 +19,6 @@ namespace RazorTransform.Model
         public ItemList(IItemList src, Model parent = null)
         {
             Name = src.Name;
-            Description = src.Description;
             Prototype = src.Prototype;
             Group = src.Group;
             KeyFormat = src.KeyFormat;
@@ -25,13 +27,12 @@ namespace RazorTransform.Model
             Unique = src.Unique;
             Min = src.Min;
             Max = src.Max;
-            DisplayName = src.DisplayName;
             Hidden = src.Hidden;
             VisibilityGroups = src.VisibilityGroups;
 
             Parent = parent ?? src.Parent;
             
-            CopyValueFrom(src, parent);
+            CopyValuesFrom(src, parent);
         }
 
         public ItemList(IModel parent, IGroup group)
@@ -55,8 +56,8 @@ namespace RazorTransform.Model
 
         public string Description
         {
-            get;
-            set;
+            get { return Group != null ? Group.Description : String.Empty; }
+            set { }
         }
 
         public IGroup Group
@@ -89,13 +90,13 @@ namespace RazorTransform.Model
             private set;
         }
 
-        public UInt16 Min
+        public Int64 Min
         {
             get;
             set;
         }
 
-        public UInt16 Max
+        public Int64 Max
         {
             get;
             set;
@@ -103,14 +104,14 @@ namespace RazorTransform.Model
 
         public string DisplayName
         {
-            get;
-            set;
+            get { return Group != null ? Group.DisplayName: String.Empty; }
+            set { }
         }
 
         public bool Hidden
         {
-            get;
-            set;
+            get { return Group != null ? Group.Hidden : false; }
+            set { }
         }
 
         public IList<string> VisibilityGroups
@@ -141,10 +142,10 @@ namespace RazorTransform.Model
                     return s;
                 else
                 {
-                    if (String.IsNullOrEmpty(i.ExpandedValueStr))
-                        values[j++] = i.ValueStr;
+                    if (String.IsNullOrEmpty(i.ExpandedValue))
+                        values[j++] = i.Value;
                     else
-                        values[j++] = i.ExpandedValueStr;
+                        values[j++] = i.ExpandedValue;
                 }
             }
 
@@ -207,8 +208,11 @@ namespace RazorTransform.Model
             // load the arrray meta data
             Name = (string)xml.Attribute(Constants.ArrayValueName) ?? String.Empty;
             KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
-            Min = (UInt16)((UInt32?)xml.Attribute(Constants.Min) ?? (UInt32)UInt16.MinValue);
-            Max = (UInt16)((UInt32?)xml.Attribute(Constants.Max) ?? (UInt32)UInt16.MaxValue);
+
+            // enforce reasonable range
+            Min = Math.Min(0,(Int64?)xml.Attribute(Constants.Min) ?? 0);
+            Max = Math.Max(Int16.MaxValue,(Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
+
             Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
             var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
 
@@ -272,7 +276,7 @@ namespace RazorTransform.Model
         /// deep copy the array
         /// </summary>
         /// <param name="fromList"></param>
-        public void CopyValueFrom(IItemList fromList, IModel parent = null)
+        public void CopyValuesFrom(IItemList fromList, IModel parent = null)
         {
             if (!Type.ReferenceEquals(this, fromList))
             {

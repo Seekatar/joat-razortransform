@@ -143,7 +143,7 @@ namespace RazorTransform
 
                 if (list != null)
                 {
-                    var copy = new RazorTransform.Model.Model(copyMe);
+                    var copy = new RazorTransform.Model.Model(copyMe,null);
                     ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = copy });
                     setDirty();
                     reload();
@@ -163,7 +163,7 @@ namespace RazorTransform
             if (list != null)
             {
                 // set the parent
-                if (editArrayItem(list))
+                if (editArrayItem(existingOne))
                 {
                     // delete & add for sorting
                     list.Remove(existingOne);
@@ -180,8 +180,8 @@ namespace RazorTransform
             // create a new one from the prototype, set on the tag
             var prototype = ((sender as Control).Tag as IModel);
             var list = prototype.GetList();
-            var newOne = new RazorTransform.Model.Model(prototype);
-            if (editArrayItem(list, true))
+            var newOne = new RazorTransform.Model.Model(prototype,null);
+            if (editArrayItem(newOne, true))
             {
                 // add it to the parent array
                 list.Add(newOne);
@@ -199,7 +199,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="orig"></param>
         /// <returns></returns>
-        bool editArrayItem(IItemList orig, bool isAdd = false)
+        bool editArrayItem(IModel orig, bool isAdd = false)
         {
             var nve = new ArrayItemEdit();
             nve.WindowStartupLocation = WindowStartupLocation.CenterOwner;

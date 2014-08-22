@@ -1,21 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
+    /// <summary>
+    /// Base interface for items and item lists
+    /// </summary>
     public interface IItemBase
     {
+        /// <summary>
+        /// Name of the item.  This is the property name on the object
+        /// </summary>
         string  Name { get; set; }
+
+        /// <summary>
+        /// Description of the item.  Usually show in the tooltip of the UI
+        /// </summary>
         string Description { get; set; }
+
+        /// <summary>
+        /// Group this item is in
+        /// </summary>
         IGroup Group { get; set; }
+
+        /// <summary>
+        /// Parent this item belongs to
+        /// </summary>
         IModel Parent { get; }
+
+        /// <summary>
+        /// Display name of this item.  May have spaces, special characters, etc.
+        /// </summary>
         string DisplayName { get; set; }
+
+        /// <summary>
+        /// Visiblity groups used to restrict when the item is shown in the UI
+        /// </summary>
         IList<string> VisibilityGroups { get; }
+
+        /// <summary>
+        /// Is this item hidden in UI by default.  Switch can show hidden
+        /// </summary>
         bool Hidden { get; set; }
+
+        /// <summary>
+        /// min value for the item.  For arrays, it's the count, strings, the length
+        /// </summary>
+        Int64 Min { get; set; }
+
+        /// <summary>
+        /// max value for the item.  For arrays, it's the count, strings, the length
+        /// </summary>
+        Int64 Max { get; set; }
 
         /// <summary>
         /// load the model from XML

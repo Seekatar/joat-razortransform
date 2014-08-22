@@ -165,9 +165,9 @@ namespace RazorTransform
                 var dest = _model.Items.SingleOrDefault(o => o is IItem && o.Name == Constants.DestinationFolder) as IItem;
                 if (dest != null)
                 {
-                    if (!dirty && !String.Equals(_settings.OutputFolder, dest.ValueStr, StringComparison.CurrentCultureIgnoreCase))
+                    if (!dirty && !String.Equals(_settings.OutputFolder, dest.Value, StringComparison.CurrentCultureIgnoreCase))
                         dirty = true;
-                    dest.ValueStr = _settings.OutputFolder;
+                    dest.Value = _settings.OutputFolder;
 
                 }
 
@@ -232,13 +232,19 @@ namespace RazorTransform
                 {
                     _cts = new CancellationTokenSource();
 
-                    await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output);  // don't show substitute progress if running w/o UI
-
-                    lock (this)
+                    try
                     {
-                        _cts = null;
+                        await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output);  // don't show substitute progress if running w/o UI
+                    }
+                    finally
+                    {
+                        lock (this)
+                        {
+                            _cts = null;
+                        }
                     }
                 }
+
 
                 // do any substitutions in  XML
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
@@ -260,6 +266,7 @@ namespace RazorTransform
                 if (_cts != null)
                 {
                     _cts.Cancel();
+                    _cts = null;
                     return true;
                 }
             }

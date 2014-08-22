@@ -19,6 +19,7 @@ namespace RazorTransform
         Guid,
         Enum,
         HyperLink,
+        Label,
         Custom
     }
 
@@ -90,6 +91,8 @@ namespace RazorTransform
                     return RtType.Int;
                 case "password":
                     return RtType.Password;
+                case "label":
+                    return RtType.Label;
                 case "folder":
                     return RtType.Folder;
                 case "uncpath":

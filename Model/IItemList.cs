@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RazorTransform.Model
 {
+    /// <summary>
+    /// Interface for lists of items
+    /// </summary>
     public interface IItemList : IItemBase, IList<IModel>
     {
         /// <summary>
@@ -31,16 +30,6 @@ namespace RazorTransform.Model
         IModel Prototype { get; }
 
         /// <summary>
-        /// min number of IModels for this list, defaults to 0
-        /// </summary>
-        UInt16 Min { get; }
-
-        /// <summary>
-        /// max number of IModels for this list, defaults to UInt16.Max
-        /// </summary>
-        UInt16 Max { get; }
-
-        /// <summary>
         /// Make the key name for a given model
         /// </summary>
         /// <param name="model">the model that is part of the list</param>
@@ -52,6 +41,6 @@ namespace RazorTransform.Model
         /// </summary>
         /// <param name="src"></param>
         /// <param name="parent"></param>
-        void CopyValueFrom(IItemList src, IModel parent = null);
+        void CopyValuesFrom(IItemList src, IModel parent = null);
     }
 }
