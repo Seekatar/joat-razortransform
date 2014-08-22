@@ -4,16 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace RazorTransform.Model
 {
     class ItemList : System.Dynamic.DynamicObject, IItemList
     {
+        private List<string> _keyReplacements = new List<string>();
         private List<IModel> _models = new List<IModel>();
 
-        public ItemList(IItemList src)
+        public ItemList(IItemList src, Model parent = null)
         {
-            throw new NotImplementedException();
+            Name = src.Name;
+            Description = src.Description;
+            Prototype = src.Prototype;
+            Group = src.Group;
+            KeyFormat = src.KeyFormat;
+            Sort = src.Sort;
+            Group = src.Group;
+            Unique = src.Unique;
+            Min = src.Min;
+            Max = src.Max;
+            DisplayName = src.DisplayName;
+            Hidden = src.Hidden;
+            VisibilityGroups = src.VisibilityGroups;
+
+            Parent = parent ?? src.Parent;
+            
+            CopyValueFrom(src, parent);
         }
 
         public ItemList(IModel parent, IGroup group)
@@ -111,8 +129,35 @@ namespace RazorTransform.Model
         /// <returns>the display name for the UI, or &lt;Unknown&gt; if an error occurred</returns>
         public string ModelKeyName(IModel model)
         {
-            // var ret = "<Unknown>";
-            throw new NotImplementedException();
+            var s = "<unknown>";
+
+            var values = new string[_keyReplacements.Count];
+            int j = 0;
+            foreach (var k in _keyReplacements)
+            {
+                // find it in the item's values
+                var i = model.Items.Where(o => o.Name == k).OfType<IItem>().SingleOrDefault();
+                if (i == null)
+                    return s;
+                else
+                {
+                    if (String.IsNullOrEmpty(i.ExpandedValueStr))
+                        values[j++] = i.ValueStr;
+                    else
+                        values[j++] = i.ExpandedValueStr;
+                }
+            }
+
+            // don't have a specified format
+            if (String.IsNullOrWhiteSpace(KeyFormat))
+            {
+                KeyFormat = String.Empty;
+                for (int i = 0; i < values.Count(); i++)
+                    KeyFormat += String.Format("{{{0}}}", i);
+            }
+            s = String.Format(KeyFormat, values);
+
+            return s;
         }
 
         /// <summary>
@@ -153,6 +198,90 @@ namespace RazorTransform.Model
             foreach( var m in this )
             {
                 m.GenerateXml(root);
+            }
+        }
+
+
+        public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides)
+        {
+            // load the arrray meta data
+            Name = (string)xml.Attribute(Constants.ArrayValueName) ?? String.Empty;
+            KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
+            Min = (UInt16)((UInt32?)xml.Attribute(Constants.Min) ?? (UInt32)UInt16.MinValue);
+            Max = (UInt16)((UInt32?)xml.Attribute(Constants.Max) ?? (UInt32)UInt16.MaxValue);
+            Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
+            var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
+
+            bool ascending;
+            // old RtObject took true/false
+            if (bool.TryParse(sortStr, out ascending))
+            {
+                Sort = ascending ? RtSort.Ascending : RtSort.None;
+            }
+            else
+            {
+                RtSort sort;
+                if (Enum.TryParse<RtSort>(sortStr, out sort))
+                    Sort = sort;
+                else
+                    Sort = RtSort.None;
+            }
+
+            // load the prototype (no values)
+            Prototype = new Model(Parent);
+            Prototype.LoadFromXml(xml, null, null);
+
+            makeKeyFormat(xml); // grab the key format from the XML
+
+            // load the values for each item in the array 
+            LoadValuesFromXml(values, overrides);
+        }
+
+        /// <summary>
+        /// load the values (array items) from the XML
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="overrides"></param>
+        public void LoadValuesFromXml(XElement values, IDictionary<string, string> overrides)
+        {
+            // load the values from the values file, if it exists
+            if (values != null)
+            {
+                // search for nested value is something like ./value[@name="itemA"]
+                string valuesXPath;
+                if (Settings.Instance.RtValuesVersion == 1)
+                    valuesXPath = String.Format("./value[@name=\"{0}\"]", Name);
+                else
+                    valuesXPath = String.Format("./{0}", Name);
+
+                var myValues = values.XPathSelectElements(valuesXPath);
+                foreach (var mv in myValues)
+                {
+                    var nextOne = new Model(Prototype, Parent);
+
+                    foreach (var g in nextOne.Items)
+                    {
+                        g.LoadValuesFromXml(mv, overrides);
+                    }
+                    Add(nextOne);
+                }
+            }
+        }
+
+        /// <summary>
+        /// deep copy the array
+        /// </summary>
+        /// <param name="fromList"></param>
+        public void CopyValueFrom(IItemList fromList, IModel parent = null)
+        {
+            if (!Type.ReferenceEquals(this, fromList))
+            {
+                Clear();
+                foreach (var g in fromList)
+                {
+                    var newOne = (IModel)Activator.CreateInstance(g.GetType(), g, parent);
+                    Add(newOne);
+                }
             }
         }
 
@@ -245,62 +374,36 @@ namespace RazorTransform.Model
         }
         #endregion
 
-        public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
-        {
-            // load the arrray meta data
-            Name = (string)xml.Attribute(Constants.ArrayValueName) ?? String.Empty;
-            KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
-            Min = (UInt16)((UInt32?)xml.Attribute(Constants.Min) ?? (UInt32)UInt16.MinValue);
-            Max = (UInt16)((UInt32?)xml.Attribute(Constants.Max) ?? (UInt32)UInt16.MaxValue);
-            Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
-            var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
-
-            bool ascending;
-            // old RtObject took true/false
-            if (bool.TryParse(sortStr, out ascending))
-            {
-                Sort = ascending ? RtSort.Ascending : RtSort.None;
-            }
-            else
-            {
-                RtSort sort;
-                if (Enum.TryParse<RtSort>(sortStr, out sort))
-                    Sort = sort;
-                else
-                    Sort = RtSort.None;
-            }
-
-            // load the prototype (no values)
-            Prototype = new Model();
-            Prototype.LoadFromXml(xml, null, null, rtValuesVersion);
-
-            // load the values for each item in the array 
-            loadValues(values, overrides, rtValuesVersion);
-        }
-
         /// <summary>
-        /// deep copy the array
+        /// read the Xml to figure out how to build the display name for each array item
         /// </summary>
-        /// <param name="groupTo"></param>
-        /// <param name="groupFrom"></param>
-        public void CopyValueFrom(IItemList groupFrom)
+        /// <param name="objectXml"></param>
+        void makeKeyFormat(XElement objectXml)
         {
-            if (!Type.ReferenceEquals(this, groupFrom))
+            string key = (string)objectXml.Attribute(Constants.Key);
+            _keyReplacements.Clear();
+
+            if (Count > 0)
             {
-                Clear();
-                foreach (var g in groupFrom)
+                if (key != null)
                 {
-                    var newOne = (IModel)Activator.CreateInstance(g.GetType(), g);
-                    Add(newOne);
+                    // scan for each child name starting with the largest
+                    foreach (var c in this.First().Items.Select(o => o.Name).OrderByDescending(o => o.Length))
+                    {
+                        if (key.Contains(c))
+                        {
+                            key = key.Replace(c, String.Format("{{{0}}}", _keyReplacements.Count));
+                            _keyReplacements.Add(c);
+                        }
+                    }
                 }
+                else if (this.First().Items.Count() > 0)
+                {
+                    key = "{0}";
+                    _keyReplacements.Add(this.First().Items.First().Name);
+                }
+                KeyFormat = key;
             }
         }
-
-
-        private void loadValues(System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

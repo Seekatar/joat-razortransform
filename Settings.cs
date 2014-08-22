@@ -20,7 +20,6 @@ namespace RazorTransform
     public class Settings 
     {
         private RazorTransform.Model.Model _settings;
-        // private TransformModelGroup _settingsGroup;
         private string _objectFile;
         private string _valuesFile;
 
@@ -37,9 +36,9 @@ namespace RazorTransform
                 result = _extras[name ];
                 return true;
             }
-            //if (_settings != null)
-                // TODO return TransformModelArrayItem.TryGetMemberFn(name, out result, null, _settings.Groups);
-            //else
+            if (_settings != null)
+                return RazorTransform.Model.Model.TryGetMemberFn(name, out result, null, _settings.Items);
+            else
                 return false;
         }
 
@@ -59,13 +58,11 @@ namespace RazorTransform
             // load the settings
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
             var config = new ModelConfig();
-            config.Load(this, objectRoot:settingsDefinition);
+            config.Load(this, false, settingsDefinition);
 
             _settings = new RazorTransform.Model.Model();
-
-            _settings.LoadFromXml(config.Root, config.ValuesRoot, overrideParms, config.RtValuesVersion);
-
-            // _settingsGroup = _settings.Groups[0];
+            RtValuesVersion = config.RtValuesVersion;
+            _settings.LoadFromXml(config.Root, config.ValuesRoot, overrideParms);
 
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -106,6 +103,9 @@ namespace RazorTransform
 
             Instance = this;
         }
+
+        // version number from file
+        public int RtValuesVersion { get; private set; }
 
         // for saving and editing
         public IModel Model { get { return _settings; } }

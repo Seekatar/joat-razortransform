@@ -20,7 +20,7 @@ namespace RazorTransform
     /// </summary>
     class RazorFileTransformer
     {
-        dynamic _model;
+        IModel _model;
 
         private int transformFiles(string inputMask, string outputFolder, bool saveFiles, bool recursive, CancellationToken cancel, IProgress<ProgressInfo> progress)
         {
@@ -244,10 +244,10 @@ namespace RazorTransform
                 // first do any values that have @Model in them
                 for (int i = 0; i < 5; i++) // allow 5 levels of nesting
                 {
-                    var model = new RazorTransform.Model.Model();
-                    foreach( var j in _model.Items)
-                        model.Items.Add(j);
-                    if (substituteValues(model, cancel, progress) == 0)
+                    //var model = new RazorTransform.Model.Model();
+                    //foreach( var j in _model.Items)
+                    //    model.Items.Add(j);
+                    if (substituteValues(_model, cancel, progress) == 0)
                         break;
                 }
             });

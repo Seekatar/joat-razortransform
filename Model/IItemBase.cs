@@ -23,8 +23,14 @@ namespace RazorTransform.Model
         /// <param name="xml">The model XML</param>
         /// <param name="values">The values XML to set on IItems in the model</param>
         /// <param name="overrides">Any override values to set</param>
-        /// <param name="rtValuesVersion">the version of the XML</param>
-        void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion);
+        void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides);
+
+        /// <summary>
+        /// load the values only from XML.  The object has already been loaded
+        /// </summary>
+        /// <param name="values">The values XML to set on IItems in the model</param>
+        /// <param name="overrides">Any override values to set</param>
+        void LoadValuesFromXml(XElement values, IDictionary<string, string> overrides);
 
         /// <summary>
         /// validate the model.
@@ -37,5 +43,6 @@ namespace RazorTransform.Model
         /// </summary>
         /// <param name="root">root element to add to</param>
         void GenerateXml(XElement root);
+
     }
 }

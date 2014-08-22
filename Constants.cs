@@ -9,9 +9,7 @@ namespace RazorTransform
     {
         Invalid,
         String,
-        Int16,
-        Int32,
-        Int64,
+        Int,
         Password,
         Folder,
         UncPath,
@@ -87,12 +85,9 @@ namespace RazorTransform
             {
                 case "string":
                     return RtType.String;
-                case "int16":
-                    return RtType.Int16;
-                case "int32":
-                    return RtType.Int32;
-                case "int64":
-                    return RtType.Int64;
+                case "int32": // older type
+                case "int":
+                    return RtType.Int;
                 case "password":
                     return RtType.Password;
                 case "folder":

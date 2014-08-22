@@ -33,7 +33,6 @@ namespace RazorTransform
         public Settings Settings { get { return _settings; } }
 
         IModel _model = new RazorTransform.Model.Model();
-        IModelConfig _modelConfig = new ModelConfig();
 
         /// <summary>
         /// load the settings, model and values from disk
@@ -54,10 +53,10 @@ namespace RazorTransform
 
                 _settings.Load(overrides);
 
-                bool ret = _modelConfig.Load(_settings);
+                bool ret = ModelConfig.Instance.Load(_settings);
                 if ( ret )
                 {
-                    _model.LoadFromXml(_modelConfig.Root, _modelConfig.ValuesRoot, overrides, _modelConfig.RtValuesVersion);
+                    _model.LoadFromXml(ModelConfig.Instance.Root, ModelConfig.Instance.ValuesRoot, overrides);
                 }
 
                 if (ret)

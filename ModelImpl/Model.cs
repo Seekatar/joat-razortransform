@@ -21,9 +21,19 @@ namespace RazorTransform.Model
         {
         }
 
-        public Model(IModel src)
+        public Model(IModel src, IModel parent = null)
         {
-            throw new NotImplementedException();
+            if (parent != null)
+                Parent = parent;
+            else
+                Parent = src.Parent;
+
+            foreach ( var i in src.Items )
+            {
+                // copy constructor, with parent
+                var newOne = (IItemBase)Activator.CreateInstance(i.GetType(), i, this);
+                Items.Add(newOne);
+            }
         }
 
         #region MyRegion
@@ -57,7 +67,7 @@ namespace RazorTransform.Model
         }
         #endregion
 
-        public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
+        public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides)
         {
             // get all the Items in the model
             var xmlGroups = xml.Elements(Constants.Group);
@@ -72,7 +82,7 @@ namespace RazorTransform.Model
                 if (xmlGroup.Attribute(Constants.ArrayValueName) != null && !String.IsNullOrEmpty(xmlGroup.Attribute(Constants.ArrayValueName).Value))
                 {
                     item = new ItemList(this, group);
-                    item.LoadFromXml(xmlGroup, values, overrides, rtValuesVersion);
+                    item.LoadFromXml(xmlGroup, values, overrides);
                     Items.Add(item);
                 }
                 else
@@ -80,7 +90,7 @@ namespace RazorTransform.Model
                     foreach (var xmlItem in xmlGroup.Elements(Constants.Item))
                     {
                         item = new Item(this, group);
-                        item.LoadFromXml(xmlItem, values, overrides, rtValuesVersion);
+                        item.LoadFromXml(xmlItem, values, overrides);
                         Items.Add(item);
                     }
                 }
@@ -150,7 +160,7 @@ namespace RazorTransform.Model
         #endregion
 
         #region DynamicObject Implementation
-        internal static bool TrySetMemberFn(SetMemberBinder binder, object value, List<IItemBase> items)
+        internal static bool TrySetMemberFn(SetMemberBinder binder, object value, IEnumerable<IItemBase> items)
         {
             var list = items.Where(p => p.Name == binder.Name);
             if (list != null)
@@ -166,12 +176,12 @@ namespace RazorTransform.Model
             return false;
         }
 
-        internal static bool TryGetMemberFn(GetMemberBinder binder, out object result, IModel model, List<IItemBase> items)
+        internal static bool TryGetMemberFn(GetMemberBinder binder, out object result, IModel model, IEnumerable<IItemBase> items)
         {
             return TryGetMemberFn(binder.Name, out result, model, items);
         }
 
-        internal static bool TryGetMemberFn(string name, out object result, IModel model, List<IItemBase> items)
+        internal static bool TryGetMemberFn(string name, out object result, IModel model, IEnumerable<IItemBase> items)
         {
             bool ret = false;
             result = null;
@@ -213,11 +223,7 @@ namespace RazorTransform.Model
 
                     if (item.Type == RtType.Bool)
                         result = item.GetValue<bool>();
-                    else if (item.Type == RtType.Int16)
-                        result = item.GetValue<Int16>();
-                    else if (item.Type == RtType.Int32)
-                        result = item.GetValue<Int32>();
-                    else if (item.Type == RtType.Int64)
+                    else if (item.Type == RtType.Int)
                         result = item.GetValue<Int64>();
                 }
                 else if (!(result is IItemList))

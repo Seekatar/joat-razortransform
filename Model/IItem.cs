@@ -13,8 +13,8 @@ namespace RazorTransform.Model
         string OriginalTypeStr { get; }
         string ExpandedValueStr { get; set; }
         string ValueStr { get; set; }
-        string MinStr { get; set; }
-        string MaxStr { get; set; }
+        Int64 Min { get; set; }
+        Int64 Max { get; set; }
         bool ReadOnly { get; set; }
         string Regex { get; set; }
         bool IsPassword { get; set; }

@@ -19,27 +19,38 @@ namespace RazorTransform.Model
             Group = group;
         }
 
+
+        public Item(Item src, IModel parent)
+        {
+            copyValuesFrom(src, parent:parent);
+        }
+
         public Item(Item src, IGroup group)
             : this(src, src.ValueStr, group)
         {
         }
 
         public Item(Item src, string value, IGroup group)
-            : this(src, group)
+        {
+            copyValuesFrom(src, value, group);
+        }
+
+        void copyValuesFrom( Item src, string value = null, IGroup group = null, IModel parent = null )
         {
             ValueStr = value ?? src.ValueStr;
             ExpandedValueStr = src.ExpandedValueStr;
+            Group = group ?? src.Group;
+            Parent = parent ?? src.Parent;
+
             DisplayName = src.DisplayName;
             Name = src.Name;
             Description = src.Description;
             Type = src.Type;
-            OriginalType = src.OriginalType;
-            Group = src.Group;
-            MinStr = src.MinStr;
-            MaxStr = src.MaxStr;
+            OriginalTypeStr = src.OriginalTypeStr;
+            Min = src.Min;
+            Max = src.Max;
             EnumName = src.EnumName;
             Regex = src.Regex;
-            Parent = src.Parent;
             IsPassword = src.IsPassword;
         }
 
@@ -61,11 +72,11 @@ namespace RazorTransform.Model
             set;
         }
 
-        public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
+        public void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
         {
             loadFromXml(xml);
 
-            SetItemValue(values, overrides, rtValuesVersion);
+            LoadValuesFromXml(values, overrides);
         }
 
         public string Name
@@ -89,13 +100,13 @@ namespace RazorTransform.Model
             set;
         }
 
-        public string MinStr
+        public Int64 Min
         {
             get;
             set;
         }
 
-        public string MaxStr
+        public Int64 Max
         {
             get;
             set;
@@ -133,7 +144,7 @@ namespace RazorTransform.Model
             set;
         }
 
-        public string OriginalType
+        public string OriginalTypeStr
         {
             get;
             private set;
@@ -177,11 +188,6 @@ namespace RazorTransform.Model
         public void Validate(ICollection<ValidationError> errors)
         {
             string value = (ValueStr ?? String.Empty).Trim();
-            Int64 min, max;
-            if (!Int64.TryParse(MinStr, out min))
-                min = Int64.MinValue;
-            if (!Int64.TryParse(MaxStr, out max))
-                max = Int64.MaxValue;
 
             switch (Type)
             {
@@ -190,29 +196,27 @@ namespace RazorTransform.Model
                     {
                         errors.Add(new ValidationError(String.Format(Resource.RegExViolation, DisplayName, Regex), Group));
                     }
-                    if (value.Length < min)
+                    if (value.Length < Min)
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, min), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, Min), Group));
                     }
-                    if (value.Length > max)
+                    if (value.Length > Max)
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, max), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, Max), Group));
                     }
                     break;
 
-                case RtType.Int16:
-                case RtType.Int32:
-                case RtType.Int64:
-                    Int32 v;
-                    if (Int32.TryParse(ValueStr, out v))
+                case RtType.Int:
+                    Int64 v;
+                    if (Int64.TryParse(ValueStr, out v))
                     {
-                        if (v < min)
+                        if (v < Min)
                         {
-                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, min), Group));
+                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, Min), Group));
                         }
-                        if (v > max)
+                        if (v > Max)
                         {
-                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, max), Group));
+                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, Max), Group));
                         }
                     }
                     else
@@ -241,7 +245,7 @@ namespace RazorTransform.Model
         #endregion
 
 
-        internal void SetItemValue(XElement values, IDictionary<string, string> overrides, int rtValuesVersion)
+        public void LoadValuesFromXml(XElement values, IDictionary<string, string> overrides)
         {
             if (overrides != null && overrides.ContainsKey(Name))
             {
@@ -250,7 +254,7 @@ namespace RazorTransform.Model
             else if (values != null)
             {
                 string v = null;
-                if (rtValuesVersion == 1)
+                if (Settings.Instance.RtValuesVersion == 1)
                 {
                     var childValues = values.Elements().Where(n =>
                     {
@@ -308,9 +312,9 @@ namespace RazorTransform.Model
 
             Description = (string)itemXml.Attribute(Constants.Description) ?? DisplayName;
 
-            OriginalType = (String)itemXml.Attribute(Constants.Type) ?? String.Empty;
+            OriginalTypeStr = (String)itemXml.Attribute(Constants.Type) ?? String.Empty;
 
-            Type = Constants.MapType(OriginalType);
+            Type = Constants.MapType(OriginalTypeStr);
 
             if (Type == RtType.HiddenString) // old files have hidden as type to indicate hidden string
             {
@@ -342,8 +346,9 @@ namespace RazorTransform.Model
             {
                 throw new Exception(String.Format(Resource.RegExNotFound, Regex));
             }
-            MinStr = (string)itemXml.Attribute(Constants.Min) ?? String.Empty;
-            MaxStr = (string)itemXml.Attribute(Constants.Max) ?? String.Empty;
+
+            Min = (Int64?)itemXml.Attribute(Constants.Min) ?? Int64.MinValue;
+            Max = (Int64?)itemXml.Attribute(Constants.Max) ?? Int64.MaxValue;
 
             setDefaultValue(itemXml);
 
@@ -389,12 +394,5 @@ namespace RazorTransform.Model
             }
             return sb.ToString();
         }
-
-
-        public string OriginalTypeStr
-        {
-            get { throw new NotImplementedException(); }
-        }
-
     }
 }

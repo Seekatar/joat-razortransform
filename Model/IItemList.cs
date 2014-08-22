@@ -50,7 +50,8 @@ namespace RazorTransform.Model
         /// <summary>
         /// copy the values from another object to this one
         /// </summary>
-        /// <param name="temp"></param>
-        void CopyValueFrom(IItemList temp);
+        /// <param name="src"></param>
+        /// <param name="parent"></param>
+        void CopyValueFrom(IItemList src, IModel parent = null);
     }
 }

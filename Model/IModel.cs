@@ -28,8 +28,7 @@ namespace RazorTransform.Model
         /// <param name="xml">The model XML</param>
         /// <param name="values">The values XML to set on IItems in the model</param>
         /// <param name="overrides">Any override values to set</param>
-        /// <param name="rtValuesVersion">the version of the XML</param>
-        void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides, int rtValuesVersion);
+        void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides);
 
         /// <summary>
         /// if the Items has an IItemList (there will be only one), return it

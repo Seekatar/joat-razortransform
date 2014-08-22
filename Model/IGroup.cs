@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
@@ -16,6 +17,6 @@ namespace RazorTransform.Model
 
         bool Hidden { get; set; }
 
-        void LoadFromXml(System.Xml.Linq.XElement xmlGroup);
+        void LoadFromXml(XElement xmlGroup);
     }
 }

@@ -289,11 +289,7 @@ namespace RazorTransform
                     return _Guid(item, binding, itemChanged);
                 case RtType.Bool: 
                     return _Bool(item, binding, itemChanged);
-                case RtType.Int16: 
-                    return _Int(item, binding, itemChanged);
-                case RtType.Int32:
-                    return _Int(item, binding, itemChanged);
-                case RtType.Int64:
+                case RtType.Int:
                     return _Int(item, binding, itemChanged);
                 case RtType.Password: 
                     return _Password(item, binding, itemChanged);
@@ -422,8 +418,8 @@ namespace RazorTransform
             if (ci.ReadOnly)
                 t.IsEnabled = false;
 
-            t.Minimum = Int64.Parse(ci.MinStr);
-            t.Maximum = Int64.Parse(ci.MaxStr);
+            t.Minimum = ci.Min;
+            t.Maximum = ci.Max;
 
             t.TextAlignment = TextAlignment.Left;
             t.Value = Int64.Parse(ci.ValueStr ?? "0");
