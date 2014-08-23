@@ -112,15 +112,15 @@ namespace RazorTransform
         async void del_Click(object sender, RoutedEventArgs e)
         {
             // find it in the list
-            var delMe = (sender as Control).Tag as IModel;
+            var delMe = (sender as Control).Tag as ArrayItem;
             if (delMe != null)
             {
-                var list = delMe.GetList();
+                var list = delMe.List;
 
                 if (list != null)
                 {
-                    list.Remove(delMe);
-                    ModelConfig.Instance.OnItemDeleted(new ItemChangedArgs() { List = list, Item = delMe });
+                    list.Remove(delMe.Model);
+                    ModelConfig.Instance.OnItemDeleted(new ItemChangedArgs() { List = list, Item = delMe.Model });
                     setDirty();
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
@@ -136,18 +136,15 @@ namespace RazorTransform
         void copy_Click(object sender, RoutedEventArgs e)
         {
             // find it in the list
-            var copyMe = (sender as Control).Tag as IModel;
+            var copyMe = (sender as Control).Tag as ArrayItem;
             if (copyMe != null)
             {
-                var list = copyMe.GetList();
-
-                if (list != null)
-                {
-                    var copy = new RazorTransform.Model.Model(copyMe,null);
-                    ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = copy });
-                    setDirty();
-                    reload();
-                }
+                var list = copyMe.List;
+                var copy = new RazorTransform.Model.Model(copyMe.Model,null);
+                list.Add(copy);
+                ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = copy });
+                setDirty();
+                reload();
             }
         }
 
@@ -158,17 +155,18 @@ namespace RazorTransform
         /// <param name="e"></param>
         async void edit_Click(object sender, RoutedEventArgs e)
         {
-            var existingOne = (sender as Control).Tag as IModel;
-            var list = existingOne.GetList();
-            if (list != null)
+            var existingOne = (sender as Control).Tag as ArrayItem;
+            if (existingOne != null)
             {
+                var list = existingOne.List;
+
                 // set the parent
-                if (editArrayItem(existingOne))
+                if (editArrayItem(existingOne.Model))
                 {
                     // delete & add for sorting
-                    list.Remove(existingOne);
-                    list.Add(existingOne);
-                    ModelConfig.Instance.OnItemChanged(new ItemChangedArgs() { List = list, Item = existingOne });
+                    list.Remove(existingOne.Model);
+                    list.Add(existingOne.Model);
+                    ModelConfig.Instance.OnItemChanged(new ItemChangedArgs() { List = list, Item = existingOne.Model });
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
                 }
@@ -178,9 +176,8 @@ namespace RazorTransform
         private async void add_Click(object sender, RoutedEventArgs e)
         {
             // create a new one from the prototype, set on the tag
-            var prototype = ((sender as Control).Tag as IModel);
-            var list = prototype.GetList();
-            var newOne = new RazorTransform.Model.Model(prototype,null);
+            var list = ((sender as Control).Tag as IItemList);
+            var newOne = new RazorTransform.Model.Model(list.Prototype,null);
             if (editArrayItem(newOne, true))
             {
                 // add it to the parent array

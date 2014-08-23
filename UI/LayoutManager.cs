@@ -130,18 +130,18 @@ namespace RazorTransform
         /// <summary>
         /// build a grid view for an array of items
         /// </summary>
-        /// <param name="parent"></param>
+        /// <param name="list"></param>
         /// <param name="addHandler"></param>
         /// <param name="editHandler"></param>
         /// <param name="deleteHandler"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(IItemList parent,
+        public static FrameworkElement BuildGridView(IItemList list,
             Action<object, RoutedEventArgs> addHandler,
             Action<object, RoutedEventArgs> editHandler,
             Action<object, RoutedEventArgs> deleteHandler,
             Action<object, RoutedEventArgs> copyHandler)
         {
-            var items = parent;
+            var items = list;
 
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
@@ -163,9 +163,9 @@ namespace RazorTransform
             // add a New button under the expander
             var add = new MyButton()
                 { 
-                    Content = String.Format( Resource.NewItem, parent.DisplayName ), 
+                    Content = String.Format( Resource.NewItem, list.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
-                    Tag = parent.Prototype,
+                    Tag = list,
                     Style = Application.Current.FindResource("ArrayNewImageButton") as Style
                 };
             var bitmap = new System.Windows.Media.Imaging.BitmapImage();
@@ -173,7 +173,7 @@ namespace RazorTransform
             bitmap.UriSource = new Uri( @"..\Resources\create.png", UriKind.Relative);
             bitmap.EndInit();
             add.Content = new Image() { Source = bitmap };
-            add.ToolTip = "Add a new item of type "+parent.DisplayName;
+            add.ToolTip = "Add a new item of type "+list.DisplayName;
             add.HorizontalAlignment = HorizontalAlignment.Left;
             add.Click += (sender, args) =>
                 {
@@ -186,7 +186,7 @@ namespace RazorTransform
             p.Children.Add(add);
             var description = new TextBlock()
             {
-                Text = parent.Description,
+                Text = list.Description,
                 Style = Application.Current.FindResource("addDescText") as Style
             };
             p.Children.Add(description);
@@ -196,20 +196,20 @@ namespace RazorTransform
             bool nameSet = false;
             foreach (var c in items)
             {
-                var l = new MyLabel() { Tag = c };
+                var l = new MyLabel() { Tag = new ArrayItem(list, c) };
                 if (!nameSet)
                 {
                     nameSet = true;
-                    l.Content = parent.DisplayName;
+                    l.Content = list.ModelKeyName(c);
                 }
 
-                l.ToolTip = parent.Description;
+                l.ToolTip = list.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
                 l.Style = Application.Current.FindResource("CfgLabel") as Style;
 
 
-                var t = new EditItemBox(parent.Count > parent.Min);
+                var t = new EditItemBox(list.Count > list.Min);
                 t.EditClicked += (sender, args) =>
                 {
                     editHandler(sender, args);
@@ -241,9 +241,9 @@ namespace RazorTransform
                         }
                     };
 
-                t.Tag = c;
-                t.ItemName = parent.DisplayName;
-                t.ToolTip = parent.Description;
+                t.Tag = new ArrayItem(list, c);
+                t.ItemName = list.DisplayName;
+                t.ToolTip = list.Description;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
                 t.Style = Application.Current.FindResource("CfgText") as Style;
@@ -251,7 +251,6 @@ namespace RazorTransform
 
                 if ((i & 1) == 0)
 				{
-
                     var gb = GetAltBrush();
 
                     Rectangle re = new Rectangle();

@@ -9,7 +9,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBox Grid.Column="0" Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=btnEdit}" Text="{Binding ItemName, ElementName=root}"  IsReadOnly="True" />
+        <TextBox Grid.Column="0" Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=btnEdit}" Text="{Binding ItemName, ElementName=root}"  IsEnabled="False" IsReadOnly="True" />
         <DockPanel Grid.Column="1">
         <my:MyButton x:Name="btnCopy" Style="{StaticResource ArrayImageButton}" DockPanel.Dock="Right"  ToolTip="Copy the item" Click="btnCopy_Click">
                 <Image Source="..\resources\copy.png"/>
