@@ -161,12 +161,13 @@ namespace RazorTransform
                 var list = existingOne.List;
 
                 // set the parent
-                if (editArrayItem(existingOne.Model))
+                var editedModel = editArrayItem(existingOne.Model);
+                if (editedModel != null)
                 {
                     // delete & add for sorting
                     list.Remove(existingOne.Model);
-                    list.Add(existingOne.Model);
-                    ModelConfig.Instance.OnItemChanged(new ItemChangedArgs() { List = list, Item = existingOne.Model });
+                    list.Add(editedModel);
+                    ModelConfig.Instance.OnItemChanged(new ItemChangedArgs() { List = list, Item = editedModel });
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
                 }
@@ -178,11 +179,12 @@ namespace RazorTransform
             // create a new one from the prototype, set on the tag
             var list = ((sender as Control).Tag as IItemList);
             var newOne = new RazorTransform.Model.Model(list.Prototype,null);
-            if (editArrayItem(newOne, true))
+            var editedModel = editArrayItem(newOne, true);
+            if (editedModel != null)
             {
                 // add it to the parent array
                 list.Add(newOne);
-                ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = newOne });
+                ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = editedModel });
                 setDirty();
                 await RazorTransformer.Instance.RefreshModelAsync(false, true);
                 reload();
@@ -195,16 +197,16 @@ namespace RazorTransform
         /// edit an array, copying it during the edit in case of cancel
         /// </summary>
         /// <param name="orig"></param>
-        /// <returns></returns>
-        bool editArrayItem(IModel orig, bool isAdd = false)
+        /// <returns>edited Model, or null if no changes</returns>
+        IModel editArrayItem(IModel orig, bool isAdd = false)
         {
             var nve = new ArrayItemEdit();
             nve.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             nve.TrySetOwner(Window.GetWindow(this));
-            bool ret = nve.ShowDialog(orig, Settings.Instance.ShowHidden, isAdd );
-            if (ret)
+            var temp = nve.ShowDialog(orig, Settings.Instance.ShowHidden, isAdd );
+            if (temp != null )
                 setDirty();
-            return ret;
+            return temp;
         }
 
         private void reload()

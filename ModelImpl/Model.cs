@@ -31,9 +31,9 @@ namespace RazorTransform.Model
         /// </summary>
         /// <param name="src"></param>
         /// <param name="parent"></param>
-        public Model(IModel src, IModel parent )
+        public Model(IModel src, IModel parent)
         {
-            CopyValuesFrom(src);
+            deepCopy(src);
             if (parent != null)
                 Parent = parent;
             else
@@ -74,11 +74,12 @@ namespace RazorTransform.Model
         /// copy all the values from an existing item
         /// </summary>
         /// <param name="temp"></param>
-        public void CopyValuesFrom(IModel src)
+        void deepCopy(IModel src)
         {
-            if ( !Object.ReferenceEquals( this, src ) )
+            if (!Object.ReferenceEquals(this, src))
             {
                 Parent = src.Parent;
+                Items.Clear();
 
                 foreach (var i in src.Items)
                 {
@@ -93,6 +94,22 @@ namespace RazorTransform.Model
         {
             // get all the Items in the model
             var xmlGroups = xml.Elements(Constants.Group);
+            var xmlUngroupedItems = xml.Elements(Constants.Item);
+
+            if (xmlUngroupedItems.Any())
+            {
+                // fake out a group based on parent
+                IGroup dummy = new Group();
+                dummy.LoadFromXml(xml);
+                var groupList = xmlGroups.ToList();
+                var dummyXml = new XElement(Constants.Group,
+                                        new XAttribute(Constants.Name, dummy.DisplayName),
+                                        new XAttribute(Constants.Hidden, dummy.Hidden),
+                                        new XAttribute(Constants.Description, dummy.Description));
+                dummyXml.Add(xmlUngroupedItems);
+                groupList.Insert(0, dummyXml);
+                xmlGroups = groupList;
+            }
 
             foreach (var xmlGroup in xmlGroups)
             {
@@ -117,10 +134,6 @@ namespace RazorTransform.Model
                     }
                 }
             }
-
-            // get all the ItemLists in the model
-            var lists = xml.Elements(Constants.Group).Where(o => o.Attribute(Constants.ArrayValueName) != null && !String.IsNullOrEmpty(o.Attribute(Constants.ArrayValueName).Value));
-
         }
 
         /// <summary>
@@ -214,8 +227,7 @@ namespace RazorTransform.Model
                 result = model.Root;
                 return true;
             }
-
-            if (name == Constants.Parent)
+            else if (name == Constants.Parent)
             {
                 if (model.Parent != null)
                     result = model.Parent;
@@ -223,18 +235,16 @@ namespace RazorTransform.Model
                     result = model;
                 return true;
             }
+            else if ( name == Constants.CurrentSettings)
+            {
+                result = Settings.Instance;
+                return true;
+            }
 
             // find in all the items with this name
-            var list = items.Where(p => p.Name == name && p is Item).FirstOrDefault();
-            var arrays = items.Where(p => p.Name == name && p is ItemList);
-            if (arrays != null && arrays.Count() > 0)
+            result = items.FirstOrDefault(p => p.Name == name);
+            if (result != null)
             {
-                ret = true;
-                result = arrays;
-            }
-            else if (list != null )
-            {
-                result = list;
                 ret = true;
                 if (result is IItem)
                 {

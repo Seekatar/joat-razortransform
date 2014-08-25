@@ -23,7 +23,7 @@ namespace RazorTransform
 
         public static RazorTransformer Instance { get { return _instance; } }
 
-        public RazorTransformer() { _instance = this;  }
+        public RazorTransformer() { _instance = this; }
 
         Settings _settings = new Settings();
         ITransformOutput _output = null;
@@ -54,7 +54,7 @@ namespace RazorTransform
                 _settings.Load(overrides);
 
                 bool ret = ModelConfig.Instance.Load(_settings);
-                if ( ret )
+                if (ret)
                 {
                     _model.LoadFromXml(ModelConfig.Instance.Root, ModelConfig.Instance.ValuesRoot, overrides);
                 }
@@ -158,7 +158,7 @@ namespace RazorTransform
         /// <returns></returns>
         internal async Task<object> SaveAsync(bool validateModel = true, bool dirty = true)
         {
-            if (!_settings.Test && !_settings.NoSave && _model.Items.Any() )
+            if (!_settings.Test && !_settings.NoSave && _model.Items.Any())
             {
                 // add destinationFolder to the model since we sneak it in for transforms.  That way if someone needs it
                 // after the transform, it's there.
@@ -209,10 +209,10 @@ namespace RazorTransform
             {
                 var errors = new List<ValidationError>();
                 _model.Validate(errors);
-                if ( errors.Any())
+                if (errors.Any())
                 {
                     var sb = new StringBuilder();
-                    foreach( var e in errors)
+                    foreach (var e in errors)
                     {
                         sb.AppendLine(e.ToString());
                     }
@@ -235,6 +235,10 @@ namespace RazorTransform
                     try
                     {
                         await rf.SubstituteValuesAsync(_cts.Token, Settings.Run ? null : _output);  // don't show substitute progress if running w/o UI
+                    }
+                    catch (Exception e)
+                    {
+                        Output.ShowMessage("Error updating values", MessageBoxButton.OK, MessageBoxImage.Error, e.Message);
                     }
                     finally
                     {

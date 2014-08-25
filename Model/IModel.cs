@@ -47,10 +47,5 @@ namespace RazorTransform.Model
         /// </summary>
         void GenerateXml(XElement root);
 
-        /// <summary>
-        /// copy all the values from an existing item
-        /// </summary>
-        /// <param name="src"></param>
-        void CopyValuesFrom(IModel src);
     }
 }

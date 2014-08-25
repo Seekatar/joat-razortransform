@@ -200,7 +200,7 @@ namespace RazorTransform
                 if (!nameSet)
                 {
                     nameSet = true;
-                    l.Content = list.ModelKeyName(c);
+                    l.Content = list.DisplayName;
                 }
 
                 l.ToolTip = list.Description;
@@ -242,8 +242,9 @@ namespace RazorTransform
                     };
 
                 t.Tag = new ArrayItem(list, c);
-                t.ItemName = list.DisplayName;
-                t.ToolTip = list.Description;
+                string rawKeyName;
+                t.ItemName = list.ModelKeyName(c,out rawKeyName);
+                t.ToolTip = rawKeyName;
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
                 t.Style = Application.Current.FindResource("CfgText") as Style;

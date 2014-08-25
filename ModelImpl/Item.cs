@@ -8,6 +8,9 @@ using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
+    /// <summary>
+    /// implementation of IItem
+    /// </summary>
     internal class Item : IItem
     {
         List<string> _visibilityGroups = new List<string>();
@@ -22,7 +25,7 @@ namespace RazorTransform.Model
 
         public Item(Item src, IModel parent)
         {
-            copyValuesFrom(src, parent:parent);
+            deepCopy(src, parent:parent);
         }
 
         public Item(Item src, IGroup group)
@@ -32,10 +35,10 @@ namespace RazorTransform.Model
 
         public Item(Item src, string value, IGroup group)
         {
-            copyValuesFrom(src, value, group);
+            deepCopy(src, value, group);
         }
 
-        void copyValuesFrom( Item src, string value = null, IGroup group = null, IModel parent = null )
+        void deepCopy( Item src, string value = null, IGroup group = null, IModel parent = null )
         {
             Value = value ?? src.Value;
             ExpandedValue = src.ExpandedValue;

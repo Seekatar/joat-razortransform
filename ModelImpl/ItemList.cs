@@ -16,23 +16,10 @@ namespace RazorTransform.Model
         private List<string> _keyReplacements = new List<string>();
         private List<IModel> _models = new List<IModel>();
 
-        public ItemList(IItemList src, Model parent = null)
+        public ItemList(ItemList src, Model parent = null)
         {
-            Name = src.Name;
-            Prototype = src.Prototype;
-            Group = src.Group;
-            KeyFormat = src.KeyFormat;
-            Sort = src.Sort;
-            Group = src.Group;
-            Unique = src.Unique;
-            Min = src.Min;
-            Max = src.Max;
-            Hidden = src.Hidden;
-            VisibilityGroups = src.VisibilityGroups;
 
-            Parent = parent ?? src.Parent;
-            
-            CopyValuesFrom(src, parent);
+            deepCopy(src, parent);
         }
 
         public ItemList(IModel parent, IGroup group)
@@ -104,7 +91,7 @@ namespace RazorTransform.Model
 
         public string DisplayName
         {
-            get { return Group != null ? Group.DisplayName: String.Empty; }
+            get { return Group != null ? Group.DisplayName : String.Empty; }
             set { }
         }
 
@@ -123,16 +110,32 @@ namespace RazorTransform.Model
         #endregion
 
         #region IItemList methods
+
+
         /// <summary>
         /// Make the key name for a given model
         /// </summary>
         /// <param name="model">the model that is part of the list</param>
-        /// <returns>the display name for the UI, or &lt;Unknown&gt; if an error occurred</returns>
+        /// <returns>the display name for the UI with any @Model values expanded, or &lt;Unknown&gt; if an error occurred</returns>
         public string ModelKeyName(IModel model)
         {
-            var s = "<unknown>";
+            string unused;
+            return ModelKeyName(model, out unused);
+        }
+
+        /// <summary>
+        /// Make the key name for a given model
+        /// </summary>
+        /// <param name="model">the model that is part of the list</param>
+        /// <param name="name">out parameter of the the raw key, with any @Model values in it</param>
+        /// <returns>the display name for the UI with any @Model values expanded, or &lt;Unknown&gt; if an error occurred</returns>
+        public string ModelKeyName(IModel model, out string name)
+        {
+            var s = name = "<unknown>";
 
             var values = new string[_keyReplacements.Count];
+            var expandedValues = new string[_keyReplacements.Count];
+
             int j = 0;
             foreach (var k in _keyReplacements)
             {
@@ -143,9 +146,11 @@ namespace RazorTransform.Model
                 else
                 {
                     if (String.IsNullOrEmpty(i.ExpandedValue))
-                        values[j++] = i.Value;
+                        expandedValues[j] = i.Value;
                     else
-                        values[j++] = i.ExpandedValue;
+                        expandedValues[j] = i.ExpandedValue;
+
+                    values[j++] = i.Value;
                 }
             }
 
@@ -156,7 +161,8 @@ namespace RazorTransform.Model
                 for (int i = 0; i < values.Count(); i++)
                     KeyFormat += String.Format("{{{0}}}", i);
             }
-            s = String.Format(KeyFormat, values);
+            name = String.Format(KeyFormat, values);
+            s = String.Format(KeyFormat, expandedValues);
 
             return s;
         }
@@ -194,15 +200,20 @@ namespace RazorTransform.Model
         /// <param name="root"></param>
         public void GenerateXml(XElement root)
         {
-            var x = new XElement(Name);
-            root.Add(x);
-            foreach( var m in this )
+            foreach (var m in this)
             {
-                m.GenerateXml(root);
+                var x = new XElement(Name);
+                root.Add(x);
+                m.GenerateXml(x);
             }
         }
 
-
+        /// <summary>
+        /// load the list from Xml
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="values"></param>
+        /// <param name="overrides"></param>
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides)
         {
             // load the arrray meta data
@@ -210,8 +221,8 @@ namespace RazorTransform.Model
             KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
 
             // enforce reasonable range
-            Min = Math.Min(0,(Int64?)xml.Attribute(Constants.Min) ?? 0);
-            Max = Math.Max(Int16.MaxValue,(Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
+            Min = Math.Min(0, (Int64?)xml.Attribute(Constants.Min) ?? 0);
+            Max = Math.Max(Int16.MaxValue, (Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
 
             Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
             var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
@@ -275,13 +286,28 @@ namespace RazorTransform.Model
         /// <summary>
         /// deep copy the array
         /// </summary>
-        /// <param name="fromList"></param>
-        public void CopyValuesFrom(IItemList fromList, IModel parent = null)
+        /// <param name="src"></param>
+        public void deepCopy(ItemList src, IModel parent = null)
         {
-            if (!Type.ReferenceEquals(this, fromList))
+            Name = src.Name;
+            Prototype = src.Prototype;
+            Group = src.Group;
+            _keyReplacements = new List<string>(src._keyReplacements);
+            _models = new List<IModel>(src._models);
+            KeyFormat = src.KeyFormat;
+            Sort = src.Sort;
+            Group = src.Group;
+            Unique = src.Unique;
+            Min = src.Min;
+            Max = src.Max;
+            Hidden = src.Hidden;
+            VisibilityGroups = src.VisibilityGroups;
+            Parent = parent ?? src.Parent;
+
+            if (!Type.ReferenceEquals(this, src))
             {
                 Clear();
-                foreach (var g in fromList)
+                foreach (var g in src)
                 {
                     var newOne = (IModel)Activator.CreateInstance(g.GetType(), g, parent);
                     Add(newOne);
@@ -378,6 +404,30 @@ namespace RazorTransform.Model
         }
         #endregion
 
+        #region DynamicObject overrides
+        /// <summary>
+        /// override to get properties if dynamic.
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public override bool TryGetMember(System.Dynamic.GetMemberBinder binder, out object result)
+        {
+            var ret = base.TryGetMember(binder, out result);
+            if (!ret)
+            {
+                var prop = this.GetType().GetProperty(binder.Name);
+                if (prop != null)
+                {
+                    result = prop.GetValue(this);
+                    ret = true;
+                }
+            }
+            return ret;
+        }
+        #endregion
+
+
         /// <summary>
         /// read the Xml to figure out how to build the display name for each array item
         /// </summary>
@@ -387,12 +437,12 @@ namespace RazorTransform.Model
             string key = (string)objectXml.Attribute(Constants.Key);
             _keyReplacements.Clear();
 
-            if (Count > 0)
+            if (Prototype.Items.Count > 0)
             {
                 if (key != null)
                 {
                     // scan for each child name starting with the largest
-                    foreach (var c in this.First().Items.Select(o => o.Name).OrderByDescending(o => o.Length))
+                    foreach (var c in Prototype.Items.Select(o => o.Name).OrderByDescending(o => o.Length))
                     {
                         if (key.Contains(c))
                         {
@@ -401,13 +451,14 @@ namespace RazorTransform.Model
                         }
                     }
                 }
-                else if (this.First().Items.Count() > 0)
+                else if (Prototype.Items.Count() > 0)
                 {
                     key = "{0}";
-                    _keyReplacements.Add(this.First().Items.First().Name);
+                    _keyReplacements.Add(Prototype.Items.First().Name);
                 }
                 KeyFormat = key;
             }
         }
+
     }
 }

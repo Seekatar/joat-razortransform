@@ -18,19 +18,19 @@ namespace RazorTransform
         /// show the dialog for editing the item
         /// </summary>
         /// <param name="info"></param>
-        /// <returns>true if the item was saved</returns>
-        public bool ShowDialog( IModel orig, bool showHidden, bool isAdd = false )
+        /// <returns>updated model if the item was saved, null if not</returns>
+        public IModel ShowDialog( IModel orig, bool showHidden, bool isAdd = false )
         {
-            var temp = new RazorTransform.Model.Model(orig,null);
+            // if add, no need to copy it
+            var temp = isAdd ? orig : new RazorTransform.Model.Model(orig,null);
             Load(temp, showHidden);
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((ShowDialog() ?? false) )
             {
-                if ( nvEdit.Dirty)
-                    orig.CopyValuesFrom(temp);
-                return isAdd || nvEdit.Dirty;
+                if ( isAdd || nvEdit.Dirty )
+                    return temp;
             }
-            return false;
+            return null;
 
         }
 

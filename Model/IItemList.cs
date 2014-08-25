@@ -33,14 +33,15 @@ namespace RazorTransform.Model
         /// Make the key name for a given model
         /// </summary>
         /// <param name="model">the model that is part of the list</param>
-        /// <returns>the display name for the UI, or &lt;Unknown&gt; if an error occurred</returns>
+        /// <returns>the display name for the UI with any @Model values expanded, or &lt;Unknown&gt; if an error occurred</returns>
         string ModelKeyName(IModel model);
 
         /// <summary>
-        /// copy the values from another object to this one
+        /// Make the key name for a given model
         /// </summary>
-        /// <param name="src"></param>
-        /// <param name="parent"></param>
-        void CopyValuesFrom(IItemList src, IModel parent = null);
+        /// <param name="model">the model that is part of the list</param>
+        /// <param name="name">out parameter of the the raw key, with any @Model values in it</param>
+        /// <returns>the display name for the UI with any @Model values expanded, or &lt;Unknown&gt; if an error occurred</returns>
+        string ModelKeyName(IModel model, out string name);
     }
 }

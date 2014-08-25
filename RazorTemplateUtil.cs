@@ -104,6 +104,11 @@ namespace RazorTransform
                 errorMessage = BuildTemplateError(t.Errors, t.SourceCode);
                 return null;
             }
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException r )
+            {
+                errorMessage = r.Message;
+                return null;
+            }
             catch (Exception ex)
             {
 

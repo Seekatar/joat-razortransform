@@ -11,7 +11,8 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.0.0.10 Another nested fix
+    <releaseNotes>2.1.0.0 Rewrite of internal model.  Label type added
+2.0.0.10 Another nested fix
 2.0.0.9 Fix for nested @Model.Parent values not expanding correctly
 2.0.0.8 Always put in orig attribute for easier RtValues parsing
 2.0.0.6 nuget dependency update
