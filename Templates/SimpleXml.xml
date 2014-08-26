@@ -6,7 +6,7 @@ This is a simple XML tranformation showing how to use Razor
   <Node name="@Model.stringA2" />
   <SomethingElse>
     <More>
-      <@Model.enumD1 value="true"/>
+      <@Model.enumS2 value="true"/>
     </More>
   </SomethingElse>
 </root>

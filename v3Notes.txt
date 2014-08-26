@@ -1,0 +1,60 @@
+V3 Refactoring notes
+
+*Bugs
+If RtValues passed in not found, it will read on that exists with rtobject!  Even in old code
+Settings doesn't show override output folder, title bar does
+
+*ToDo
+Settings needs to keep its own ModelConfig.  Need to be attached to root.  IRootModel?  Customs loaded once, from both Settings, & main file
+Calling Instance.On*?  Shouldn't be in model
+VariableItems has MSI specific names
+Unittest for transforms
+@Model examples in sample
+Add "Saved" indicator or disable if not dirty?
+
+*New Features
+VisiblityGroups
+Search and replace, already have recursive find
+Add double support
+Nested Groups/Models for RtThySelf
+Support setting arrays using keys 
+Right click an item to copy @Model value to clipboard
+
+*Doc changes
+Label
+Numbers now all Int64 internally, use limits to restrict
+
+*Resolved
+no -- Do I need CopyValuesFrom in iface?
+nah, label is good -- Add "helptext" type that just shows text in multiple line control  Html??
+fixed -- When can we set IsPassword??
+fixed -- (old version would not get error at all, now show it)  If get exception in expansion, exits app. e.g. Set @Model.junk on something, when refreshes, 
+	exits instead of just showing message. 
+	Shouldn't show the message on refresh anyway?  Old exe doesn't
+No, it shows error and stops loading XML, like any other XML error -- When loading Min/Max if attr has bad value, does it blow up?
+fixed -- Model.CurrentSettings not getting set
+
+*New Model
+IModel
+	has Items <IItemBase>
+	has Parent <IModel>
+
+IItemBase
+	has Parent <IModel>, Name, Desc, IGroup
+	IItem
+		has Value, ExpandedValue
+	IItemList
+		has Key, Sort (enum), Unique
+		Implements IList<Model>, 
+
+IGroup
+	has Name, Desc, Visibility
+
+Old names -> new names
+TransformModel -> ModelConfig (Enums, Regexes, etc) and IModel Model
+TransformModelItem -> IItem, Item
+TransformModelArray -> IItemList, ItemList
+	ItemList has array of Models
+	ItemList knows how to make display name for the Model
+PropertyName -> Name
+

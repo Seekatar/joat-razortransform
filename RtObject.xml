@@ -2,7 +2,7 @@
 <RtObject>
   <group name="Hello" description="Welcome to Artie" hidden="false">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
-    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" />
+    <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" /> 
     <item name="w3" displayName="Go!" description="Welcome String3" defaultValue="Click the play button to transform these values into output" type="Label" />
     <item name="w4" displayName="Where?" description="Welcome String4" defaultValue="&lt;user&gt;\LocalAppData\RazorTransform has these sample files" type="Label" />
     <item name="w5" displayName="Output?" description="Welcome String5" defaultValue="After running, output is in the folder shown in the title bar" type="Label" />

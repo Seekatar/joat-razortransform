@@ -1,3 +1,4 @@
 ﻿The version is @Model.version4 and short version is @Model.version2
 @* This will launch explorer in the output folder *@
+@{System.Windows.MessageBox.Show("This is from a transform!  Click ok and it will open the output folder", "Artie", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);}
 @{System.Diagnostics.Process.Start(Model.CurrentSettings.OutputFolder);}

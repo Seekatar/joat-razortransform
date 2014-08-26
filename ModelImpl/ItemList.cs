@@ -221,8 +221,8 @@ namespace RazorTransform.Model
             KeyFormat = (string)xml.Attribute(Constants.Key) ?? String.Empty;
 
             // enforce reasonable range
-            Min = Math.Min(0, (Int64?)xml.Attribute(Constants.Min) ?? 0);
-            Max = Math.Max(Int16.MaxValue, (Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
+            Min = Math.Max(0, (Int64?)xml.Attribute(Constants.Min) ?? 0);
+            Max = Math.Min(Int16.MaxValue, (Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
 
             Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
             var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();

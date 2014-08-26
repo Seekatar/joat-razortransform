@@ -286,11 +286,8 @@
     <Resource Include="Resources\PlayClose.png" />
     <Resource Include="Resources\Apply.png" />
     <Content Include="RtObject.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="RtValues.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\zBasic.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
