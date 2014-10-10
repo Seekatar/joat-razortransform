@@ -289,6 +289,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Templates\ZReflection.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Templates\ArrayIndex.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\zBasic.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

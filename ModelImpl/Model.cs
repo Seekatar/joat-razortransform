@@ -193,6 +193,11 @@ namespace RazorTransform.Model
         {
             return TryGetMemberFn(binder, out result, this, _items);
         }
+
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return _items.Select(o => o.Name);
+        }
         #endregion
 
         #region DynamicObject Implementation

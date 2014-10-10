@@ -129,7 +129,7 @@ namespace RazorTransform
 
         private int substituteValues(IModel model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null)
         {
-            Regex r = new Regex(@"@\({0,1}Model\.[\w\.]+\){0,1}");
+            Regex r = new Regex(@"@\({0,1}Model\.[""\w\[\]\.]+\){0,1}");
 
             int max = Math.Max(1, model.Items.Count);
             int changeCount = 0;
@@ -164,43 +164,44 @@ namespace RazorTransform
                     else if ( g is IItem )
                     {
                         var i = g as IItem;
+                        
+                        var subst = i.Value != null ? i.Value : String.Empty;
+
+                        var matches = r.Matches(subst);
+                        if (matches.Count > 0)
                         {
-                            var subst = i.Value != null ? i.Value : String.Empty;
-
-                            var matches = r.Matches(subst);
-                            if (matches.Count > 0)
+                            foreach (Match match in r.Matches(subst))
                             {
-                                foreach (Match match in r.Matches(subst))
-                                {
-                                    string errorMessage = null;
+                                string errorMessage = null;
 
-                                    string result = null;
+                                string result = null;
+                                lock (_substituteMapping)
+                                {
+                                    if (_substituteMapping.ContainsKey(match.Value))
+                                        result = _substituteMapping[match.Value];
+                                }
+                                if (result == null)
+                                {
+                                    result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage, match.Value);
+                                    if (!String.IsNullOrEmpty(errorMessage))
+                                    {
+                                        throw new Exception(errorMessage);
+                                    }
                                     lock (_substituteMapping)
                                     {
-                                        if (_substituteMapping.ContainsKey(match.Value))
-                                            result = _substituteMapping[match.Value];
+                                        if (match.Value.Contains(".Root.") || depth == 0)
+                                            _substituteMapping[match.Value] = result;
                                     }
-                                    if (result == null)
-                                    {
-                                        result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage, match.Value);
-                                        if (!String.IsNullOrEmpty(errorMessage))
-                                        {
-                                            throw new Exception(errorMessage);
-                                        }
-                                        lock (_substituteMapping)
-                                        {
-                                            if (match.Value.Contains(".Root.") || depth == 0)
-                                                _substituteMapping[match.Value] = result;
-                                        }
-                                    }
-                                    if (result != null)
-                                        subst = subst.Replace(match.Value, result);
-
                                 }
-                                i.ExpandedValue = subst;
-                            }
+                                if (result != null)
+                                    subst = subst.Replace(match.Value, result);
 
+                            }
+                            i.ExpandedValue = subst;
                         }
+                        else
+                            i.ExpandedValue = i.Value;
+
                     }
                     Interlocked.Increment(ref count);
                 }

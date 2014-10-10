@@ -285,7 +285,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must have at least {1} items.
+        ///   Looks up a localized string similar to &quot;{0}&quot; has {2} items, but must have no more than {1}..
         /// </summary>
         internal static string MaxCount {
             get {
@@ -294,7 +294,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must be less than {1}.
+        ///   Looks up a localized string similar to &quot;{0}&quot; is {2} but must be less than {1}..
         /// </summary>
         internal static string MaxInt {
             get {
@@ -303,7 +303,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} can contain no more than {1} characters .
+        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{3}&quot; must contain no more than {1} characters, but has {2}..
         /// </summary>
         internal static string MaxStrLen {
             get {
@@ -312,7 +312,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must have at least {1} items.
+        ///   Looks up a localized string similar to &quot;{0}&quot; has {2} items, but must have at least {1}..
         /// </summary>
         internal static string MinCount {
             get {
@@ -321,7 +321,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must be greater than {1}.
+        ///   Looks up a localized string similar to &quot;{0}&quot; is {2} but must be greater than {1}. .
         /// </summary>
         internal static string MinInt {
             get {
@@ -330,7 +330,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} must have at least {1} characters long.
+        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{3}&quot; must contain at least {1} characters, but has {2}..
         /// </summary>
         internal static string MinStrLen {
             get {
@@ -385,7 +385,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to String &quot;{0}&quot; does not match pattern &quot;{1}&quot;.
+        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{2}&quot; does not match pattern &quot;{1}&quot;.
         /// </summary>
         internal static string RegExViolation {
             get {

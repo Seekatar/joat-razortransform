@@ -3,6 +3,9 @@ V3 Refactoring notes
 *Bugs
 If RtValues passed in not found, it will read on that exists with rtobject!  Even in old code
 Settings doesn't show override output folder, title bar does
+If default directory doesn't have a Templates folder, then doesn't find anything and quickly exits.  Should warn if no templates found
+Numbers can't use @Model TEMP changed to use _Default control
+If have validation violation, can never save.  Should prompt to allow saving.
 
 *ToDo
 Settings needs to keep its own ModelConfig.  Need to be attached to root.  IRootModel?  Customs loaded once, from both Settings, & main file
@@ -10,19 +13,21 @@ Calling Instance.On*?  Shouldn't be in model
 VariableItems has MSI specific names
 Unittest for transforms
 @Model examples in sample
-Add "Saved" indicator or disable if not dirty?
+Add "Saved" & "Refreshed" indicator/toast or disable if not dirty?
+Test command line index override
 
 *New Features
 VisiblityGroups
 Search and replace, already have recursive find
 Add double support
 Nested Groups/Models for RtThySelf
-Support setting arrays using keys 
 Right click an item to copy @Model value to clipboard
 
 *Doc changes
 Label
 Numbers now all Int64 internally, use limits to restrict
+Overriding index on command line
+@Model with index 
 
 *Resolved
 no -- Do I need CopyValuesFrom in iface?
@@ -33,6 +38,9 @@ fixed -- (old version would not get error at all, now show it)  If get exception
 	Shouldn't show the message on refresh anyway?  Old exe doesn't
 No, it shows error and stops loading XML, like any other XML error -- When loading Min/Max if attr has bad value, does it blow up?
 fixed -- Model.CurrentSettings not getting set
+Done -- Support setting arrays using keys 
+fixed -- Indexing into array works, but @Model.Array[0].name doesn't work right.
+fixed -- Length of string needs to be enforced for value, not orig, e.g. "@Model.test"
 
 *New Model
 IModel

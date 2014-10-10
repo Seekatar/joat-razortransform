@@ -175,11 +175,11 @@ namespace RazorTransform.Model
         {
             if (Count < Min)
             {
-                errors.Add(new ValidationError(String.Format(Resource.MinCount, DisplayName, Min), Group));
+                errors.Add(new ValidationError(String.Format(Resource.MinCount, DisplayName, Min, Count), Group));
             }
             else if (Count > Max)
             {
-                errors.Add(new ValidationError(string.Format(Resource.MaxCount, DisplayName, Max), Group));
+                errors.Add(new ValidationError(string.Format(Resource.MaxCount, DisplayName, Max,Count), Group));
             }
             if (Unique)
             {
@@ -421,6 +421,39 @@ namespace RazorTransform.Model
                 {
                     result = prop.GetValue(this);
                     ret = true;
+                }
+            }
+            return ret;
+        }
+
+        public override bool TryGetIndex(System.Dynamic.GetIndexBinder binder, object[] indexes, out object result)
+        {
+            bool ret = false;
+            result = null;
+            if ( indexes.Length == 1 )
+            {
+                object i = indexes[0];
+                if ( i is int )
+                {
+                    if ( (int)i >= 0 && (int)i < this.Count )
+                    {
+                        result = this[(int)i];
+                        ret = true;
+                    }
+                }
+                else if ( i is string )
+                {
+                    // find a matching key value
+                    foreach ( var m in _models )
+                    {
+                        if ( ModelKeyName(m) == (i as string) )
+                        {
+                            result = m;
+                            ret = true;
+                            break;
+                        }
+                    }
+
                 }
             }
             return ret;

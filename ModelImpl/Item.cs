@@ -190,22 +190,22 @@ namespace RazorTransform.Model
         /// <param name="errors">collection to be populated</param>
         public void Validate(ICollection<ValidationError> errors)
         {
-            string value = (Value ?? String.Empty).Trim();
+            string value = ExpandedValue ?? (Value ?? String.Empty).Trim();
 
             switch (Type)
             {
                 case RtType.String:
                     if (!String.IsNullOrWhiteSpace(Regex) && !System.Text.RegularExpressions.Regex.IsMatch(value, ModelConfig.Instance.Regexes[Regex]))
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.RegExViolation, DisplayName, Regex), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.RegExViolation, DisplayName, ModelConfig.Instance.Regexes[Regex], value), Group));
                     }
                     if (value.Length < Min)
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, Min), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, Min, value.Length, value), Group));
                     }
                     if (value.Length > Max)
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, Max), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, Max, value.Length, value), Group));
                     }
                     break;
 
@@ -215,11 +215,11 @@ namespace RazorTransform.Model
                     {
                         if (v < Min)
                         {
-                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, Min), Group));
+                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, Min, value.Length), Group));
                         }
                         if (v > Max)
                         {
-                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, Max), Group));
+                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, Max, value.Length), Group));
                         }
                     }
                     else

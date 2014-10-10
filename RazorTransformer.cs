@@ -205,22 +205,6 @@ namespace RazorTransform
         {
             object modelObject = null;
 
-            if (validateModel)
-            {
-                var errors = new List<ValidationError>();
-                _model.Validate(errors);
-                if (errors.Any())
-                {
-                    var sb = new StringBuilder();
-                    foreach (var e in errors)
-                    {
-                        sb.AppendLine(e.ToString());
-                    }
-                    Output.ShowMessage(Resource.ValidationError, secondaryMsg: sb.ToString(), messageBoxImage: MessageBoxImage.Asterisk);
-                    return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
-                }
-            }
-
             var body = generateXml();
 
             if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
@@ -249,6 +233,23 @@ namespace RazorTransform
                     }
                 }
 
+                // validate after doing substitutions
+                if (validateModel)
+                {
+                    var errors = new List<ValidationError>();
+                    _model.Validate(errors);
+                    if (errors.Any())
+                    {
+                        var sb = new StringBuilder();
+                        foreach (var e in errors)
+                        {
+                            sb.AppendLine(e.ToString());
+                        }
+                        Output.ShowMessage(Resource.ValidationError, secondaryMsg: sb.ToString(), messageBoxImage: MessageBoxImage.Asterisk);
+                        return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
+                    }
+                }
+
 
                 // do any substitutions in  XML
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
@@ -257,6 +258,7 @@ namespace RazorTransform
                     return new Tuple<System.Xml.Linq.XDocument, object>(doc, modelObject);
                 }
             }
+
             return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
         }
         /// <summary>

@@ -209,22 +209,22 @@ Command line options are:
     <value>Do you want to save changes in {0}?</value>
   </data>
   <data name="MaxCount" xml:space="preserve">
-    <value>{0} must have at least {1} items</value>
+    <value>"{0}" has {2} items, but must have no more than {1}.</value>
   </data>
   <data name="MaxInt" xml:space="preserve">
-    <value>{0} must be less than {1}</value>
+    <value>"{0}" is {2} but must be less than {1}.</value>
   </data>
   <data name="MaxStrLen" xml:space="preserve">
-    <value>{0} can contain no more than {1} characters </value>
+    <value>"{0}" with a value of "{3}" must contain no more than {1} characters, but has {2}.</value>
   </data>
   <data name="MinCount" xml:space="preserve">
-    <value>{0} must have at least {1} items</value>
+    <value>"{0}" has {2} items, but must have at least {1}.</value>
   </data>
   <data name="MinInt" xml:space="preserve">
-    <value>{0} must be greater than {1}</value>
+    <value>"{0}" is {2} but must be greater than {1}. </value>
   </data>
   <data name="MinStrLen" xml:space="preserve">
-    <value>{0} must have at least {1} characters long</value>
+    <value>"{0}" with a value of "{3}" must contain at least {1} characters, but has {2}.</value>
   </data>
   <data name="NewItem" xml:space="preserve">
     <value>Add</value>
@@ -243,7 +243,7 @@ Command line options are:
     <value>Regular expression "{0}" not found in configuration</value>
   </data>
   <data name="RegExViolation" xml:space="preserve">
-    <value>String "{0}" does not match pattern "{1}"</value>
+    <value>"{0}" with a value of "{2}" does not match pattern "{1}"</value>
   </data>
   <data name="RunningPowerShell" xml:space="preserve">
     <value>Starting PowerShell processing...</value>

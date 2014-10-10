@@ -434,7 +434,8 @@ namespace RazorTransform
             return t;
         }
 
-        private static Control _Int (IItem ci, Binding binding, Action itemChanged )
+#if ModelNotAllowedinLongUpDown
+        private static Control _Int(IItem ci, Binding binding, Action itemChanged)
         {
             var t = new Xceed.Wpf.Toolkit.LongUpDown();
             if (ci.ReadOnly)
@@ -447,9 +448,14 @@ namespace RazorTransform
             t.Value = Int64.Parse(ci.Value ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
-            t.ValueChanged += (o, e) => { itemChanged();  };
+            t.ValueChanged += (o, e) => { itemChanged(); };
             return t;
         }
-
+#else        
+        private static Control _Int(IItem ci, Binding binding, Action itemChanged)
+        {
+            return _Default(ci, binding, itemChanged);
+        }
+#endif
     }
 }
