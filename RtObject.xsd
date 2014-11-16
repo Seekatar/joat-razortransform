@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema id="RtObjectSchema"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="my://RtObject"
+           xmlns="my://RtObject"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
   <xs:element name="RtObject">
     <xs:complexType>
       <xs:sequence>
@@ -47,6 +52,7 @@
       <xs:attribute name="expanded" type="dotNetBool"/>
       <xs:attribute name="hidden" type="dotNetBool"/>
       <xs:attribute name="key" type="xs:string"/>
+      <xs:attribute name="max" type="xs:integer"/>
       <xs:attribute name="min" type="xs:integer"/>
       <xs:attribute name="name" use="required" type="xs:string"/>
       <xs:attribute name="sort" type="dotNetBool"/>
@@ -63,12 +69,14 @@
       <xs:attribute name="readOnly" type="dotNetBool"/>
       <xs:attribute name="regex" type="xs:string"/>
       <xs:attribute name="type" use="required" type="xs:NCName"/>
+      <xs:attribute name="max" type="xs:integer"/>
+      <xs:attribute name="min" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
   <xs:simpleType name="dotNetBool">
     <xs:restriction base="xs:NCName">
-      <xs:enumeration value="True"/>
-      <xs:enumeration value="False"/>
+      <xs:enumeration value="true"/>
+      <xs:enumeration value="false"/>
     </xs:restriction>
   </xs:simpleType> 
   <xs:simpleType name="range">

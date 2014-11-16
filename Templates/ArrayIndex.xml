@@ -1,0 +1,6 @@
+﻿<arrayIndex>
+  <!-- note, do not use &quot; to quote a string index, since in @Model, it's C#, not XML -->
+  <array name="indexByInt" value="@Model.itemAS[0].nameA" desc="@Model.itemAS[0].descriptionA" />
+  <array name="indexByKey" value="@Model.itemAS["B"].nameA" desc="@Model.itemAS["B"].descriptionA" />
+  <array name="nestedByBoth" value="@Model.itemA[">Nested1"].itemAB[0].itemABC["Level3"].nameC" />
+</arrayIndex>

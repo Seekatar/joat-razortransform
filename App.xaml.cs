@@ -46,10 +46,11 @@ namespace RazorTransform
                     .Add("upgrade", v => { upgrade = true; parms["Run"] = true; run = true; });
 
                 List<string> overrides = options.Parse(args);
+                List<string> unknowns = new List<string>();
+                var overrideDict = Settings.SplitCommandLineOverrides(overrides, unknowns);
 
-
-                if (showHelp)
-                    ShowHelp();
+                if (showHelp || unknowns.Count > 0 )
+                    ShowHelp(unknowns);
                 else
                 {
                     if (run) // run without the UI
@@ -57,7 +58,7 @@ namespace RazorTransform
                         var transformer = new RazorTransformer();
                         try
                         {
-                            var ok = transformer.InitializeAsync(parms, Settings.SplitCommandLineOverrides(overrides));
+                            var ok = transformer.InitializeAsync(parms, overrideDict );
                             ok.Wait();
 
                             transformer.Output.Report(new ProgressInfo(transformer.Settings.ToString(transformer.Model)));
@@ -105,7 +106,7 @@ namespace RazorTransform
                         var mw = new MainWindow();
                         try
                         {
-                            mw.Initialize(parms, Settings.SplitCommandLineOverrides(overrides));
+                            mw.Initialize(parms, overrideDict);
                             mw.Show();
 
                             app.Run();
@@ -129,10 +130,14 @@ namespace RazorTransform
             return ret;
         }
 
-        public static void ShowHelp()
+        public static void ShowHelp(List<string> unknowns)
         {
-            // sure would like to show console output
-            MessageBox.Show(Resource.HelpString, Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            var unknownmsg = String.Empty;
+            if ( unknowns != null && unknowns.Count > 0 )
+            {
+                unknownmsg = String.Format(Resource.UnknownCommands, String.Join(", ", unknowns));
+            }
+            MessageBox.Show(String.Format(Resource.HelpString, unknownmsg), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
     }
 }

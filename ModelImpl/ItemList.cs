@@ -430,6 +430,8 @@ namespace RazorTransform.Model
         {
             bool ret = false;
             result = null;
+            string indexValue = "<none>";
+
             if ( indexes.Length == 1 )
             {
                 object i = indexes[0];
@@ -455,7 +457,10 @@ namespace RazorTransform.Model
                     }
 
                 }
+                indexValue = i.ToString();
             }
+            if ( !ret )
+                throw new IndexOutOfRangeException(String.Format(Resource.IndexOutOfRange, DisplayName, Name, indexValue));
             return ret;
         }
         #endregion

@@ -137,6 +137,9 @@
     <value>Close the application</value>
     <comment>Button text</comment>
   </data>
+  <data name="ConfirmDirtySave" xml:space="preserve">
+    <value>Do you want to save with invalid data?</value>
+  </data>
   <data name="ConversionComplete" xml:space="preserve">
     <value>Conversion complete.</value>
   </data>
@@ -184,7 +187,7 @@
     <value>Folder "{0}" not found</value>
   </data>
   <data name="HelpString" xml:space="preserve">
-    <value>RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
+    <value>{0}RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
 
 Command line options are:
    [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] 
@@ -201,6 +204,9 @@ Command line options are:
  &lt;logFile&gt; defaults to RazorTransformTool.log
  &lt;overrides&gt; allows you to override values before the transform using name=value any number of times.
 </value>
+  </data>
+  <data name="IndexOutOfRange" xml:space="preserve">
+    <value>"Index out of range for "{0}": {1}[{2}]"</value>
   </data>
   <data name="InvalidUri" xml:space="preserve">
     <value>Invalid Uri: </value>
@@ -274,6 +280,11 @@ Command line options are:
   </data>
   <data name="UniqueViolation" xml:space="preserve">
     <value>Non unique name : "{0}"</value>
+  </data>
+  <data name="UnknownCommands" xml:space="preserve">
+    <value>Unknown parameters: {0}
+
+</value>
   </data>
   <data name="ValidationError" xml:space="preserve">
     <value>Error validating values</value>

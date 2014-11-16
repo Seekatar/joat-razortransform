@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema id="RtValuesSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           targetNamespace="my://RtValues" 
+           xmlns="my://RtValues" 
+           attributeFormDefault="unqualified" 
+           elementFormDefault="qualified">
   <xs:element name="RtValues">
     <xs:complexType>
       <xs:sequence>

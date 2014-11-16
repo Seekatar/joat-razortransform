@@ -115,6 +115,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to save with invalid data?.
+        /// </summary>
+        internal static string ConfirmDirtySave {
+            get {
+                return ResourceManager.GetString("ConfirmDirtySave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Conversion complete..
         /// </summary>
         internal static string ConversionComplete {
@@ -251,18 +260,27 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
+        ///   Looks up a localized string similar to {0}RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
         ///
         ///Command line options are:
         ///   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] 
         ///
         ///   -h -? show this help
         ///  -test runs the transforms without saving the output to make sure Razor views work
-        ///  -nosave does not save the override values in &lt;objectFile&gt;, useful when using over [rest of string was truncated]&quot;;.
+        ///  -nosave does not save the override values in &lt;objectFile&gt;, useful when using o [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HelpString {
             get {
                 return ResourceManager.GetString("HelpString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Index out of range for &quot;{0}&quot;: {1}[{2}]&quot;.
+        /// </summary>
+        internal static string IndexOutOfRange {
+            get {
+                return ResourceManager.GetString("IndexOutOfRange", resourceCulture);
             }
         }
         
@@ -480,6 +498,17 @@ namespace RazorTransform {
         internal static string UniqueViolation {
             get {
                 return ResourceManager.GetString("UniqueViolation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown parameters: {0}
+        ///
+        ///.
+        /// </summary>
+        internal static string UnknownCommands {
+            get {
+                return ResourceManager.GetString("UnknownCommands", resourceCulture);
             }
         }
         

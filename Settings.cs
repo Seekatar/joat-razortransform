@@ -59,10 +59,7 @@ namespace RazorTransform
             var settingsDefinition = XDocument.Parse(_settingsXml).Root;
             var config = new ModelConfig();
             config.Load(this, false, settingsDefinition);
-
-            _settings = new RazorTransform.Model.Model();
             RtValuesVersion = config.RtValuesVersion;
-            _settings.LoadFromXml(config.Root, config.ValuesRoot, overrideParms);
 
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -81,10 +78,24 @@ namespace RazorTransform
             }
 
             ValuesFile = Path.Combine(directoryName, ValuesFile); // if ValuesFile has a fully-qualified name, that is returned
-            if (!File.Exists(ValuesFile))
+
+            _settings = new RazorTransform.Model.Model();
+            XElement root = null;
+            if ( File.Exists( ValuesFile))
             {
-                // set destination to same as obj
-                ValuesFile = Path.Combine(Path.GetDirectoryName(ObjectFile), "RtValues.xml");
+                try
+                {
+                    var doc = XDocument.Load(ValuesFile);
+                    root = doc.Root;
+                }
+                catch { }
+            }
+
+            _settings.LoadFromXml(config.Root, root, overrideParms);
+            var output = _settings.Items.SingleOrDefault(o => o.Name == "RTSettings_LastPath");
+            if ( output != null && output is Item )
+            {
+                 (output as Item).Value = (output as Item).ExpandedValue = OutputFolder;
             }
         }
 
@@ -108,7 +119,7 @@ namespace RazorTransform
         public int RtValuesVersion { get; private set; }
 
         // for saving and editing
-        public IModel Model { get { return _settings; } }
+        public IModel Model { get { return _settings; } set { _settings = value as Model.Model; }  }
 
         // values saved in values file
         public string Title { get { return this["RTSettings_Title"]; } set { this["RTSettings_Title"] = value; } }
@@ -120,7 +131,10 @@ namespace RazorTransform
                 var temp = OverrideOutputFolder ?? this["RTSettings_LastPath"]; 
                 return Path.GetFullPath(temp);
             }
-            set { this["RTSettings_LastPath"] = value; }
+            set 
+            { 
+                this["RTSettings_LastPath"] = value; 
+            }
         }
 
         public string TemplateFolder { get { return Path.GetFullPath(OverrideTemplateFolder ?? this["RTSettings_LastTemplatePath"]); } set { this["RTSettings_LastTemplatePath"] = value; } }
@@ -178,7 +192,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="overrideParms"></param>
         /// <returns></returns>
-        static public IDictionary<string, string> SplitCommandLineOverrides(IEnumerable<string> overrideParms)
+        static public IDictionary<string, string> SplitCommandLineOverrides(IEnumerable<string> overrideParms, List<string> unknowns )
         {
             var ret = new Dictionary<string, string>();
 
@@ -195,6 +209,10 @@ namespace RazorTransform
                         {
                             ret.Add(s, v);
                         }
+                    }
+                    else
+                    {
+                        unknowns.Add(o);
                     }
                 }
             }

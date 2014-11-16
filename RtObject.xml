@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- <RtObject could break code that gets XElement.Name since it would include ns now xmlns="my://RtObject"--> 
 <RtObject>
   <group name="Hello" description="Welcome to Artie" hidden="false">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
@@ -84,6 +85,13 @@
     <item readOnly="true" name="RofolderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\Program Files" type="Folder" hidden="false" />
   </group>
 
+  <group name="Model" description="@Model examples">
+    <item name="s8" displayName="@Model Examples" description="@Model examples" defaultValue="@Model syntax examples referencing values in other tabs. Hover to see values.  Click refresh button to refresh." type="Label" />
+    <item name="model1" displayName="S1" description="Get the value of the first string from strings tab" defaultValue="@Model.stringA1" type="string"/>
+    <item name="model2" displayName="ArrayByNum" description="Get simple array value by number" defaultValue="@Model.itemAS[0].nameA" type="string"/>
+    <item name="model3" displayName="ArrayByName" description="Get simple array value by name" defaultValue="@Model.itemAS[&quot;B&quot;].nameA" type="string"/>
+    <item name="model4" displayName="NestedArray" description="Get nested array" defaultValue="@Model.itemA[0].itemAB[0].itemABC[&quot;Level3&quot;].nameC" type="string"/>
+  </group>
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
 
   <enum name="EnumA">

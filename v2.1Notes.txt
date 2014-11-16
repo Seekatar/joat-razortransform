@@ -1,11 +1,8 @@
-V3 Refactoring notes
+V2.1 Refactoring notes
 
 *Bugs
-If RtValues passed in not found, it will read on that exists with rtobject!  Even in old code
-Settings doesn't show override output folder, title bar does
 If default directory doesn't have a Templates folder, then doesn't find anything and quickly exits.  Should warn if no templates found
 Numbers can't use @Model TEMP changed to use _Default control
-If have validation violation, can never save.  Should prompt to allow saving.
 
 *ToDo
 Settings needs to keep its own ModelConfig.  Need to be attached to root.  IRootModel?  Customs loaded once, from both Settings, & main file
@@ -30,6 +27,9 @@ Overriding index on command line
 @Model with index 
 
 *Resolved
+fixed 11/15 -- If RtValues passed in not found, it will read one that exists with rtobject!  Even in old code
+fixed 11/15 -- If have validation violation, can never save.  Should prompt to allow saving.
+fixed 11/15, wasn't doing settings right at all. -- Settings doesn't show override output folder, title bar does
 no -- Do I need CopyValuesFrom in iface?
 nah, label is good -- Add "helptext" type that just shows text in multiple line control  Html??
 fixed -- When can we set IsPassword??

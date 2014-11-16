@@ -129,7 +129,7 @@ namespace RazorTransform
 
         private int substituteValues(IModel model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null)
         {
-            Regex r = new Regex(@"@\({0,1}Model\.[""\w\[\]\.]+\){0,1}");
+            Regex r = new Regex(@"@\({0,1}Model(\.\w+(\[.+\]){0,1}){1,4}\){0,1}");
 
             int max = Math.Max(1, model.Items.Count);
             int changeCount = 0;

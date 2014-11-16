@@ -25,7 +25,7 @@ namespace RazorTransform
         private bool _embedded = false; // are we embedded in another app (hide certain buttons)
         private bool _runPowerShell = false;
         private string _logFileName = "Deploy";
-        private string _workingDir = "..";
+        private string _workingDir = ".";
         private string _scriptFname = "PsScripts.xml";
         private bool _step = false;
         private ProcessingState _currentState = ProcessingState.idle;
@@ -401,7 +401,9 @@ namespace RazorTransform
                     {
                         if ((await _transformer.SaveAsync(true, editControl.Dirty)) == null)  // failed validation don't exit
                         {
-                            okToClose = false;
+                            okToClose = _transformer.Output.ShowMessage(Resource.ConfirmDirtySave, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                            if (okToClose)
+                                await _transformer.SaveAsync(false, editControl.Dirty);
                         }
                     }
                     else if (resp == MessageBoxResult.Cancel)
@@ -453,9 +455,11 @@ namespace RazorTransform
         {
             var aie = new ArrayItemEdit();
             aie.TrySetOwner(Window.GetWindow(this));
-            aie.ShowDialog(_transformer.Settings.Model, _transformer.Settings.ShowHidden);
-            if (aie.Dirty)
+            var newSettings = aie.ShowDialog(_transformer.Settings.Model, _transformer.Settings.ShowHidden);
+            if (aie.Dirty )
                 editControl.Dirty = true;
+            if (newSettings != null)
+                _transformer.Settings.Model = newSettings;
         }
 
         /// <summary>

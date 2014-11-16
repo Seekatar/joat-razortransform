@@ -44,7 +44,10 @@ namespace RazorTransform
             catch (EntryPointNotFoundException)
             {
                 // fall back to message box since in debugger TaskDialog doesn't usually work
-                return MessageBox.Show(msg+ Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+                if (App.Current != null && App.Current.MainWindow != null)
+                    return MessageBox.Show(App.Current.MainWindow, msg + Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
+                else
+                    return MessageBox.Show(msg+ Environment.NewLine + secondaryMsg, Resource.Title, messageBoxButton, messageBoxImage);
             }
         }
 

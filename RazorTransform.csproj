@@ -271,6 +271,9 @@
     <None Include="RazorTransform.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="RtObject.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="RtValues.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -289,9 +292,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Templates\ZReflection.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Templates\ZReflection.txt" />
     <Content Include="Templates\ArrayIndex.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

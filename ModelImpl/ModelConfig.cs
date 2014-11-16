@@ -221,7 +221,7 @@ namespace RazorTransform.Model
             Enums.Clear();
             Regexes.Clear();
 
-            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Enum))
+            foreach (var x in objectRoot.Elements().Where(n => n.Name.LocalName == Constants.Enum))
             {
                 var name = x.Attribute(Constants.Name);
                 if (name == null)
@@ -231,7 +231,7 @@ namespace RazorTransform.Model
                 Enums[name.Value] = dict;
             }
 
-            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.RegEx))
+            foreach (var x in objectRoot.Elements().Where(n => n.Name.LocalName == Constants.RegEx))
             {
                 var name = x.Attribute(Constants.Name);
                 var value = x.Attribute(Constants.Value);
@@ -241,7 +241,7 @@ namespace RazorTransform.Model
                 Regexes[name.Value] = value.Value;
             }
 
-            foreach (var x in objectRoot.Elements().Where(n => n.Name == Constants.Custom))
+            foreach (var x in objectRoot.Elements().Where(n => n.Name.LocalName == Constants.Custom))
             {
                 var parms = new Dictionary<string, string>();
                 string name = null;
@@ -249,9 +249,9 @@ namespace RazorTransform.Model
                 string className = null;
                 foreach (var a in x.Attributes())
                 {
-                    if (a.Name == Constants.Name)
+                    if (a.Name.LocalName == Constants.Name)
                         name = a.Value;
-                    else if (a.Name == Constants.Class)
+                    else if (a.Name.LocalName == Constants.Class)
                         className = a.Value;
                     else
                         parms[a.Name.LocalName] = a.Value;

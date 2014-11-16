@@ -181,7 +181,8 @@ namespace RazorTransform.Model
         /// <returns></returns>
         public T GetValue<T>()
         {
-            return (T)Convert.ChangeType(this.Value, typeof(T));
+            string value = ExpandedValue ?? (Value ?? String.Empty).Trim();
+            return (T)Convert.ChangeType(value, typeof(T));
         }
 
         /// <summary>
@@ -211,7 +212,7 @@ namespace RazorTransform.Model
 
                 case RtType.Int:
                     Int64 v;
-                    if (Int64.TryParse(Value, out v))
+                    if (Int64.TryParse(value, out v))
                     {
                         if (v < Min)
                         {
@@ -224,7 +225,7 @@ namespace RazorTransform.Model
                     }
                     else
                     {
-                        errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, Value), Group));
+                        errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, value), Group));
                     }
                     break;
             }
