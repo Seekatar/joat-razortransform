@@ -205,10 +205,6 @@ namespace RazorTransform
         {
             object modelObject = null;
 
-            var body = generateXml();
-
-            if (!String.IsNullOrWhiteSpace(body)) // failed extension validation?
-            {
                 modelObject = _model;
 
                 RazorFileTransformer rf = new RazorFileTransformer(modelObject);
@@ -251,15 +247,16 @@ namespace RazorTransform
                 }
 
 
+                var body = generateXml();
+
                 // do any substitutions in  XML
                 if (!String.IsNullOrWhiteSpace(body)) // if not saving, this will be empty
                 {
                     var doc = System.Xml.Linq.XDocument.Parse(body);
                     return new Tuple<System.Xml.Linq.XDocument, object>(doc, modelObject);
                 }
-            }
-
-            return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
+                else
+                    return new Tuple<System.Xml.Linq.XDocument, object>(null, null);
         }
         /// <summary>
         /// cancel a running transform

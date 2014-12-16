@@ -11,7 +11,10 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.1.0.0 Rewrite of internal model.  Label type added.  Settings fixes.  @Model.array indexing by number, name support
+    <releaseNotes>2.1.0.3 Fix saving values
+2.1.0.2 Fix for dupe tabs if running with PowerShell
+2.1.0.1 Fix for (c) encoding
+2.1.0.0 Rewrite of internal model.  Label type added.  Settings fixes.  @Model.array indexing by number, name support
 2.0.0.10 Another nested fix
 2.0.0.9 Fix for nested @Model.Parent values not expanding correctly
 2.0.0.8 Always put in orig attribute for easier RtValues parsing
@@ -20,7 +23,7 @@
 2.0.0.4 Fix for DestinationFolder not triggering Dirty and ADM callback save
 2.0.0.3 Pick up new RtPsHost
 2.0.0.2 First Nuget Package</releaseNotes>
-        <copyright>Copyright © Jim Wallace 2010-2014</copyright>
+        <copyright>Copyright (c) Jim Wallace 2010-2014</copyright>
         <tags>Razor File Generator Free Deploy Tool</tags>
         <dependencies>
             <dependency id="RazorEngine" version="3.4.0" />

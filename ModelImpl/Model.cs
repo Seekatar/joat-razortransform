@@ -92,6 +92,8 @@ namespace RazorTransform.Model
 
         public void LoadFromXml(System.Xml.Linq.XElement xml, System.Xml.Linq.XElement values, IDictionary<string, string> overrides)
         {
+            Items.Clear(); // reloading
+
             // get all the Items in the model
             var xmlGroups = xml.Elements(Constants.Group);
             var xmlUngroupedItems = xml.Elements(Constants.Item);
