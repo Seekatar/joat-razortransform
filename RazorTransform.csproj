@@ -288,30 +288,30 @@
     <Resource Include="Resources\Cancel.png" />
     <Resource Include="Resources\PlayClose.png" />
     <Resource Include="Resources\Apply.png" />
-    <Content Include="RtObject.xml">
+    <None Include="RtObject.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="Templates\ZReflection.txt" />
-    <Content Include="Templates\ArrayIndex.xml">
+    <None Include="Templates\ArrayIndex.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\zBasic.txt">
+    </None>
+    <None Include="Templates\zBasic.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\ItemBTranforms.txt">
+    </None>
+    <None Include="Templates\ItemBTranforms.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\ItemBXml.xml">
+    </None>
+    <None Include="Templates\ItemBXml.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\NestedTest.txt">
+    </None>
+    <None Include="Templates\NestedTest.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\SimpleXml.xml">
+    </None>
+    <None Include="Templates\SimpleXml.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

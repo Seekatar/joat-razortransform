@@ -55,6 +55,9 @@ namespace RazorTransform.Model
             EnumName = src.EnumName;
             Regex = src.Regex;
             IsPassword = src.IsPassword;
+            Hidden = src.Hidden;
+            ExpandedValue = src.ExpandedValue;
+            _visibilityGroups = src._visibilityGroups;
         }
 
         #region IItem/IItemBase properties

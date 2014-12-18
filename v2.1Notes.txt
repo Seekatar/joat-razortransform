@@ -48,7 +48,7 @@ IModel
 	has Parent <IModel>
 
 IItemBase
-	has Parent <IModel>, Name, Desc, IGroup
+	has Parent <IModel>, Name, Desc, IGroup (no longer group class, but just an attribute)
 	IItem
 		has Value, ExpandedValue
 	IItemList

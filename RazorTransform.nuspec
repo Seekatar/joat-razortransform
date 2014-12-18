@@ -11,7 +11,8 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.1.0.3 Fix saving values
+    <releaseNotes>2.1.0.4 Fix for hidden items showing up
+2.1.0.3 Fix saving values
 2.1.0.2 Fix for dupe tabs if running with PowerShell
 2.1.0.1 Fix for (c) encoding
 2.1.0.0 Rewrite of internal model.  Label type added.  Settings fixes.  @Model.array indexing by number, name support
