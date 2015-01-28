@@ -48,7 +48,6 @@ namespace RazorTransform
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
                 l.Style = Application.Current.FindResource("CfgLabel") as Style;
-                l.Padding = new Thickness(5);
 
                 Breadcrumb.SetContextMenu(l, ci.Name);
 
@@ -83,7 +82,10 @@ namespace RazorTransform
                     t.ToolTip = sp;
                 }
                 else
+                {
                     t.ToolTip = ci.Description;
+                }
+
                 t.SetValue(Grid.ColumnProperty, 1);
                 t.SetValue(Grid.RowProperty, i);
                 t.HorizontalAlignment = HorizontalAlignment.Left;
@@ -101,8 +103,6 @@ namespace RazorTransform
 
                     grid.Children.Add(re);
                 }
-
-                t.Padding = new Thickness(5);
 
                 t.Loaded += (s, e) =>
                     {
@@ -439,9 +439,9 @@ namespace RazorTransform
             return t;
         }
 
-#if ModelNotAllowedinLongUpDown
         private static Control _Int(IItem ci, Binding binding, Action itemChanged)
         {
+#if ModelNotAllowedinLongUpDown
             var t = new Xceed.Wpf.Toolkit.LongUpDown();
             if (ci.ReadOnly)
                 t.IsEnabled = false;
@@ -455,12 +455,27 @@ namespace RazorTransform
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
             t.ValueChanged += (o, e) => { itemChanged(); };
             return t;
-        }
-#else        
-        private static Control _Int(IItem ci, Binding binding, Action itemChanged)
-        {
+#elif UseDefaultForNum       
             return _Default(ci, binding, itemChanged);
-        }
+#else
+            var units = ci.Attribute("units");
+            if (!String.IsNullOrWhiteSpace(units))
+            {
+                var t = new NumberWithUnits("hours");
+                if (ci.ReadOnly)
+                    t.IsReadOnly = true;
+
+                binding.Mode = BindingMode.TwoWay;
+                t.SetBinding(FolderInputBox.FolderNameProperty, binding);
+                t.TextChanged += (o, e) => { itemChanged(); };
+                return t;
+            }
+            else
+            {
+                return _Default(ci, binding, itemChanged);
+            }
+
 #endif
+        }
     }
 }

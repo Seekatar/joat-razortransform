@@ -99,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Controls\NumberWithUnits.xaml.cs">
+      <DependentUpon>NumberWithUnits.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Hyperlink.xaml.cs">
       <DependentUpon>Hyperlink.xaml</DependentUpon>
     </Compile>
@@ -183,6 +186,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
+    <Page Include="Controls\NumberWithUnits.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\Hyperlink.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

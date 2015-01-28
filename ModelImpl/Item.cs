@@ -58,6 +58,7 @@ namespace RazorTransform.Model
             Hidden = src.Hidden;
             ExpandedValue = src.ExpandedValue;
             _visibilityGroups = src._visibilityGroups;
+            _element = src._element;
         }
 
         #region IItem/IItemBase properties
@@ -248,6 +249,16 @@ namespace RazorTransform.Model
                 x = new XElement(Name, Value ?? String.Empty, new XAttribute(Constants.Original, String.Empty));
 
             root.Add(x);
+        }
+
+        public string Attribute(string name)
+        {
+            string ret = null;
+            if ( _element != null )
+            {
+                return (string)_element.Attribute(name);
+            }
+            return ret;
         }
         #endregion
 

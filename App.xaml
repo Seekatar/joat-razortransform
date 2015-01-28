@@ -51,11 +51,13 @@
             <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.FontWeight" Value="Bold"/>
             <Setter Property="Control.Margin" Value="5,5,5,5"/>
+            <Setter Property="Control.Padding" Value="5,5,5,5"/>
         </Style>
         <Style x:Key="CfgText">
             <Setter Property="Control.FontFamily" Value="Arial"/>
             <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.Margin" Value="5,5,5,5"/>
+            <Setter Property="Control.Padding" Value="5,5,5,5"/>
         </Style>
         <Style x:Key="CfgButton">
             <Setter Property="Control.FontSize" Value="12"/>
@@ -126,6 +128,13 @@
             <Setter Property="Control.FontFamily" Value="Arial"/>
             <Setter Property="Control.FontSize" Value="14"/>
             <Setter Property="Control.Padding" Value="5"/>
+            <Setter Property="Control.Margin" Value="0"/>
+        </Style>
+        <Style x:Key="labelUnits">
+            <Setter Property="Control.FontFamily" Value="Arial"/>
+            <Setter Property="Control.FontSize" Value="14"/>
+            <Setter Property="Control.Padding" Value="5"/>
+            <Setter Property="Control.Margin" Value="0"/>
         </Style>
         <Style TargetType="my:MyButton" x:Key="txtButton">
             <Setter Property="FontFamily" Value="Arial"/>
