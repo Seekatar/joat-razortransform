@@ -14,6 +14,8 @@ namespace RazorTransform
 {
     public static class LayoutManager
     {
+        public static UI.Breadcrumb Breadcrumb = new UI.Breadcrumb();
+        
         /// <summary>
         /// build a grid view for a model of only simple items, usually this is a tab of items
         /// </summary>
@@ -46,6 +48,9 @@ namespace RazorTransform
                 l.SetValue(Grid.ColumnProperty, 0);
                 l.SetValue(Grid.RowProperty, i);
                 l.Style = Application.Current.FindResource("CfgLabel") as Style;
+                l.Padding = new Thickness(5);
+
+                Breadcrumb.SetContextMenu(l, ci.Name);
 
                 var binding = new Binding();
                 binding.Source = ci;
@@ -97,7 +102,7 @@ namespace RazorTransform
                     grid.Children.Add(re);
                 }
 
-                l.Padding = t.Padding = new Thickness(5);
+                t.Padding = new Thickness(5);
 
                 t.Loaded += (s, e) =>
                     {

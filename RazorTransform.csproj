@@ -134,6 +134,7 @@
     <Compile Include="RazorTransformer.cs" />
     <Compile Include="TransformResult.cs" />
     <Compile Include="UI\ArrayItem.cs" />
+    <Compile Include="UI\Breadcrumb.cs" />
     <Compile Include="UI\GuiProgress.cs" />
     <Compile Include="Controls\ITransformParentWindow.cs" />
     <Compile Include="Util\CollectionExtensions.cs" />
@@ -333,6 +334,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Clipboard.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

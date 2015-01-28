@@ -133,6 +133,33 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy {0} to the clipboard.
+        /// </summary>
+        internal static string CopyContextMenu {
+            get {
+                return ResourceManager.GetString("CopyContextMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the name of this item that can be used elsewhere in Artie.  If the ordering changes, this will be invalid..
+        /// </summary>
+        internal static string CopyIndexTooltip {
+            get {
+                return ResourceManager.GetString("CopyIndexTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the name of this item that can be used elsewhere in Artie.  If the key changes, this will be invalid..
+        /// </summary>
+        internal static string CopyNameTooltip {
+            get {
+                return ResourceManager.GetString("CopyNameTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Destination folder must exist. {0}.
         /// </summary>
         internal static string DestMustExist {

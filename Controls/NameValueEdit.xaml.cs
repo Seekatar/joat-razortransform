@@ -159,6 +159,9 @@ namespace RazorTransform
             if (existingOne != null)
             {
                 var list = existingOne.List;
+                int index = existingOne.List.IndexOf(existingOne.Model);
+
+                LayoutManager.Breadcrumb.PushArray(list.Name, list.ModelKeyName(existingOne.Model),index);
 
                 // set the parent
                 var editedModel = editArrayItem(existingOne.Model);
@@ -171,6 +174,7 @@ namespace RazorTransform
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
                 }
+                LayoutManager.Breadcrumb.Pop();
             }
         }
 
@@ -179,6 +183,7 @@ namespace RazorTransform
             // create a new one from the prototype, set on the tag
             var list = ((sender as Control).Tag as IItemList);
             var newOne = new RazorTransform.Model.Model(list.Prototype,null);
+            LayoutManager.Breadcrumb.PushArray(list.Name,"?",-1);
             var editedModel = editArrayItem(newOne, true);
             if (editedModel != null)
             {
@@ -189,6 +194,7 @@ namespace RazorTransform
                 await RazorTransformer.Instance.RefreshModelAsync(false, true);
                 reload();
             }
+            LayoutManager.Breadcrumb.Pop();
         }
 		
         #endregion        

@@ -143,6 +143,15 @@
   <data name="ConversionComplete" xml:space="preserve">
     <value>Conversion complete.</value>
   </data>
+  <data name="CopyContextMenu" xml:space="preserve">
+    <value>Copy {0} to the clipboard</value>
+  </data>
+  <data name="CopyIndexTooltip" xml:space="preserve">
+    <value>This is the name of this item that can be used elsewhere in Artie.  If the ordering changes, this will be invalid.</value>
+  </data>
+  <data name="CopyNameTooltip" xml:space="preserve">
+    <value>This is the name of this item that can be used elsewhere in Artie.  If the key changes, this will be invalid.</value>
+  </data>
   <data name="DestMustExist" xml:space="preserve">
     <value>Destination folder must exist. {0}</value>
   </data>
