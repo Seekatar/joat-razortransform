@@ -215,6 +215,10 @@ namespace RazorTransform
 
 
                 var t = new EditItemBox(list.Count > list.Min);
+                t.MouseDoubleClick += (sender, args) =>
+                {
+                    editHandler(sender, args);
+                };
                 t.EditClicked += (sender, args) =>
                 {
                     editHandler(sender, args);
@@ -461,13 +465,13 @@ namespace RazorTransform
             var units = ci.Attribute("units");
             if (!String.IsNullOrWhiteSpace(units))
             {
-                var t = new NumberWithUnits("hours");
+                var t = new NumberWithUnits(units);
                 if (ci.ReadOnly)
                     t.IsReadOnly = true;
 
                 binding.Mode = BindingMode.TwoWay;
-                t.SetBinding(FolderInputBox.FolderNameProperty, binding);
-                t.TextChanged += (o, e) => { itemChanged(); };
+                t.SetBinding(NumberWithUnits.NumTextProperty, binding);
+                t.NumTextChanged += (o, e) => { itemChanged(); };
                 return t;
             }
             else

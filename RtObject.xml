@@ -51,7 +51,7 @@
 
   <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2, unique name." hidden="false" arrayValueName="itemAS" min="2" unique="true">
     <group name="Basic" description="this is the basic stuff" hidden="false" >
-      <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" />
+      <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" regex="No spaces"/>
       <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />
     </group>
     <group name="Other" description="this is other stuff" hidden="false" >
@@ -114,6 +114,7 @@
     <value key="horse" value="Horse"/>
     <value key="chicken" value="Chicken"/>
   </enum>
+  <enum name="Dynamic" script="test.ps1" />
   <regex name="version4" value="^\d+\.\d+\.\d+\.\d+$" />
   <regex name="version2" value="^\d+\.\d+$" />
   <regex name="No spaces" value="^[^\s]+$" />

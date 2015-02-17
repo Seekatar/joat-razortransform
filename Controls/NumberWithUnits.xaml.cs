@@ -10,20 +10,20 @@ namespace RazorTransform
         public NumberWithUnits(string units)
         {
             InitializeComponent();
-            theTextBox.TextChanged += new TextChangedEventHandler(OnTextChanged);
+            theTextBox.TextChanged += new TextChangedEventHandler(OnNumTextChanged);
             theUnits.Content = units;
         }
 
-        public string Text
+        public string NumText
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get { return (string)GetValue(NumTextProperty); }
+            set { SetValue(NumTextProperty, value); }
         }
         
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        private void OnNumTextChanged(object sender, TextChangedEventArgs e)
         {
             e.Handled = true;
-            RoutedEventArgs args = new RoutedEventArgs(TextChangedEvent);
+            RoutedEventArgs args = new RoutedEventArgs(NumTextChangedEvent);
             RaiseEvent(args);
         }
 
@@ -33,17 +33,17 @@ namespace RazorTransform
             set { theTextBox.IsReadOnly = value; }
         }
 
-        public event RoutedEventHandler TextChanged
+        public event RoutedEventHandler NumTextChanged
         {
-            add { AddHandler(TextChangedEvent, value); }
-            remove { RemoveHandler(TextChangedEvent, value); }
+            add { AddHandler(NumTextChangedEvent, value); }
+            remove { RemoveHandler(NumTextChangedEvent, value); }
         }
         
-        public static readonly DependencyProperty TextProperty =
-           DependencyProperty.Register("Text", typeof(string), typeof(NumberWithUnits));
+        public static readonly DependencyProperty NumTextProperty =
+           DependencyProperty.Register("NumText", typeof(string), typeof(NumberWithUnits));
         
-        public static readonly RoutedEvent TextChangedEvent =
-            EventManager.RegisterRoutedEvent("TextChanged",
+        public static readonly RoutedEvent NumTextChangedEvent =
+            EventManager.RegisterRoutedEvent("NumTextChanged",
             RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(NumberWithUnits));
 
     }

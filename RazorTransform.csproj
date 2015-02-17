@@ -51,9 +51,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\RazorEngine.3.4.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
-    <Reference Include="RtPsHost, Version=1.0.1.3, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
+    <Reference Include="RtPsHost, Version=1.0.1.4, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\RtPsHost.1.0.1.3\lib\net45\RtPsHost.dll</HintPath>
+      <HintPath>packages\RtPsHost.1.0.1.4\lib\net45\RtPsHost.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -332,7 +332,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

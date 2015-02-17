@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="RazorTransform.BoolInput"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Name="root">
+    x:Name="root" Margin="0">
     <DockPanel>
         <CheckBox x:Name="theCheckBox"  IsChecked="{Binding Bool, ElementName=root}"  VerticalAlignment="Center"/>
     </DockPanel>

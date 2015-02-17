@@ -2,9 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:my="clr-namespace:RazorTransform.Controls"
-    x:Name="root">
-    <DockPanel>
+    x:Name="root"
+             Margin="0">
+    <DockPanel >
         <Label Style="{StaticResource labelUnits}" x:Name="theUnits" DockPanel.Dock="Right"></Label>
-        <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding FileName, ElementName=root}" />
+        <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding NumText, ElementName=root}" />
     </DockPanel>
 </UserControl>

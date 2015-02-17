@@ -191,6 +191,10 @@ namespace RazorTransform.Model
                     }
                 }
             }
+            foreach ( var i in this)
+            {
+                i.Validate(errors);
+            }
 
         }
 

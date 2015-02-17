@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:my="clr-namespace:RazorTransform.Controls"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    x:Name="root">
+    x:Name="root" Margin="0">
     <DockPanel Margin="0">
         <xctk:ColorPicker x:Name="colorPicker" SelectedColor="{Binding ColorText, ElementName=root}" DisplayColorAndName="True" />
     </DockPanel>

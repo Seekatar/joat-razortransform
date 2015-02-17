@@ -165,6 +165,7 @@ namespace RazorTransform
 
                 // set the parent
                 var editedModel = editArrayItem(existingOne.Model);
+                LayoutManager.Breadcrumb.Pop();
                 if (editedModel != null)
                 {
                     // delete & add for sorting
@@ -174,7 +175,6 @@ namespace RazorTransform
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
                 }
-                LayoutManager.Breadcrumb.Pop();
             }
         }
 
@@ -185,6 +185,7 @@ namespace RazorTransform
             var newOne = new RazorTransform.Model.Model(list.Prototype,null);
             LayoutManager.Breadcrumb.PushArray(list.Name,"?",-1);
             var editedModel = editArrayItem(newOne, true);
+            LayoutManager.Breadcrumb.Pop();
             if (editedModel != null)
             {
                 // add it to the parent array
@@ -194,7 +195,6 @@ namespace RazorTransform
                 await RazorTransformer.Instance.RefreshModelAsync(false, true);
                 reload();
             }
-            LayoutManager.Breadcrumb.Pop();
         }
 		
         #endregion        
