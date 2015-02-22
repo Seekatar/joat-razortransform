@@ -35,7 +35,8 @@ namespace RazorTransform
             transforming,
             transformed,
             shellExecuting,
-            shellExecuted
+            shellExecuted,
+            saving
         }
 
         public MainEdit()
@@ -195,7 +196,8 @@ namespace RazorTransform
             switch (currentState)
             {
                 case ProcessingState.transforming:
-                    if (_runPowerShell)
+                case ProcessingState.saving:
+                    if (currentState == ProcessingState.transforming && _runPowerShell)
                     {
                         editControl.Visibility = System.Windows.Visibility.Collapsed;
 
@@ -323,9 +325,9 @@ namespace RazorTransform
             foreach (var i in items.OfType<IItem>())
             {
                 if (i.IsPassword)
-                    dict[i.Name] = i.Value;
+                    dict[i.Name] = i.ExpandedValue;
                 else if (i.Name == "SQLServer" || i.Name == "InstanceName")
-                    dict[i.Name] = i.Value;
+                    dict[i.Name] = i.ExpandedValue;
             }
             foreach (var i in items.OfType<IItemList>())
             {
@@ -523,7 +525,7 @@ namespace RazorTransform
         /// <param name="e"></param>
         private async void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            setButtonStates(ProcessingState.transforming);
+            setButtonStates(ProcessingState.saving);
             if (await _transformer.SaveAsync(true, editControl.Dirty) != null)
                 editControl.Dirty = false;
             setButtonStates(ProcessingState.idle);

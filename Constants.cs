@@ -62,6 +62,7 @@ namespace RazorTransform
         internal const string Class = "classname";
         internal const string Custom = "custom";
         internal const string Parameter = "parameter";
+        internal const string Parameters = "parms";
         internal const string Model = "model";
         internal const string Original = "orig";
         internal const string Version = "version";
@@ -69,6 +70,8 @@ namespace RazorTransform
         internal const string Root = "Root";
         internal const string Parent = "Parent";
         internal const string DestinationFolder = "DestinationFolder";
+        internal const string Script = "script";
+        internal const string Timeout = "timeoutSecs";
 
         // Version history
         // 2 = switch RtValues to use names instead of value for everything

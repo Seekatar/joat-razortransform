@@ -204,34 +204,38 @@ namespace RazorTransform.Model
                     {
                         errors.Add(new ValidationError(String.Format(Resource.RegExViolation, DisplayName, ModelConfig.Instance.Regexes[Regex], value), Group));
                     }
-                    if (value.Length < Min)
-                    {
-                        errors.Add(new ValidationError(String.Format(Resource.MinStrLen, DisplayName, Min, value.Length, value), Group));
-                    }
-                    if (value.Length > Max)
-                    {
-                        errors.Add(new ValidationError(String.Format(Resource.MaxStrLen, DisplayName, Max, value.Length, value), Group));
-                    }
+                    validateRange(value.Length, value, Resource.MinStrLen, Resource.MaxStrLen, Resource.RangeStrLen, errors );
                     break;
 
                 case RtType.Int:
                     Int64 v;
                     if (Int64.TryParse(value, out v))
                     {
-                        if (v < Min)
-                        {
-                            errors.Add(new ValidationError(String.Format(Resource.MinInt, DisplayName, Min, value.Length), Group));
-                        }
-                        if (v > Max)
-                        {
-                            errors.Add(new ValidationError(String.Format(Resource.MaxInt, DisplayName, Max, value.Length), Group));
-                        }
+                        validateRange(v, value, Resource.MinInt, Resource.MaxInt, Resource.RangeInt, errors);
                     }
                     else
                     {
                         errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, value), Group));
                     }
                     break;
+            }
+        }
+
+        private void validateRange(long len, string value, string minMsg, string maxMsg, string rangeMsg, ICollection<ValidationError> errors)
+        {
+            if (len < Min)
+            {
+                if ( Max != Int64.MaxValue )
+                    errors.Add(new ValidationError(String.Format(rangeMsg, DisplayName, value, len, Min, Max), Group));
+                else 
+                    errors.Add(new ValidationError(String.Format(minMsg, DisplayName, value, len, Min), Group));
+            }
+            if (len > Max)
+            {
+                if (Min != Int64.MinValue)
+                    errors.Add(new ValidationError(String.Format(rangeMsg, DisplayName, value, len, Min, Max), Group));
+                else
+                    errors.Add(new ValidationError(String.Format(maxMsg, DisplayName, value, len, Max), Group));
             }
         }
 

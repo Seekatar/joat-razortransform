@@ -223,11 +223,58 @@ namespace RazorTransform.Model
 
             foreach (var x in objectRoot.Elements().Where(n => n.Name.LocalName == Constants.Enum))
             {
+                bool loaded = false;
+                var dict = new Dictionary<string, string>();
+
                 var name = x.Attribute(Constants.Name);
                 if (name == null)
                     throw new ArgumentNullException(Resource.ErrorNullEnumName);
-                var dict = new Dictionary<string, string>();
-                dict.LoadFromXml(x);
+                var scriptAttr = x.Attribute(Constants.Script);
+                if (scriptAttr != null && !String.IsNullOrWhiteSpace(scriptAttr.Value))
+                {
+                    var timeout = 1000;
+                    int timeoutAttr = (Int32?)x.Attribute(Constants.Timeout) ?? Int32.MinValue;
+                    if (timeoutAttr > 0)
+                    {
+                        timeout = 1000 * timeoutAttr;
+                    }
+                    var path = scriptAttr.Value;
+                    if (!File.Exists(path))
+                    {
+                        // not fully qualified or in current dir, is it with the object file?
+                        path = Path.Combine(Path.GetDirectoryName(Settings.Instance.ObjectFile), path);
+                        if (!File.Exists(path))
+                        {
+                            throw new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value));
+                        }
+                    }
+
+                    Dictionary<string, object> parms = parseParms((String)x.Attribute(Constants.Parameters) ?? null);
+
+                    // run the script to generate the enums
+                    var ps = RtPsHost.PsHostFactory.CreateHost();
+                    var task = ps.InvokeScriptAsync(path, (System.Collections.IDictionary o) =>
+                    {
+                        foreach (var i in o.Keys)
+                        {
+                            dict[o[i].ToString()] = i.ToString();
+                        }
+                    }, parms);
+                    task.Wait(timeout);
+                    if (task.Status != TaskStatus.RanToCompletion)
+                    {
+                        throw new ArgumentException(String.Format(Resource.EnumScriptTimeout, name.Value, path));
+                    }
+                    if (dict.Count == 0)
+                    {
+                        throw new ArgumentException(String.Format(Resource.NoEnumContent, name.Value, path));
+                    }
+                    loaded = true;
+                }
+                if (!loaded)
+                {
+                    dict.LoadFromXml(x);
+                }
                 Enums[name.Value] = dict;
             }
 
@@ -288,6 +335,28 @@ namespace RazorTransform.Model
             Root = objectRoot;
 
             return true;
+        }
+
+        private Dictionary<string, object> parseParms(string p)
+        {
+            Dictionary<string, object> ret = new Dictionary<string, object>();
+            if (p != null)
+            {
+                // format is name=value;name2=value
+                // allow escaping with \  name\=1=valu\;;
+                p = p.Replace("\\;", "\t").Replace("\\=", "\b");
+
+                foreach (var parm in p.Split(";".ToCharArray()))
+                {
+                    var nameValue = parm.Split("=".ToCharArray());
+                    if (nameValue.Length == 2)
+                    {
+                        ret[nameValue[0].Replace('\t', ';').Replace('\b', '=')] = nameValue[1].Replace('\t', ';').Replace('\b', '=');
+                    }
+                }
+            }
+
+            return ret;
         }
     }
 }

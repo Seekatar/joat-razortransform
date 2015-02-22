@@ -169,6 +169,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Timed out waiting on enum {0}&apos;s script &quot;{1}&quot; to run..
+        /// </summary>
+        internal static string EnumScriptTimeout {
+            get {
+                return ResourceManager.GetString("EnumScriptTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to create object from .
         /// </summary>
         internal static string ErrorCreatingCustom {
@@ -201,6 +210,15 @@ namespace RazorTransform {
         internal static string ErrorCustomType {
             get {
                 return ResourceManager.GetString("ErrorCustomType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error executing enum script &quot;{0}&quot;: {1}.
+        /// </summary>
+        internal static string ErrorInEnumScript {
+            get {
+                return ResourceManager.GetString("ErrorInEnumScript", resourceCulture);
             }
         }
         
@@ -290,11 +308,11 @@ namespace RazorTransform {
         ///   Looks up a localized string similar to {0}RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
         ///
         ///Command line options are:
-        ///   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] 
+        ///   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] [-powerShell] 
         ///
         ///   -h -? show this help
         ///  -test runs the transforms without saving the output to make sure Razor views work
-        ///  -nosave does not save the override values in &lt;objectFile&gt;, useful when using o [rest of string was truncated]&quot;;.
+        ///  -nosave does not save the override values in &lt;objectFile&gt;, usefu [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HelpString {
             get {
@@ -308,6 +326,15 @@ namespace RazorTransform {
         internal static string IndexOutOfRange {
             get {
                 return ResourceManager.GetString("IndexOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script specified in enum {0}, &quot;{1}&quot; was not found..
+        /// </summary>
+        internal static string InvalidEnumScript {
+            get {
+                return ResourceManager.GetString("InvalidEnumScript", resourceCulture);
             }
         }
         
@@ -339,7 +366,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; is {2} but must be less than {1}..
+        ///   Looks up a localized string similar to &quot;{0}&quot; is {2} but must be less than {3}..
         /// </summary>
         internal static string MaxInt {
             get {
@@ -348,7 +375,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{3}&quot; must contain no more than {1} characters, but has {2}..
+        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{1}&quot; must contain no more than {3} characters, but has {2}..
         /// </summary>
         internal static string MaxStrLen {
             get {
@@ -366,7 +393,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; is {2} but must be greater than {1}. .
+        ///   Looks up a localized string similar to &quot;{0}&quot; is {1} but must be greater than {3}. .
         /// </summary>
         internal static string MinInt {
             get {
@@ -375,7 +402,7 @@ namespace RazorTransform {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{3}&quot; must contain at least {1} characters, but has {2}..
+        ///   Looks up a localized string similar to &quot;{0}&quot; with a value of &quot;{1}&quot; must contain at least {3} characters, but has {2}..
         /// </summary>
         internal static string MinStrLen {
             get {
@@ -389,6 +416,15 @@ namespace RazorTransform {
         internal static string NewItem {
             get {
                 return ResourceManager.GetString("NewItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing found for enum {0} after executing script &quot;{1}&quot;.
+        /// </summary>
+        internal static string NoEnumContent {
+            get {
+                return ResourceManager.GetString("NoEnumContent", resourceCulture);
             }
         }
         
@@ -417,6 +453,24 @@ namespace RazorTransform {
         internal static string ProcessingTransforms {
             get {
                 return ResourceManager.GetString("ProcessingTransforms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; is {1} but must be between {3} and {4}..
+        /// </summary>
+        internal static string RangeInt {
+            get {
+                return ResourceManager.GetString("RangeInt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; has a value of &quot;{1}&quot; and length of {2} but length must be between {3} and {4}.
+        /// </summary>
+        internal static string RangeStrLen {
+            get {
+                return ResourceManager.GetString("RangeStrLen", resourceCulture);
             }
         }
         

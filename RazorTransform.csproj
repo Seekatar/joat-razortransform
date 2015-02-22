@@ -51,9 +51,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\RazorEngine.3.4.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
-    <Reference Include="RtPsHost, Version=1.0.1.4, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
+    <Reference Include="RtPsHost, Version=1.0.3.0, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\RtPsHost.1.0.1.4\lib\net45\RtPsHost.dll</HintPath>
+      <HintPath>packages\RtPsHost.1.0.3.0\lib\net45\RtPsHost.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -116,6 +116,9 @@
     <Compile Include="Custom\RtThyRegEx.cs" />
     <Compile Include="Custom\RtThySelfType.cs" />
     <Compile Include="EventArgs.cs" />
+    <None Include="EnumTest.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ITransformModel.cs" />
     <None Include="ITransformModelGroup.cs" />
     <None Include="ITransformModelItem.cs" />

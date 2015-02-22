@@ -20,6 +20,7 @@
     <item name="folderS1" displayName="Folder name" description="Folder Description" defaultValue="c:\" type="Folder" hidden="false" />
     <item name="passwordS1" displayName="Password" description="enter a password.  Password values are never stored." defaultValue="" type="Password" hidden="false" />
     <item name="guidS1" displayName="Guid" description="Click to create a Guid" defaultValue="" type="Guid" hidden="false" />
+    <item name="enumS3" displayName="Dynamic Enum" description="dynamically created values" defaultValue="&lt;None&gt;" type="Dynamic" hidden="false" />
   </group>
 
   <group name="Strings" description="A few strings" hidden="false">
@@ -114,7 +115,8 @@
     <value key="horse" value="Horse"/>
     <value key="chicken" value="Chicken"/>
   </enum>
-  <enum name="Dynamic" script="test.ps1" />
+  <enum name="Dynamic" script="EnumTest.ps1" timeoutSecs="2" parms="extra=123;more=&quot;4\;56\=&quot;"/>
+  
   <regex name="version4" value="^\d+\.\d+\.\d+\.\d+$" />
   <regex name="version2" value="^\d+\.\d+$" />
   <regex name="No spaces" value="^[^\s]+$" />

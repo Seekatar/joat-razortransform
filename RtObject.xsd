@@ -27,6 +27,7 @@
         <xs:element maxOccurs="unbounded" ref="value"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="script" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="value">
