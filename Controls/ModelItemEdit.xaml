@@ -9,6 +9,9 @@
             <TextBlock Style="{StaticResource txtBlockValue}" x:Name="arrow" Margin="10,0,5,0" Visibility="Collapsed">=></TextBlock>
             <TextBlock Style="{StaticResource txtBlockValue}" x:Name="expandedValue" Text="{Binding ExpandedValue, ElementName=root}" Margin="0,0,10,0" Visibility="Collapsed" />
         </StackPanel>
-        <TextBox Style="{StaticResource txtBox}" x:Name="value" Text="{Binding Value, ElementName=root}" />
+        <DockPanel>
+            <TextBlock Style="{StaticResource labelUnits}" x:Name="units" Text="{Binding Units, ElementName=root}" Margin="5,0,5,0" VerticalAlignment="Center" DockPanel.Dock="Right" Visibility="Collapsed">hours</TextBlock>
+            <TextBox Style="{StaticResource txtBox}" x:Name="value" Text="{Binding Value, ElementName=root}" />
+        </DockPanel>
     </DockPanel>
 </UserControl>

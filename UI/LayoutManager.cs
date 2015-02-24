@@ -417,7 +417,9 @@ namespace RazorTransform
 
         private static Control _Default (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
-            var t = new ModelItemEdit(ci);
+            var units = ci.Attribute("units");
+
+            var t = new ModelItemEdit(ci, units);
 
             var ttBinding = new Binding()
             {
@@ -483,22 +485,7 @@ namespace RazorTransform
 #elif UseDefaultForNum       
             return _Default(ci, binding, itemChanged);
 #else
-            var units = ci.Attribute("units");
-            if (!String.IsNullOrWhiteSpace(units))
-            {
-                var t = new NumberWithUnits(units);
-                if (ci.ReadOnly)
-                    t.IsReadOnly = true;
-
-                binding.Mode = BindingMode.TwoWay;
-                t.SetBinding(NumberWithUnits.NumTextProperty, binding);
-                t.NumTextChanged += (o, e) => { itemChanged(ci); };
-                return t;
-            }
-            else
-            {
-                return _Default(ci, binding, itemChanged);
-            }
+            return _Default(ci, binding, itemChanged);
 
 #endif
         }

@@ -10,7 +10,7 @@ namespace RazorTransform
     {
         RazorTransform.Model.IItem _item; 
 
-        public ModelItemEdit(RazorTransform.Model.IItem item )
+        public ModelItemEdit(RazorTransform.Model.IItem item, string units = null )
         {
             InitializeComponent();
             // this.value.TextChanged += new TextChangedEventHandler(OnOrigChanged);
@@ -20,6 +20,12 @@ namespace RazorTransform
             if ( _item.Value != _item.ExpandedValue )
             {
                 arrow.Visibility = expandedValue.Visibility = System.Windows.Visibility.Visible;
+            }
+
+            if ( !String.IsNullOrWhiteSpace(units))
+            {
+                this.units.Visibility = System.Windows.Visibility.Visible;
+                this.units.Text = units;
             }
         }
 
