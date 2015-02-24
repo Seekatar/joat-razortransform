@@ -73,10 +73,11 @@ namespace RazorTransform.Model
             set;
         }
 
+        string _expandedValue;
         public string ExpandedValue
         {
-            get;
-            set;
+            get { return _expandedValue; }
+            set { OnPropertyChanged(_expandedValue, value, "ExpandedValue"); _expandedValue = value; }
         }
 
         public void LoadFromXml(XElement xml, XElement values, IDictionary<string, string> overrides)
@@ -415,6 +416,17 @@ namespace RazorTransform.Model
 
             }
             return sb.ToString();
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(object oldValue, object newValue, string propertyName)
+        {
+            if (!Object.Equals(oldValue, newValue))
+            {
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

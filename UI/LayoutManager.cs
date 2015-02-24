@@ -21,7 +21,7 @@ namespace RazorTransform
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public static FrameworkElement BuildGridView(IEnumerable<IItemBase> items, bool showHidden, Action itemChanged = null )
+        public static FrameworkElement BuildGridView(IEnumerable<IItemBase> items, bool showHidden, Action<IItem> itemChanged = null )
         {
             Grid grid = new Grid();
             grid.Margin = new Thickness(5);
@@ -287,7 +287,7 @@ namespace RazorTransform
             return new SolidColorBrush() { Color = (Color)Application.Current.FindResource("DarkColor") };
         }
 
-        private static Control CreateControl(IItem item, Binding binding, Action itemChanged )
+        private static Control CreateControl(IItem item, Binding binding, Action<IItem> itemChanged )
         {
             if (item.Type == RtType.Custom && ModelConfig.Instance.CustomTypes.ContainsKey(item.OriginalTypeStr))
             {
@@ -328,12 +328,12 @@ namespace RazorTransform
 
 
 
-        private static Control _Folder ( IItem ci, Binding binding, Action itemChanged) 
+        private static Control _Folder ( IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             return _UncPath(ci, binding, itemChanged);
         }
 
-        private static Control _UncPath (IItem ci, Binding binding, Action itemChanged) 
+        private static Control _UncPath (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var t = new FolderInputBox(ci.DisplayName, true);
             if (ci.ReadOnly)
@@ -341,11 +341,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(FolderInputBox.FolderNameProperty, binding);
-            t.FolderNameChanged += (o, e) => { itemChanged(); };
+            t.FolderNameChanged += (o, e) => { itemChanged(ci); };
             return t;
         }
 
-        private static Control _Guid (IItem ci, Binding binding, Action itemChanged) 
+        private static Control _Guid (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var t = new GuidInput();
             if (ci.ReadOnly)
@@ -353,11 +353,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             t.SetBinding(GuidInput.GuidStrProperty, binding);
-            t.GuidStrChanged += (o, e) => { itemChanged(); };
+            t.GuidStrChanged += (o, e) => { itemChanged(ci); };
             return t;
         }
 
-        private static Control _Bool (IItem ci, Binding binding, Action itemChanged) 
+        private static Control _Bool (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var bib = new BoolInput();
             if (ci.ReadOnly)
@@ -365,11 +365,11 @@ namespace RazorTransform
 
             binding.Mode = BindingMode.TwoWay;
             bib.SetBinding(BoolInput.BoolProperty, binding);
-            bib.BoolChanged += (o, e) => { itemChanged(); };
+            bib.BoolChanged += (o, e) => { itemChanged(ci); };
             return bib;
         }
 
-        private static ComboBoxInput _ComboBox (IItem ci, Binding binding, Action itemChanged) 
+        private static ComboBoxInput _ComboBox (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var bib = new ComboBoxInput();
             if (ci.ReadOnly)
@@ -383,11 +383,11 @@ namespace RazorTransform
             listBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
             bib.SetBinding(ComboBoxInput.ComboBoxListProperty, listBinding);
 
-            bib.ComboBoxChanged += (o, e) => { itemChanged(); };
+            bib.ComboBoxChanged += (o, e) => { itemChanged(ci); };
             return bib;
         }
 
-        private static Hyperlink _HyperLink (IItem ci, Binding binding, Action itemChanged) 
+        private static Hyperlink _HyperLink (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var bib = new Hyperlink();
 
@@ -415,7 +415,28 @@ namespace RazorTransform
             return t;
         }
 
-        private static Control _Default (IItem ci, Binding binding, Action itemChanged) 
+        private static Control _Default (IItem ci, Binding binding, Action<IItem> itemChanged) 
+        {
+            var t = new ModelItemEdit(ci);
+
+            var ttBinding = new Binding()
+            {
+                Source = ci,
+                Path = new PropertyPath("ExpandedValue"),
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Mode = BindingMode.TwoWay
+            };
+            t.SetBinding(ModelItemEdit.ExpandedValueProperty, ttBinding);
+
+            t.MinWidth = 150;
+            binding.Mode = BindingMode.TwoWay;
+            t.SetBinding(ModelItemEdit.ValueProperty, binding);
+
+            t.ValueChanged += (o, e) => { itemChanged(ci); };
+            return t;
+        }
+
+        private static Control _DefaultOld (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var t = new TextBox();
             if (ci.ReadOnly)
@@ -426,11 +447,11 @@ namespace RazorTransform
 
             t.MinWidth = 150;
             t.SetBinding(TextBox.TextProperty, binding);
-            t.TextChanged += (o, e) => { itemChanged(); }; 
+            t.TextChanged += (o, e) => { itemChanged(ci); }; 
             return t;
         }
 
-        private static Control _Password (IItem ci, Binding binding, Action itemChanged) 
+        private static Control _Password (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
             var t = new PasswordBox();
             if (ci.ReadOnly)
@@ -439,11 +460,11 @@ namespace RazorTransform
             t.MinWidth = 150;
             var value = ci.Value;
             t.Password = value;
-            t.PasswordChanged += (o, e) => { itemChanged(); };
+            t.PasswordChanged += (o, e) => { itemChanged(ci); };
             return t;
         }
 
-        private static Control _Int(IItem ci, Binding binding, Action itemChanged)
+        private static Control _Int(IItem ci, Binding binding, Action<IItem> itemChanged)
         {
 #if ModelNotAllowedinLongUpDown
             var t = new Xceed.Wpf.Toolkit.LongUpDown();
@@ -457,7 +478,7 @@ namespace RazorTransform
             t.Value = Int64.Parse(ci.Value ?? "0");
 
             t.SetBinding(Xceed.Wpf.Toolkit.IntegerUpDown.TextProperty, binding);
-            t.ValueChanged += (o, e) => { itemChanged(); };
+            t.ValueChanged += (o, e) => { itemChanged(ci); };
             return t;
 #elif UseDefaultForNum       
             return _Default(ci, binding, itemChanged);
@@ -471,7 +492,7 @@ namespace RazorTransform
 
                 binding.Mode = BindingMode.TwoWay;
                 t.SetBinding(NumberWithUnits.NumTextProperty, binding);
-                t.NumTextChanged += (o, e) => { itemChanged(); };
+                t.NumTextChanged += (o, e) => { itemChanged(ci); };
                 return t;
             }
             else

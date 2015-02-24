@@ -25,9 +25,9 @@ namespace RazorTransform
 
     public enum RtSort
     {
-        None,
-        Ascending,
-        Descending
+        none,
+        ascending,
+        descending
     }
 
     /// <summary>

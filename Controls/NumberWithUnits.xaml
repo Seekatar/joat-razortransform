@@ -6,6 +6,6 @@
              Margin="0">
     <DockPanel >
         <Label Style="{StaticResource labelUnits}" x:Name="theUnits" DockPanel.Dock="Right"></Label>
-        <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" MinWidth="{Binding ActualWidth, ElementName=theButton}" Text="{Binding NumText, ElementName=root}" />
+        <TextBox Style="{StaticResource txtBox}" x:Name="theTextBox" Text="{Binding NumText, ElementName=root}" />
     </DockPanel>
 </UserControl>

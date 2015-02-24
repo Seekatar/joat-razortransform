@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- <RtObject could break code that gets XElement.Name since it would include ns now xmlns="my://RtObject"--> 
 <RtObject>
-  <group name="Hello" description="Welcome to Artie" hidden="false">
+  <group name="Hello" description="Welcome to Artie" hidden="true">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
     <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" /> 
     <item name="w3" displayName="Go!" description="Welcome String3" defaultValue="Click the play button to transform these values into output" type="Label" />
@@ -36,7 +36,7 @@
     <item name="s4" displayName="Ints" description="Sample string" defaultValue="This tab has ints with different limits." type="Label" />
     <item name="intA1" displayName="Int32 10-20" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
     <item name="intA2" displayName="Int32 &gt; 10" description="Int32 with min of 10." defaultValue="12" type="Int32" hidden="false" min="10" />
-    <item name="intA3" displayName="Int32 &lt; 10" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" />
+    <item name="intA3" displayName="Int32 &lt; 10" description="Int32 with max of 10." defaultValue="13" type="Int32" hidden="false" max="10" units="days"/>
   </group>
   
   <group name="Grouped" description="Array of itemB objects with min number of 3." hidden="false" arrayValueName="itemB" min="3" key="-&gt;name description" >
@@ -50,7 +50,7 @@
     </group>
   </group>
 
-  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2, unique name." hidden="false" arrayValueName="itemAS" min="2" unique="true">
+  <group name="Simple Array" description="Array of itemAS objects with a group.  Min 2, unique name." hidden="false" arrayValueName="itemAS" min="2" unique="true" sort="descending">
     <group name="Basic" description="this is the basic stuff" hidden="false" >
       <item name="nameA" displayName="Name for A" description="Name, no spaces" defaultValue="" type="string" hidden="false" regex="No spaces"/>
       <item name="descriptionA" displayName="Description for A" description="description" defaultValue="" type="string" hidden="false" />

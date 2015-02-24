@@ -22,8 +22,8 @@ namespace RazorTransform.UI
         /// </summary>
         public Breadcrumb() 
         {
-            _byIndex.Add("Model");
-            _byName.Add("Model");
+            _byIndex.Add("Model.Root");
+            _byName.Add("Model.Root");
         }
 
         /// <summary>
@@ -47,6 +47,11 @@ namespace RazorTransform.UI
                 return;
             _byIndex.RemoveAt(_byIndex.Count - 1);
             _byName.RemoveAt(_byName.Count - 1);
+        }
+
+        public int Depth 
+        {
+            get { return _byIndex.Count - 1; }
         }
 
         /// <summary>

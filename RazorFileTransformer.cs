@@ -21,6 +21,8 @@ namespace RazorTransform
     class RazorFileTransformer
     {
         IModel _model;
+        Regex _modelRegex = new Regex(@"@\({0,1}Model(\.\w+(\[.+\]){0,1}){1,4}\){0,1}");
+
 
         private int transformFiles(string inputMask, string outputFolder, bool saveFiles, bool recursive, CancellationToken cancel, IProgress<ProgressInfo> progress)
         {
@@ -129,8 +131,6 @@ namespace RazorTransform
 
         private int substituteValues(IModel model, CancellationToken cancel, IProgress<ProgressInfo> progress = null, int depth = 0, string nestedName = null)
         {
-            Regex r = new Regex(@"@\({0,1}Model(\.\w+(\[.+\]){0,1}){1,4}\){0,1}");
-
             int max = Math.Max(1, model.Items.Count);
             int changeCount = 0;
             int count = 0;
@@ -167,41 +167,7 @@ namespace RazorTransform
                         
                         var subst = i.Value != null ? i.Value : String.Empty;
 
-                        var matches = r.Matches(subst);
-                        if (matches.Count > 0)
-                        {
-                            foreach (Match match in r.Matches(subst))
-                            {
-                                string errorMessage = null;
-
-                                string result = null;
-                                lock (_substituteMapping)
-                                {
-                                    if (_substituteMapping.ContainsKey(match.Value))
-                                        result = _substituteMapping[match.Value];
-                                }
-                                if (result == null)
-                                {
-                                    result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage, match.Value);
-                                    if (!String.IsNullOrEmpty(errorMessage))
-                                    {
-                                        throw new Exception(errorMessage);
-                                    }
-                                    lock (_substituteMapping)
-                                    {
-                                        if (match.Value.Contains(".Root.") || depth == 0)
-                                            _substituteMapping[match.Value] = result;
-                                    }
-                                }
-                                if (result != null)
-                                    subst = subst.Replace(match.Value, result);
-
-                            }
-                            i.ExpandedValue = subst;
-                        }
-                        else
-                            i.ExpandedValue = i.Value;
-
+                        i.ExpandedValue = ExpandValue(subst, model, depth );
                     }
                     Interlocked.Increment(ref count);
                 }
@@ -234,6 +200,45 @@ namespace RazorTransform
             {
                 return transformFiles(inputMask, outputFolder, saveFiles, recursive, cancel, progress);
             });
+        }
+
+        public string ExpandValue( string subst, object model, int depth )
+        {
+            var matches = _modelRegex.Matches(subst);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in _modelRegex.Matches(subst))
+                {
+                    string errorMessage = null;
+
+                    string result = null;
+                    lock (_substituteMapping)
+                    {
+                        if (_substituteMapping.ContainsKey(match.Value))
+                            result = _substituteMapping[match.Value];
+                    }
+                    if (result == null)
+                    {
+                        result = RazorTemplateUtil.TryTransform(model, HttpUtility.HtmlDecode(match.Value), out errorMessage, match.Value);
+                        if (!String.IsNullOrEmpty(errorMessage))
+                        {
+                            throw new Exception(errorMessage);
+                        }
+                        lock (_substituteMapping)
+                        {
+                            if (match.Value.Contains(".Root.") || depth == 0)
+                                _substituteMapping[match.Value] = result;
+                        }
+                    }
+                    if (result != null)
+                        subst = subst.Replace(match.Value, result);
+
+                }
+                return subst;
+            }
+            else
+                return subst;
+
         }
 
         public Task SubstituteValuesAsync(CancellationToken cancel, IProgress<ProgressInfo> progress = null)

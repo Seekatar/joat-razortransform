@@ -40,14 +40,14 @@ namespace RazorTransform.Custom
             _psColors = parms.ContainsKey("psColors") && bool.Parse(parms["psColors"]);
         }
 
-        public Control CreateControl(IItem ci, System.Windows.Data.Binding binding,System.Action itemChanged)
+        public Control CreateControl(IItem ci, System.Windows.Data.Binding binding,System.Action<IItem> itemChanged)
         {
 
             var t = new ColorPicker(ci, _psColors);
             binding.Mode = BindingMode.TwoWay;
 
             t.SetBinding(ColorPicker.ColorProperty, binding);
-            t.ColorChanged += (o, e) => { itemChanged(); };
+            t.ColorChanged += (o, e) => { itemChanged(ci); };
             return t;
         }
 

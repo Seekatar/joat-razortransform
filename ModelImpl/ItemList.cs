@@ -229,21 +229,21 @@ namespace RazorTransform.Model
             Max = Math.Min(Int16.MaxValue, (Int64?)xml.Attribute(Constants.Max) ?? Int16.MaxValue);
 
             Unique = (bool?)xml.Attribute(Constants.Unique) ?? false;
-            var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.None.ToString();
+            var sortStr = (string)xml.Attribute(Constants.Sort) ?? RtSort.none.ToString();
 
             bool ascending;
             // old RtObject took true/false
             if (bool.TryParse(sortStr, out ascending))
             {
-                Sort = ascending ? RtSort.Ascending : RtSort.None;
+                Sort = ascending ? RtSort.ascending : RtSort.none;
             }
             else
             {
                 RtSort sort;
-                if (Enum.TryParse<RtSort>(sortStr, out sort))
+                if (Enum.TryParse<RtSort>(sortStr.ToLower(), out sort))
                     Sort = sort;
                 else
-                    Sort = RtSort.None;
+                    Sort = RtSort.none;
             }
 
             // load the prototype (no values)
@@ -351,15 +351,18 @@ namespace RazorTransform.Model
 
         public void Add(IModel item)
         {
-            if (Sort != RtSort.None)
+            if (Sort != RtSort.none)
             {
+                var key = ModelKeyName(item);
                 int i = 0;
                 for (; i < _models.Count; i++)
                 {
-                    var key = ModelKeyName(item);
-                    if ((Sort == RtSort.Ascending && String.Compare(ModelKeyName(_models[i]), key) >= 0) || // ascending
-                                                      String.Compare(ModelKeyName(_models[i]), key) <= 0)    // descending
+                    var existingKey = ModelKeyName(_models[i]);
+                    if ((Sort == RtSort.ascending && String.Compare(key, existingKey) <= 0) || 
+                        (Sort == RtSort.descending && String.Compare(key, existingKey) >= 0))    
+                    {
                         break;
+                    }
                 }
                 _models.Insert(i, item);
             }

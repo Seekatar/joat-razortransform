@@ -71,7 +71,7 @@ namespace RazorTransform.Custom
             throw new NotImplementedException();
         }
 
-        public System.Windows.Controls.Control CreateControl(IItem info, System.Windows.Data.Binding binding, System.Action itemChanged)
+        public System.Windows.Controls.Control CreateControl(IItem info, System.Windows.Data.Binding binding, System.Action<IItem> itemChanged)
         {
             // never needed to be called
             throw new NotImplementedException();

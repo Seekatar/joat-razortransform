@@ -28,7 +28,7 @@ namespace RazorTransform.Custom
         /// <param name="binding">the binding object for the control</param>
         /// <param name="itemChanged"> call when the item has changed to indicate dirty</param>
         /// <returns>the control to show on the screen</returns>
-        Control CreateControl(IItem info, Binding binding, Action itemChanged);
+        Control CreateControl(IItem info, Binding binding, Action<IItem> itemChanged);
 
         /// <summary>
         /// called after the object is constructed

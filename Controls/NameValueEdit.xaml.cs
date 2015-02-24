@@ -78,10 +78,24 @@ namespace RazorTransform
 
         public bool Dirty { get; set; }
 
-        private void setDirty()
+        private void setDirty(IItem item)
+        {
+            RazorFileTransformer rf = new RazorFileTransformer(_model.Root);
+            item.ExpandedValue = rf.ExpandValue(item.Value, _model, LayoutManager.Breadcrumb.Depth); 
+            Dirty = true;
+        }
+
+        private void setDirty(IModel orig)
         {
             Dirty = true;
         }
+
+        private void setDirty(IItemList list)
+        {
+            Dirty = true;
+        }
+		
+
 
         /// <summary>
         /// Create the tab for a group
@@ -121,7 +135,7 @@ namespace RazorTransform
                 {
                     list.Remove(delMe.Model);
                     ModelConfig.Instance.OnItemDeleted(new ItemChangedArgs() { List = list, Item = delMe.Model });
-                    setDirty();
+                    setDirty(list);
                     await RazorTransformer.Instance.RefreshModelAsync(false, true);
                     reload();
                 }
@@ -143,7 +157,7 @@ namespace RazorTransform
                 var copy = new RazorTransform.Model.Model(copyMe.Model,null);
                 list.Add(copy);
                 ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = copy });
-                setDirty();
+                setDirty(list);
                 reload();
             }
         }
@@ -191,12 +205,12 @@ namespace RazorTransform
                 // add it to the parent array
                 list.Add(newOne);
                 ModelConfig.Instance.OnItemAdded(new ItemChangedArgs() { List = list, Item = editedModel });
-                setDirty();
+                setDirty(list);
                 await RazorTransformer.Instance.RefreshModelAsync(false, true);
                 reload();
             }
         }
-		
+
         #endregion        
         
         /// <summary>
@@ -211,7 +225,7 @@ namespace RazorTransform
             nve.TrySetOwner(Window.GetWindow(this));
             var temp = nve.ShowDialog(orig, Settings.Instance.ShowHidden, isAdd );
             if (temp != null )
-                setDirty();
+                setDirty(orig);
             return temp;
         }
 
