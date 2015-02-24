@@ -134,6 +134,11 @@ namespace RazorTransform
                 transformResult = await _transformer.DoTransformAsync(editControl.Dirty);
                 editControl.Dirty = false;
             }
+            else
+            {
+                await _transformer.SaveAsync(true, editControl.Dirty); // validate, only save if dirty
+            }
+            editControl.Dirty = false;
 
             if (transformResult.Result == ProcessingResult.ok)
             {

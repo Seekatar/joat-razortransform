@@ -421,6 +421,12 @@ namespace RazorTransform
 
             var t = new ModelItemEdit(ci, units);
 
+            if (ci.ReadOnly)
+            {
+                t.IsReadOnly = true;
+                t.IsEnabled = false;
+            }
+
             var ttBinding = new Binding()
             {
                 Source = ci,

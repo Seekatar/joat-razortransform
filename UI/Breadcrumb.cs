@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,8 @@ namespace RazorTransform.UI
     {
         IList<string> _byName = new List<string>();
         IList<string> _byIndex = new List<string>();
+        Regex _re = new Regex("^[A-Za-z_]\\w*$");
+        const string _invalidKeyMarker = "<<invalidKey>>";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Breadcrumb"/> class.
@@ -35,7 +38,10 @@ namespace RazorTransform.UI
         public void PushArray(string name, string key, int index)
         {
             _byIndex.Add(string.Format("{0}[{1}]", name, index));
-            _byName.Add(string.Format("{0}[{1}]", name, key));
+            if (_re.IsMatch(key))
+                _byName.Add(string.Format("{0}[{1}]", name, key));
+            else
+                _byName.Add(string.Format("{0}[{1}]", name, index));
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace RazorTransform.UI
         /// <summary>
         /// Sets the context menu for breadcrumb on the item
         /// </summary>
-        /// <param name="l">The l.</param>
+        /// <param name="l">The element.</param>
         /// <param name="itemName">Name of the item.</param>
         public void SetContextMenu(FrameworkElement l, string itemName)
         {
@@ -77,15 +83,18 @@ namespace RazorTransform.UI
             var item = new MenuItem();
 
             string name = string.Format("@({0}.{1})", String.Join(".", list), itemName);
-            item.Header = string.Format(Resource.CopyContextMenu, name);
-            item.ToolTip = tooltip;
-            item.Icon = new System.Windows.Controls.Image
+            if (!l.ContextMenu.HasItems || (string)(l.ContextMenu.Items[0] as MenuItem).CommandParameter != name)
             {
-                Source = new BitmapImage(new Uri(@"..\Resources\Clipboard.png", UriKind.Relative))
-            };
-            item.CommandParameter = name;
-            item.Click += item_Click;
-            l.ContextMenu.Items.Add(item);
+                item.Header = string.Format(Resource.CopyContextMenu, name);
+                item.ToolTip = tooltip;
+                item.Icon = new System.Windows.Controls.Image
+                {
+                    Source = new BitmapImage(new Uri(@"..\Resources\Clipboard.png", UriKind.Relative))
+                };
+                item.CommandParameter = name;
+                item.Click += item_Click;
+                l.ContextMenu.Items.Add(item);
+            }
         }
 
         static void item_Click(object sender, RoutedEventArgs e)
