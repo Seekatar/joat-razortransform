@@ -81,7 +81,16 @@ namespace RazorTransform
         private void setDirty(IItem item)
         {
             RazorFileTransformer rf = new RazorFileTransformer(_model.Root);
-            item.ExpandedValue = rf.ExpandValue(item.Value, _model, LayoutManager.Breadcrumb.Depth); 
+            try
+            {
+                item.ExpandedValue = rf.ExpandValue(item.Value, _model, LayoutManager.Breadcrumb.Depth);
+            }
+            catch (Exception e)
+            {
+                // leave value alone
+                MessageBox.Show(String.Format(Resource.ExceptionFormat, e.BuildMessage()), Resource.Title, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            }
             Dirty = true;
         }
 
