@@ -10,7 +10,7 @@ namespace RazorTransform
         public BoolInput()
         {
             InitializeComponent();
-            theCheckBox.Checked += new RoutedEventHandler(OnChecked);
+            theCheckBox.Click += new RoutedEventHandler(OnChecked);
         }
 
         void theCheckBox_Checked(object sender, RoutedEventArgs e)

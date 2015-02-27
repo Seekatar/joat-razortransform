@@ -337,6 +337,8 @@ namespace RazorTransform.Model
 
             OriginalTypeStr = (String)itemXml.Attribute(Constants.Type) ?? String.Empty;
 
+            Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
+
             Type = Constants.MapType(OriginalTypeStr);
 
             if (Type == RtType.HiddenString) // old files have hidden as type to indicate hidden string
@@ -352,12 +354,7 @@ namespace RazorTransform.Model
             {
                 IsPassword = true;
             }
-            else
-            {
-                Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
-            }
-
-            if (Type == RtType.Invalid)
+            else if (Type == RtType.Invalid)
             {
                 throw new Exception("Invalid type for property " + Name);
             }

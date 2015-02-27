@@ -248,6 +248,7 @@ namespace RazorTransform.Model
                             throw new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value));
                         }
                     }
+                    path = System.IO.Path.GetFullPath(path);
 
                     Dictionary<string, object> parms = parseParms((String)x.Attribute(Constants.Parameters) ?? null);
 
