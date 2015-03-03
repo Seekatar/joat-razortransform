@@ -241,11 +241,16 @@ namespace RazorTransform.Model
                     var path = scriptAttr.Value;
                     if (!File.Exists(path))
                     {
-                        // not fully qualified or in current dir, is it with the object file?
-                        path = Path.Combine(Path.GetDirectoryName(Settings.Instance.ObjectFile), path);
+                        // look above output
+                        path = Path.Combine(Settings.Instance.OutputFolder, scriptAttr.Value);
                         if (!File.Exists(path))
                         {
-                            throw new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value));
+                            // not fully qualified or in current dir, is it with the object file?
+                            path = Path.Combine(Path.GetDirectoryName(Settings.Instance.ObjectFile), path);
+                            if (!File.Exists(path))
+                            {
+                                throw new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value));
+                            }
                         }
                     }
                     path = System.IO.Path.GetFullPath(path);
