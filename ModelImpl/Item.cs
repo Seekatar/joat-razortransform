@@ -381,7 +381,7 @@ namespace RazorTransform.Model
         /// <param name="x"></param>
         protected virtual void setDefaultValue(XElement x)
         {
-            if (x.Attribute(Constants.DefaultValue) != null && !String.IsNullOrEmpty(x.Attribute(Constants.DefaultValue).Value))
+            if (x.Attribute(Constants.DefaultValue) != null )
             {
                 Value = x.Attribute(Constants.DefaultValue).Value;
             }

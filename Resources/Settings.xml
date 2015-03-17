@@ -11,9 +11,9 @@
     <item name="RTSettings_Copyright" displayName="Copyright" description="Copyright" type="label" defaultValue="Copyright (c) 2014. Jim Wallace" />
     <item name="RTSettings_Version" displayName="Version" description="Major version" type="label" defaultValue="2.0" />
     <item name="RTSettings_FileVersion" displayName="File Version" description="Version of file" type="label" defaultValue="2.0" />
-    <item name="RTSettings_License" displayName="License" description="MIT License" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/wiki/License" />
-    <item name="RTSettings_Doc" displayName="Using Guide" description="" type="hyperlink" defaultValue="https://code.google.com/p/joat-razortransform/" />
-    <item name="RTSettings_MainPage" displayName="Project page" description="" type="hyperlink" defaultValue="https://joat-razortransform.googlecode.com/git/Doc/Using%20Arite.docx" />
+    <item name="RTSettings_License" displayName="License" description="MIT License" type="hyperlink" defaultValue="https://github.com/Seekatar/joat-razortransform/wiki/License" />
+    <item name="RTSettings_Doc" displayName="Using Guide" description="" type="hyperlink" defaultValue="https://github.com/Seekatar/joat-razortransform/raw/master/Doc/Using%20Arite.docx" />
+    <item name="RTSettings_MainPage" displayName="Project page" description="" type="hyperlink" defaultValue="https://github.com/Seekatar/joat-razortransform" />
     
   </group>
   <custom name="PsColorType" classname="RazorTransform.Custom.PsColorType,RazorTransform"/>

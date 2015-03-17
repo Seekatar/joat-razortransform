@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace RazorTransform
 {
@@ -91,6 +92,17 @@ namespace RazorTransform
                 catch { }
             }
 
+            // readonly settings are in About group
+            var ro = config.Root.XPathSelectElements("/RtObject/group[@name=\"About\"]/item");
+            if (root != null)
+            {
+                foreach (var r in ro.Select( o => o.Attribute("name").Value ) )
+                {
+                    var e = root.Element(r);
+                    if (e != null)
+                        e.Remove();
+                }
+            }
             _settings.LoadFromXml(config.Root, root, overrideParms);
             var output = _settings.Items.SingleOrDefault(o => o.Name == "RTSettings_LastPath");
             if ( output != null && output is Item )
