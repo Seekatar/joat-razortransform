@@ -467,6 +467,8 @@ namespace RazorTransform
 
             t.MinWidth = 150;
             var value = ci.Value;
+            (ci as PasswordItem).GetPassword = () => { return t.Password; };
+            (ci as PasswordItem).SetPassword = (o) => { t.Password = o; };
             t.Password = value;
             t.PasswordChanged += (o, e) => { itemChanged(ci); };
             return t;

@@ -134,6 +134,7 @@
     <Compile Include="Model\IItemBase.cs" />
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelConfig.cs" />
+    <Compile Include="ModelImpl\PasswordItem.cs" />
     <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTemplateUtil.cs" />

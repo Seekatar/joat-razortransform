@@ -67,7 +67,7 @@ namespace RazorTransform.Model
             get { return _visibilityGroups; }
         }
 
-        public string Value
+        public virtual string Value
         {
             get;
             set;

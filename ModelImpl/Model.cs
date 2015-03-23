@@ -132,6 +132,12 @@ namespace RazorTransform.Model
                     {
                         item = new Item(this, group);
                         item.LoadFromXml(xmlItem, values, overrides);
+                        if ( (item as IItem).IsPassword )
+                        {
+                            // what a hack
+                            item = new PasswordItem(this, group);
+                            item.LoadFromXml(xmlItem, values, overrides);
+                        }
                         Items.Add(item);
                     }
                 }
