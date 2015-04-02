@@ -65,6 +65,40 @@ namespace RazorTransform.Model
         #endregion
 
         #region IModel methods
+        /// <summary>
+        /// Get the exported items.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, object> ExportedItems()
+        {
+            var dict = new Dictionary<string, object>();
+            exportedItems(Items, dict);
+            return dict;
+        }
+
+        /// <summary>
+        /// Recursively get items to export.
+        /// </summary>
+        /// <param name="items">The items.</param>
+        /// <param name="dict">The dictionary.</param>
+        private void exportedItems(IEnumerable<IItemBase> items, Dictionary<string, object> dict)
+        {
+            foreach (var i in items.OfType<IItem>())
+            {
+                if (i.IsPassword)
+                    dict[i.Name] = i.ExpandedValue;
+                else if (i.Name == "SQLServer" || i.Name == "InstanceName")
+                    dict[i.Name] = i.ExpandedValue;
+            }
+            foreach (var i in items.OfType<IItemList>())
+            {
+                foreach (var m in i)
+                {
+                    exportedItems(m.Items, dict);
+                }
+            }
+        }
+
         public IItemList GetList()
         {
             return Items.FirstOrDefault() as IItemList;

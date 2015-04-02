@@ -115,11 +115,29 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RazorTransform complete..
+        /// </summary>
+        internal static string Complete {
+            get {
+                return ResourceManager.GetString("Complete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to save with invalid data?.
         /// </summary>
         internal static string ConfirmDirtySave {
             get {
                 return ResourceManager.GetString("ConfirmDirtySave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to cancel the PowerShell?.
+        /// </summary>
+        internal static string ConfirmPowerShellCancel {
+            get {
+                return ResourceManager.GetString("ConfirmPowerShellCancel", resourceCulture);
             }
         }
         
@@ -330,6 +348,24 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The array &quot;{0}&quot; specified in the object file for EnumFromArray &quot;{1}&quot; was not found..
+        /// </summary>
+        internal static string InvalidArrayName {
+            get {
+                return ResourceManager.GetString("InvalidArrayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The enum &quot;{0}&quot; specified in the object file for EnumFromArray &quot;{1}&quot; was not found..
+        /// </summary>
+        internal static string InvalidEnumName {
+            get {
+                return ResourceManager.GetString("InvalidEnumName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Script specified in enum {0}, &quot;{1}&quot; was not found..
         /// </summary>
         internal static string InvalidEnumScript {
@@ -520,6 +556,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RazorTransform starting....
+        /// </summary>
+        internal static string Starting {
+            get {
+                return ResourceManager.GetString("Starting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Starting transforms.
         /// </summary>
         internal static string StartingTransforms {
@@ -534,6 +579,15 @@ namespace RazorTransform {
         internal static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template folder &quot;{0}&quot; not found..
+        /// </summary>
+        internal static string TemplateFolderNotFound {
+            get {
+                return ResourceManager.GetString("TemplateFolderNotFound", resourceCulture);
             }
         }
         

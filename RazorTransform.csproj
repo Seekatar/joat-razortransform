@@ -112,9 +112,9 @@
     <Compile Include="Controls\Progress.xaml.cs">
       <DependentUpon>Progress.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Custom\CustomRazorTransformTypeBase.cs" />
+    <Compile Include="Custom\EnumFromArrayType.cs" />
     <Compile Include="Custom\ICustomRazorTransformType.cs" />
-    <Compile Include="Custom\RtThyRegEx.cs" />
-    <Compile Include="Custom\RtThySelfType.cs" />
     <Compile Include="EventArgs.cs" />
     <None Include="EnumTest.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

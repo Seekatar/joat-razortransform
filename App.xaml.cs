@@ -58,6 +58,7 @@ namespace RazorTransform
                         var transformer = new RazorTransformer();
                         try
                         {
+                            Console.WriteLine(Resource.Starting);
                             var ok = transformer.InitializeAsync(parms, overrideDict );
                             ok.Wait();
 
@@ -96,9 +97,13 @@ namespace RazorTransform
                         {
                             transformer.Output.Report(new ProgressInfo(String.Format(Resource.ExceptionFormat, e.BuildMessage())));
                         }
+                        Console.WriteLine(Resource.Complete);
+
                     }
                     else // show gui
                     {
+                        var isAttached = LogProgress.IsConsoleAttached(); // will attach if needed
+
                         var app = new App();
 
                         app.InitializeComponent();

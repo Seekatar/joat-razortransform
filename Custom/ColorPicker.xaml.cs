@@ -28,19 +28,19 @@ namespace RazorTransform.Custom
     /// <summary>
     /// custom type for representing a Color
     /// </summary>
-    public class ColorType : ICustomRazorTransformType
+    public class ColorType : CustomRazorTransformTypeBase
     {
         bool _psColors = false;
 
         public ColorType() { }
 
-        public virtual void Initialize(IModelConfig model, IDictionary<string, string> parms) 
+        public override void Initialize(IModelConfig config, IDictionary<string, string> parms)
         {
             // only one parm now
             _psColors = parms.ContainsKey("psColors") && bool.Parse(parms["psColors"]);
         }
 
-        public Control CreateControl(IItem ci, System.Windows.Data.Binding binding,System.Action<IItem> itemChanged)
+        public override Control CreateControl(IItem ci, System.Windows.Data.Binding binding,System.Action<IItem> itemChanged)
         {
 
             var t = new ColorPicker(ci, _psColors);
@@ -51,18 +51,20 @@ namespace RazorTransform.Custom
             return t;
         }
 
-        public IItem CreateItem(IModel parent, IGroup group, XElement e)
+        public override IItem CreateItem(IModel parent, IGroup group, XElement e)
         {
             return new ColorItem(parent, group);
         }
+
+        public IModel Model { get; set; }
     }
 
     public class PsColorType : ColorType
     {
-        public override void Initialize(IModelConfig model, IDictionary<string, string> parms)
+        public override void Initialize(IModelConfig config, IDictionary<string, string> parms)
         {
             parms["psColors"] = true.ToString();
-            base.Initialize(model, parms);
+            base.Initialize(config, parms);
         }
     }
 

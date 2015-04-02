@@ -12,6 +12,12 @@ namespace RazorTransform.Model
         IList<IItemBase> Items { get; }
 
         /// <summary>
+        /// Get the exported items.
+        /// </summary>
+        /// <returns></returns>
+        Dictionary<string, object> ExportedItems();
+
+        /// <summary>
         /// get the parent model
         /// </summary>
         IModel Parent { get; }

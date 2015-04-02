@@ -162,20 +162,26 @@ namespace RazorTransform
                 }
             }
 
-            if (RanTransformOk && _runPowerShell)
+            if (RanTransformOk )
             {
-                RanTransformOk = false;
-                psConsole.WriteLine("", WriteType.Host);
-                psConsole.WriteSystemMessage(Resource.RunningPowerShell);
-                _parent.SendData(new Dictionary<string, string>
+                if (_runPowerShell)
                 {
-                    {"PSStart", DateTime.Now.Ticks.ToString() }
-                });
-                transformResult.Result = await runPowerShell();
-                _parent.SendData(new Dictionary<string, string>
-                {
-                    {"PSEnd", DateTime.Now.Ticks.ToString() }
-                });
+                    RanTransformOk = false;
+                    psConsole.WriteLine("", WriteType.Host);
+                    psConsole.WriteSystemMessage(Resource.RunningPowerShell);
+                    _parent.SendData(new Dictionary<string, string>
+                                        {
+                                            {"PSStart", DateTime.Now.Ticks.ToString() }
+                                        });
+                    transformResult.Result = await runPowerShell();
+                    _parent.SendData(new Dictionary<string, string>
+                                        {
+                                            {"PSEnd", DateTime.Now.Ticks.ToString() }
+                                        });
+                }
+                else
+                    LogProgress.WriteExports(exportedItems());
+
                 RanTransformOk = transformResult.Result == ProcessingResult.ok;
             }
             else
@@ -310,9 +316,9 @@ namespace RazorTransform
         /// grab all the password to set as variables in the PsHost to avoid writing them to disk
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, object> variableItems()
+        Dictionary<string, object> exportedItems()
         {
-            var dict = new Dictionary<string, object>();
+            var dict = _transformer.Model.ExportedItems();
             dict["PsLogFileName"] = _logFileName;
             dict["PsWorkingDir"] = _workingDir;
             dict["PsStep"] = _step ? "$True" : "$False";
@@ -320,27 +326,8 @@ namespace RazorTransform
             {
                 dict["instanceDbName"] = _overrides["InstanceDbName"];
             }
-            variableItems(_transformer.Model.Items, dict);
 
             return dict;
-        }
-
-        private void variableItems(IEnumerable<IItemBase> items, Dictionary<string, object> dict)
-        {
-            foreach (var i in items.OfType<IItem>())
-            {
-                if (i.IsPassword)
-                    dict[i.Name] = i.ExpandedValue;
-                else if (i.Name == "SQLServer" || i.Name == "InstanceName")
-                    dict[i.Name] = i.ExpandedValue;
-            }
-            foreach (var i in items.OfType<IItemList>())
-            {
-                foreach (var m in i)
-                {
-                    variableItems(m.Items, dict);
-                }
-            }
         }
 
         private async Task<ProcessingResult> runPowerShell()
@@ -360,7 +347,7 @@ namespace RazorTransform
                     if (File.Exists(_scriptFname))
                     {
                         // invoke all the scripts
-                        ret = (ProcessingResult)await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, variableItems());
+                        ret = (ProcessingResult)await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, exportedItems());
                     }
                     else
                     {
@@ -391,7 +378,11 @@ namespace RazorTransform
             btnCancel.IsEnabled = false;
             if (_currentState == ProcessingState.shellExecuting)
             {
-                psConsole.Cancel(); // this is async
+                var okToClose = _transformer.Output.ShowMessage(Resource.ConfirmPowerShellCancel, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+                if (okToClose)
+                    psConsole.Cancel(); // this is async
+                else
+                    return;
             }
             else if (_currentState == ProcessingState.shellExecuted && !RanTransformOk)
             {
@@ -490,7 +481,7 @@ namespace RazorTransform
 
                     psConsole.SyncContext = null;
                     psConsole.Initialize();
-                    var result = await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, variableItems(), ScriptInfo.ScriptType.preRun);
+                    var result = await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, exportedItems(), ScriptInfo.ScriptType.preRun);
                 }
                 if (!String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSForeground"]) && !String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSBackground"]))
                 {

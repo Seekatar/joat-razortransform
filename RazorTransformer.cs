@@ -57,6 +57,8 @@ namespace RazorTransform
                 if (ret)
                 {
                     _model.LoadFromXml(ModelConfig.Instance.Root, ModelConfig.Instance.ValuesRoot, overrides);
+
+                    ModelConfig.Instance.OnModelLoaded(new ModelLoadedArgs(_model));
                 }
 
                 if (ret)

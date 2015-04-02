@@ -25,4 +25,14 @@ namespace RazorTransform
     {
     }
 
+    /// <summary>
+    /// event args for global changes, load, validate, save, etc.
+    /// </summary>
+    public class ModelLoadedArgs : System.EventArgs
+    {
+        public ModelLoadedArgs(IModel model) { Model = model; }
+        public IModel Model { get; private set; }
+    }
+
+
 }

@@ -44,8 +44,8 @@
     <item name="value" displayName="Value" description="Regular expression" type="String" defaultValue=""  />
   </group>
 
-  <custom name="RtThySelfType" classname="RazorTransform.Custom.RtThySelfType,RazorTransform"/>
-  <custom name="RtThySelfRegEx" classname="RazorTransform.Custom.RtThySelfRegEx,RazorTransform"/>
+  <custom name="RtThySelfType" classname="RazorTransform.Custom.EnumFromArrayType,RazorTransform"/>
+  <custom name="RtThySelfRegEx" classname="RazorTransform.Custom.EnumFromArrayType,RazorTransform"/>
 
   <enum name="RtRegEx">
     <value key="" value="&lt;None&gt;" />

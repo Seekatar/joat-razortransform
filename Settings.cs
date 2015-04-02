@@ -109,6 +109,11 @@ namespace RazorTransform
             {
                  (output as Item).Value = (output as Item).ExpandedValue = OutputFolder;
             }
+
+            if (!Directory.Exists(TemplateFolder))
+            {
+                throw new DirectoryNotFoundException(String.Format(Resource.TemplateFolderNotFound, TemplateFolder));
+            }
         }
 
         public static Settings Instance { get; private set; }

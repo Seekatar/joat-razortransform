@@ -45,7 +45,7 @@ namespace RazorTransform.Model
         event EventHandler<ItemChangedArgs> ItemAdded;
         event EventHandler<ItemChangedArgs> ItemChanged;
         event EventHandler<ItemChangedArgs> ItemDeleted;
-        event EventHandler<ModelChangedArgs> ModelLoaded;
+        event EventHandler<ModelLoadedArgs> ModelLoaded;
         event EventHandler<ModelChangedArgs> ModelSaved;
         event EventHandler<ModelChangedArgs> ModelValidate;
 
@@ -70,13 +70,12 @@ namespace RazorTransform.Model
         /// <summary>
         /// fired after all XML is parsed and the model arrays have been loaded
         /// </summary>
-        /// <param name="args"></param>
-        void OnModelLoaded();
+        /// <param name="args">The arguments.</param>
+        void OnModelLoaded(ModelLoadedArgs args);
 
         /// <summary>
         /// called before saving the model
         /// </summary>
-        /// <param name="args"></param>
         void OnModelValidate();
 
         /// <summary>

@@ -12,11 +12,20 @@ namespace RazorTransform
     class LogProgress :  ITransformOutput
     {
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        private static extern bool AttachConsole(int processId);
+        static extern bool AttachConsole(int processId);
+
+        static public bool IsConsoleAttached()
+        {
+            if( !_consoleAttached )
+            {
+                _consoleAttached = AttachConsole(-1); // current process
+            }
+            return _consoleAttached;
+        }
 
         FileStream _fs;
         TextWriter _tw;
-        bool _consoleAttached;
+        static bool _consoleAttached;
 
         /// <summary>
         /// constructor
@@ -24,7 +33,7 @@ namespace RazorTransform
         /// <param name="fname">name of output file</param>
         public LogProgress(ProgressInfo fname)
         {
-            _consoleAttached = AttachConsole((int)-1);
+            IsConsoleAttached();
 
             try
             {
@@ -75,6 +84,20 @@ namespace RazorTransform
             Report(new ProgressInfo(msg));
 
             return MessageBoxResult.None;
+        }
+
+        internal static void WriteExports(System.Collections.Generic.Dictionary<string, object> dictionary)
+        {
+            if (LogProgress.IsConsoleAttached())
+            {
+                int count = 0;
+                foreach (var v in dictionary)
+                {
+                    count++;
+                    Console.WriteLine("=>\t{0}\t{1}", v.Key, v.Value.ToString());
+                }
+                Console.WriteLine(String.Format("Wrote {0} lines", count));
+            }
         }
     }
 }

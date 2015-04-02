@@ -11,7 +11,7 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.1.2 Show Expanded values with @Model strings and numbers, move to GitHub
+    <releaseNotes>2.1.2 Show Expanded values with @Model strings and numbers, move to GitHub, fix for password
 2.1.1.0 Add enum
 2.1.0.8 Add @Model breadcrumb and units and margin fix and other fixes
 2.1.0.0 Rewrite of internal model.  Label type added.  Settings fixes.  @Model.array indexing by number, name support

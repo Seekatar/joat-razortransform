@@ -137,8 +137,14 @@
     <value>Close the application</value>
     <comment>Button text</comment>
   </data>
+  <data name="Complete" xml:space="preserve">
+    <value>RazorTransform complete.</value>
+  </data>
   <data name="ConfirmDirtySave" xml:space="preserve">
     <value>Do you want to save with invalid data?</value>
+  </data>
+  <data name="ConfirmPowerShellCancel" xml:space="preserve">
+    <value>Are you sure you want to cancel the PowerShell?</value>
   </data>
   <data name="ConversionComplete" xml:space="preserve">
     <value>Conversion complete.</value>
@@ -224,6 +230,12 @@ Command line options are:
   <data name="IndexOutOfRange" xml:space="preserve">
     <value>"Index out of range for "{0}": {1}[{2}]"</value>
   </data>
+  <data name="InvalidArrayName" xml:space="preserve">
+    <value>The array "{0}" specified in the object file for EnumFromArray "{1}" was not found.</value>
+  </data>
+  <data name="InvalidEnumName" xml:space="preserve">
+    <value>The enum "{0}" specified in the object file for EnumFromArray "{1}" was not found.</value>
+  </data>
   <data name="InvalidEnumScript" xml:space="preserve">
     <value>Script specified in enum {0}, "{1}" was not found.</value>
   </data>
@@ -288,11 +300,17 @@ Command line options are:
   <data name="SettingsException" xml:space="preserve">
     <value>Continuing after exception loading settings: {0}</value>
   </data>
+  <data name="Starting" xml:space="preserve">
+    <value>RazorTransform starting...</value>
+  </data>
   <data name="StartingTransforms" xml:space="preserve">
     <value>Starting transforms</value>
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success! Processed {0} files in {2:f2} secs to {1}</value>
+  </data>
+  <data name="TemplateFolderNotFound" xml:space="preserve">
+    <value>Template folder "{0}" not found.</value>
   </data>
   <data name="TestModeComplete" xml:space="preserve">
     <value>Test mode specified.  No data was written out</value>

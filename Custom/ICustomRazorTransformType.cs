@@ -33,8 +33,14 @@ namespace RazorTransform.Custom
         /// <summary>
         /// called after the object is constructed
         /// </summary>
-        /// <param name="model">the model that you're being constructed for</param>
+        /// <param name="config">The model's configuration.</param>
         /// <param name="parms">any parameters from your XML</param>
-        void Initialize(IModelConfig model, IDictionary<string, string> parms);
+        void Initialize(IModelConfig config, IDictionary<string, string> parms);
+
+        /// <summary>
+        /// Set with name from XML on load.
+        /// </summary>
+        string Name { get; set; }
+
     }
 }

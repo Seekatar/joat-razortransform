@@ -75,7 +75,7 @@ namespace RazorTransform.Model
         public event EventHandler<ItemChangedArgs> ItemChanged;
         public event EventHandler<ItemChangedArgs> ItemAdded;
         public event EventHandler<ItemChangedArgs> ItemDeleted;
-        public event EventHandler<ModelChangedArgs> ModelLoaded;
+        public event EventHandler<ModelLoadedArgs> ModelLoaded;
         public event EventHandler<ModelChangedArgs> ModelValidate;
         public event EventHandler<ModelChangedArgs> ModelSaved;
 
@@ -113,10 +113,10 @@ namespace RazorTransform.Model
         /// fired after all XML is parsed and the model arrays have been loaded
         /// </summary>
         /// <param name="args"></param>
-        public void OnModelLoaded()
+        public void OnModelLoaded(ModelLoadedArgs args)
         {
             var temp = ModelLoaded;
-            if (temp != null) temp(this, new ModelChangedArgs());
+            if (temp != null) temp(this, args);
         }
 
         /// <summary>
@@ -331,7 +331,10 @@ namespace RazorTransform.Model
                 if (custom == null)
                     throw new ArgumentException(Resource.ErrorCreatingCustom + className);
                 else
+                {
+                    custom.Name = name;
                     custom.Initialize(this, parms);
+                }
 
                 CustomTypes[name] = custom;
             }
