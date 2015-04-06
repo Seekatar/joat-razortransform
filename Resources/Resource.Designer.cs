@@ -61,6 +61,15 @@ namespace RazorTransform {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enum value &quot;{1}&quot; not found for enum &quot;{0}&quot;.
+        /// </summary>
+        internal static string BadEnum {
+            get {
+                return ResourceManager.GetString("BadEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not a number: &quot;{1}&quot;.
         /// </summary>
         internal static string BadInteger {

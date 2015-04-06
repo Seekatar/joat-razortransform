@@ -219,6 +219,19 @@ namespace RazorTransform.Model
                         errors.Add(new ValidationError(String.Format(Resource.BadInteger, DisplayName, value), Group));
                     }
                     break;
+                case RtType.Enum:
+                    if ( Min > 0 ) // enum doesn't allow empty 
+                    {
+                        if ( ModelConfig.Instance.Enums.ContainsKey( EnumName ) )
+                        {
+                            var myEnum = ModelConfig.Instance.Enums[EnumName];
+                            if ( myEnum.Keys.Where(o => o == value).SingleOrDefault() == null )
+                            {
+                                errors.Add(new ValidationError(String.Format(Resource.BadEnum, DisplayName, value), Group));
+                            }
+                        }
+                    }
+                    break;
             }
         }
 
