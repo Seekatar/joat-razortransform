@@ -12,7 +12,7 @@
   <group name="Sampler" description="One of each" hidden="false">
     <item name="s1" displayName="Sampler" description="Sample string" defaultValue="This tab has one of each simple type." type="Label" />
     <item name="colorS1" displayName="Color" description="pick a color.  This is a custom control" defaultValue="Blue" type="ColorType" />
-    <item name="stringS1" displayName="String" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20" />
+    <item name="stringS1" displayName="String" description="String with a size range of 10-20" defaultValue="Fred Flintstone" type="String" hidden="false" min="10" max="20"/>
     <item name="boolS1" displayName="Boolean" description="This is a boolean value defaulting to False." defaultValue="False" type="Bool" hidden="false" />
     <item name="intS1" displayName="Int32" description="Int32 with a range of 10-20" defaultValue="11" type="Int32" hidden="false" min="10" max="20" />
     <item name="enumS2" displayName="Enum" description="animals" defaultValue="cow" type="Animals" hidden="false" min="1" />
@@ -31,6 +31,8 @@
     <item name="stringA3" displayName="String Max 10" description="String with max size of 10." defaultValue="test" type="String" hidden="false" max="10" />
     <item name="version4" displayName="Version4" description="RegEx restricting to d.d.d.d" defaultValue="1.0.0.0" type="String" regex="version4" hidden="false" />
     <item name="version2" displayName="Version2" description="RegEx restricting to d.d" defaultValue="1.0" type="String" regex="version2" hidden="false" />
+    <item name="multiline" displayName="Multiline" description="Mulitline edit" defaultValue="" type="String" hidden="false" multiline="true"/>
+    
   </group>
 
   <group name="Ints" description="Some integers" hidden="false" >

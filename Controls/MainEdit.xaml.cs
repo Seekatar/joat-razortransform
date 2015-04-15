@@ -322,9 +322,10 @@ namespace RazorTransform
             dict["PsLogFileName"] = _logFileName;
             dict["PsWorkingDir"] = _workingDir;
             dict["PsStep"] = _step ? "$True" : "$False";
-            if (_overrides.ContainsKey("InstanceDbName"))
+            // push in any overrides
+            foreach ( var o in _overrides )
             {
-                dict["instanceDbName"] = _overrides["InstanceDbName"];
+                dict[o.Key] = o.Value;
             }
 
             return dict;

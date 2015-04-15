@@ -417,9 +417,12 @@ namespace RazorTransform
 
         private static Control _Default (IItem ci, Binding binding, Action<IItem> itemChanged) 
         {
-            var units = ci.Attribute("units");
+            var units = ci.Attribute(Constants.Units);
+            var multiLine = ci.Attribute(Constants.Multiline);
+            bool b;
+            var isMultiLine = multiLine != null && Boolean.TryParse(multiLine, out b) && b;
 
-            var t = new ModelItemEdit(ci, units);
+            var t = new ModelItemEdit(ci, units, isMultiLine );
 
             if (ci.ReadOnly)
             {

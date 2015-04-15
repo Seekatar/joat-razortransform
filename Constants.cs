@@ -72,6 +72,8 @@ namespace RazorTransform
         internal const string DestinationFolder = "DestinationFolder";
         internal const string Script = "script";
         internal const string Timeout = "timeoutSecs";
+        internal const string Multiline = "multiline";
+        internal const string Units = "units";
 
         // Version history
         // 2 = switch RtValues to use names instead of value for everything

@@ -11,7 +11,7 @@
         </StackPanel>
         <DockPanel>
             <TextBlock Style="{StaticResource labelUnits}" x:Name="units" Text="{Binding Units, ElementName=root}" Margin="5,0,5,0" VerticalAlignment="Center" DockPanel.Dock="Right" Visibility="Collapsed">hours</TextBlock>
-            <TextBox Style="{StaticResource txtBox}" x:Name="value" Text="{Binding Value, ElementName=root}" />
+            <TextBox Style="{StaticResource txtBox}" x:Name="value" Text="{Binding Value, ElementName=root}" TextWrapping="Wrap" />
         </DockPanel>
     </DockPanel>
 </UserControl>

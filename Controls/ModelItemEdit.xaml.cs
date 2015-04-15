@@ -10,7 +10,7 @@ namespace RazorTransform
     {
         RazorTransform.Model.IItem _item; 
 
-        public ModelItemEdit(RazorTransform.Model.IItem item, string units = null )
+        public ModelItemEdit(RazorTransform.Model.IItem item, string units = null, bool multiLine = false )
         {
             InitializeComponent();
             // this.value.TextChanged += new TextChangedEventHandler(OnOrigChanged);
@@ -26,6 +26,11 @@ namespace RazorTransform
             {
                 this.units.Visibility = System.Windows.Visibility.Visible;
                 this.units.Text = units;
+            }
+
+            if ( multiLine )
+            {
+                this.value.AcceptsReturn = true;
             }
         }
 
