@@ -24,6 +24,7 @@ namespace RazorTransform
         private ITransformParentWindow _parent;
         private bool _embedded = false; // are we embedded in another app (hide certain buttons)
         private bool _runPowerShell = false;
+        private bool _exportPs = false; // should we export variables to PowerShell via stdout?
         private string _logFileName = "Deploy";
         private string _workingDir = ".";
         private string _scriptFname = "PsScripts.xml";
@@ -88,6 +89,7 @@ namespace RazorTransform
             _parms = parms;
             _overrides = overrides;
             _runPowerShell = runPowerShell || _parms.ContainsKey("PowerShell");
+            _exportPs = _runPowerShell || _parms.ContainsKey("ExportPs");
 
             // any overrides?
             if (_overrides.ContainsKey("PsScriptFileName"))
@@ -179,8 +181,10 @@ namespace RazorTransform
                                             {"PSEnd", DateTime.Now.Ticks.ToString() }
                                         });
                 }
-                else
-                    LogProgress.WriteExports(exportedItems());
+                else if (_exportPs)
+                {
+                    LogProgress.WriteExports(_transformer.Model.ExportedItems());
+                }
 
                 RanTransformOk = transformResult.Result == ProcessingResult.ok;
             }
@@ -319,14 +323,16 @@ namespace RazorTransform
         Dictionary<string, object> exportedItems()
         {
             var dict = _transformer.Model.ExportedItems();
-            dict["PsLogFileName"] = _logFileName;
-            dict["PsWorkingDir"] = _workingDir;
-            dict["PsStep"] = _step ? "$True" : "$False";
+			
             // push in any overrides
             foreach ( var o in _overrides )
             {
                 dict[o.Key] = o.Value;
             }
+			
+            dict["PsLogFileName"] = _logFileName;
+            dict["PsWorkingDir"] = _workingDir;
+            dict["PsStep"] = _step ? "$True" : "$False";
 
             return dict;
         }
@@ -482,7 +488,9 @@ namespace RazorTransform
 
                     psConsole.SyncContext = null;
                     psConsole.Initialize();
-                    var result = await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, exportedItems(), ScriptInfo.ScriptType.preRun);
+                    var preLogFileName = Path.Combine(Path.GetDirectoryName(_logFileName), "Pre_" + Path.GetFileName(_logFileName));
+
+                    var result = await psConsole.InvokeAsync(_scriptFname, preLogFileName, _step, exportedItems(), ScriptInfo.ScriptType.preRun);
                 }
                 if (!String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSForeground"]) && !String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSBackground"]))
                 {

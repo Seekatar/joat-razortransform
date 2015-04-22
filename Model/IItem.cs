@@ -51,11 +51,13 @@ namespace RazorTransform.Model
         string Regex { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this is exported to PowerShell.
+        /// </summary>
+        bool IsExported { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance is password.
         /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance is password; otherwise, <c>false</c>.
-        /// </value>
         bool IsPassword { get; set; }
 
         /// <summary>

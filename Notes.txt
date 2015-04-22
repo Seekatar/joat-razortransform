@@ -1,7 +1,8 @@
 Notes
 
 *Bugs
-
+LogFile parameters honored anywhere?
+sqlServer not getting passed in PreRun scripts since model fails to load so can't detect that it's an export
 
 *ToDo
 Allow passing in XML to populate Enum.  PS is ok, but quirky.  Get Count() error way down in PS when running the ABL populate script without
@@ -14,6 +15,7 @@ Add "Saved" & "Refreshed" indicator/toast or disable if not dirty?
 Test command line index override
 
 *New Features
+exportPs
 VisiblityGroups
 Search and replace, already have recursive find
 Add double support

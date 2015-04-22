@@ -214,13 +214,14 @@
     <value>{0}RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
 
 Command line options are:
-   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] [-powerShell] 
+   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave]  [-powerShell]  [-exportPs] [-h|-?] [&lt;overrides....&gt;]
 
    -h -? show this help
   -test runs the transforms without saving the output to make sure Razor views work
   -nosave does not save the override values in &lt;objectFile&gt;, useful when using overrides 
   -run runs transforms without pulling up the UI, and the file and folder must exist.  Output is written to &lt;logfile&gt;
   -powerShell runs any PowerShell commands in xml.  See documenation for details
+  -exportPs exports any items marked as export to PowerShell via stdout.
 
  &lt;objectFile&gt; defaults to .\RtObject.xml
  &lt;valuesFile&gt;defaults to .\RtValues

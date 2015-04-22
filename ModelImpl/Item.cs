@@ -170,6 +170,18 @@ namespace RazorTransform.Model
             set;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this is exported to PowerShell
+        /// </summary>
+        public bool IsExported
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is a password.
+        /// </summary>
         public bool IsPassword
         {
             get;
@@ -351,6 +363,8 @@ namespace RazorTransform.Model
             OriginalTypeStr = (String)itemXml.Attribute(Constants.Type) ?? String.Empty;
 
             Hidden = (bool?)itemXml.Attribute(Constants.Hidden) ?? false;
+
+            IsExported = (bool?)itemXml.Attribute(Constants.ExportToPs) ?? false;
 
             Type = Constants.MapType(OriginalTypeStr);
 

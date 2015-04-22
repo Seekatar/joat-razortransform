@@ -43,6 +43,7 @@ namespace RazorTransform
                     .Add("powerShell", v => { parms.Add("PowerShell", true); })
                     .Add("template=", v => parms.Add("OverrideTemplateFolder", v))
                     .Add("showHidden", v => parms.Add("ShowHidden", true))
+                    .Add("exportPs", v => parms.Add("ExportPs", true))
                     .Add("upgrade", v => { upgrade = true; parms["Run"] = true; run = true; });
 
                 List<string> overrides = options.Parse(args);
@@ -81,6 +82,8 @@ namespace RazorTransform
 
                                 if (result.Result.Result == ProcessingResult.ok)
                                 {
+                                    LogProgress.WriteExports(transformer.Model.ExportedItems());
+
                                     ret = EXIT_NO_ERROR; // ok
                                     if (transformer.Settings.Test)
                                     {

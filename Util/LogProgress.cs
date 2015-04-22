@@ -86,6 +86,10 @@ namespace RazorTransform
             return MessageBoxResult.None;
         }
 
+        /// <summary>
+        /// Writes the PowerShell exports to the console so an attached script can read them
+        /// </summary>
+        /// <param name="dictionary">The dictionary.</param>
         internal static void WriteExports(System.Collections.Generic.Dictionary<string, object> dictionary)
         {
             if (LogProgress.IsConsoleAttached())
@@ -96,7 +100,6 @@ namespace RazorTransform
                     count++;
                     Console.WriteLine("=>\t{0}\t{1}", v.Key, v.Value.ToString());
                 }
-                Console.WriteLine(String.Format("Wrote {0} lines", count));
             }
         }
     }

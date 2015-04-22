@@ -335,11 +335,11 @@ namespace RazorTransform {
         ///   Looks up a localized string similar to {0}RazorTranformation Tool transforms an object described in &lt;objectFile&gt;into all the files in a &lt;templateFolder&gt;
         ///
         ///Command line options are:
-        ///   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave] [-h|-?] [&lt;overrides....&gt;] [-powerShell] 
+        ///   [-run] [-object &lt;objectFile&gt;] [-values &lt;valuesFile&gt;] [-output &lt;outputFolder&gt;] [-template &lt;templateFolder&gt; [-logFile &lt;logFile&gt;] [-test] [-nosave]  [-powerShell]  [-exportPs] [-h|-?] [&lt;overrides....&gt;]
         ///
         ///   -h -? show this help
         ///  -test runs the transforms without saving the output to make sure Razor views work
-        ///  -nosave does not save the override values in &lt;objectFile&gt;, usefu [rest of string was truncated]&quot;;.
+        ///  -nosave does not save the override values in &lt;objec [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string HelpString {
             get {

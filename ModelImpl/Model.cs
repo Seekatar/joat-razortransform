@@ -83,12 +83,9 @@ namespace RazorTransform.Model
         /// <param name="dict">The dictionary.</param>
         private void exportedItems(IEnumerable<IItemBase> items, Dictionary<string, object> dict)
         {
-            foreach (var i in items.OfType<IItem>())
+            foreach (var i in items.OfType<IItem>().Where( o => o.IsExported ))
             {
-                if (i.IsPassword)
-                    dict[i.Name] = i.ExpandedValue;
-                else if (i.Name == "SQLServer" || i.Name == "InstanceName")
-                    dict[i.Name] = i.ExpandedValue;
+                dict[i.Name] = i.ExpandedValue;
             }
             foreach (var i in items.OfType<IItemList>())
             {

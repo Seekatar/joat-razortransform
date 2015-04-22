@@ -74,6 +74,7 @@ namespace RazorTransform
         internal const string Timeout = "timeoutSecs";
         internal const string Multiline = "multiline";
         internal const string Units = "units";
+        internal const string ExportToPs = "exportToPs";
 
         // Version history
         // 2 = switch RtValues to use names instead of value for everything
