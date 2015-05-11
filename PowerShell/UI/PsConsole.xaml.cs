@@ -78,31 +78,67 @@ namespace PSHostGui
                 Directory.CreateDirectory(Path.GetDirectoryName(logFname));
             }
 
+            var timings = new List<StepTiming>();
+
             using (_loggingConsole = new LoggingConsole(logFname))
             {
-
-                WriteSystemMessage(String.Format("Logging to \"{0}\"", logFname));
-
-                ret = await _psHost.InvokeAsync(scriptFname, step, variables, scriptType);
-
-            }
-
-            if (scriptType == ScriptInfo.ScriptType.normal)
-            {
-                if (ret == ProcessingResult.ok)
+                try
                 {
-                    await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.postRun);
-                    await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.success);
+
+                    WriteSystemMessage(String.Format("Logging to \"{0}\"", logFname));
+
+                    ret = await _psHost.InvokeAsync(scriptFname, step, variables, scriptType, timings: timings);
+
+                    if (scriptType == ScriptInfo.ScriptType.normal)
+                    {
+                        if (ret == ProcessingResult.ok)
+                        {
+                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.postRun, timings: timings);
+                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.success, timings: timings);
+                        }
+                        else
+                        {
+                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.fail, timings: timings);
+                        }
+                    }
                 }
-                else
+                finally
                 {
-                    await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.fail);
+                    writeTimings(timings);
                 }
             }
 
             WriteSystemMessage(String.Format("Logged to \"{0}\"", logFname));
 
             return ret;
+        }
+
+        private void writeTimings(List<StepTiming> timings)
+        {
+            string s;
+            var total = timings.Sum(o => o.Duration.TotalSeconds);
+            WriteSystemMessage(String.Empty);
+            WriteSystemMessage("Steps successfully run:");
+
+            _loggingConsole.WriteLine(String.Empty, WriteType.System);
+            _loggingConsole.WriteLine("Steps successfully run:", WriteType.System);
+
+            foreach (var t in timings)
+            {
+                s = string.Format("{0,40} {1} {2,5:f0}% {3}",
+                                            t.Name,
+                                            t.Skipped ? "skipped" : string.Format("{0,7:f2} secs", t.Duration.TotalSeconds),
+                                            (total > 0) ? 100 * t.Duration.TotalSeconds / total : 0,
+                                            (total > 0) ? (new String('*', (int)(50 * t.Duration.TotalSeconds / total))) : string.Empty);
+                WriteSystemMessage(s);
+                _loggingConsole.WriteLine(s,WriteType.System);
+
+            }
+            s = string.Format("{0,40} {1,7:f2} secs",
+                                        "TOTAL",
+                                        total);
+            WriteSystemMessage(s);
+            _loggingConsole.WriteLine(s,WriteType.System);
         }
 
         /// <summary>
