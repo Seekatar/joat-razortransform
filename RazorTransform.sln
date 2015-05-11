@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorTransform", "RazorTransform.csproj", "{42BF7D72-BE20-43AA-89C1-6DD553A1E55C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{412DC3EA-C4B8-4010-B9CD-7DBB5650DDB3} = {412DC3EA-C4B8-4010-B9CD-7DBB5650DDB3}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtPsHost", "..\joat-rtpshost\RtPsHost.csproj", "{412DC3EA-C4B8-4010-B9CD-7DBB5650DDB3}"
 EndProject
