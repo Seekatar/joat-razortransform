@@ -123,18 +123,22 @@ namespace PSHostGui
             _loggingConsole.WriteLine(String.Empty, WriteType.System);
             _loggingConsole.WriteLine("Steps successfully run:", WriteType.System);
 
+            var maxNameLen = timings.Max(o => o.Name.Length);
+            var timingFormat = String.Format("{{0,{0}}} {{1}} {{2,5:f0}}% {{3}}", maxNameLen);
+            var summaryFormat = String.Format("{{0,{0}}} {{1,7:f2}} secs", maxNameLen);
+
             foreach (var t in timings)
             {
-                s = string.Format("{0,40} {1} {2,5:f0}% {3}",
+                s = string.Format( timingFormat,
                                             t.Name,
-                                            t.Skipped ? "skipped" : string.Format("{0,7:f2} secs", t.Duration.TotalSeconds),
+                                            t.Skipped ? "skipped     " : string.Format("{0,7:f2} secs", t.Duration.TotalSeconds),
                                             (total > 0) ? 100 * t.Duration.TotalSeconds / total : 0,
                                             (total > 0) ? (new String('*', (int)(50 * t.Duration.TotalSeconds / total))) : string.Empty);
                 WriteSystemMessage(s);
                 _loggingConsole.WriteLine(s,WriteType.System);
 
             }
-            s = string.Format("{0,40} {1,7:f2} secs",
+            s = string.Format(summaryFormat,
                                         "TOTAL",
                                         total);
             WriteSystemMessage(s);
