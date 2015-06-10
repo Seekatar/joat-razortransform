@@ -94,17 +94,20 @@ namespace PSHostGui
                         if (ret == ProcessingResult.ok)
                         {
                             await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.postRun, timings: timings);
+                            writeTimings(timings);
+                            _loggingConsole.Dispose();
                             await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.success, timings: timings);
                         }
                         else
                         {
+                            writeTimings(timings);
+                            _loggingConsole.Dispose();
                             await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.fail, timings: timings);
                         }
                     }
                 }
                 finally
                 {
-                    writeTimings(timings);
                 }
             }
 
