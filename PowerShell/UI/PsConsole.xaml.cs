@@ -321,12 +321,16 @@ namespace PSHostGui
 
         public void WriteProgress(ProgressInfo progressInfo)
         {
-            var key = _progress.Keys.Where(o => o.Id == progressInfo.Id || o.Activity == progressInfo.Activity).FirstOrDefault();
+            KeyValuePair<ProgressInfo,Progress> tuple;
+            lock (_progress)
+            {
+                tuple = _progress.Where(o => o.Key.Id == progressInfo.Id || o.Key.Activity == progressInfo.Activity).FirstOrDefault();
+            }
 
             syncContext.Send(_ =>
             {
                 Progress progress = null;
-                if (key == null)
+                if (tuple.Key == null)
                 {
                     if (progressInfo.PercentComplete >= 100)
                         return;
@@ -337,19 +341,33 @@ namespace PSHostGui
                         progressStack.Visibility = System.Windows.Visibility.Visible;
 
                     progressStack.Children.Add(progress);
-                    _progress[progressInfo] = progress;
+                    lock (_progress)
+                    {
+                        _progress[progressInfo] = progress;
+                    }
                 }
                 else
                 {
-                    progress = _progress[key];
+                    progress = tuple.Value;
                 }
 
                 if (progressInfo.PercentComplete >= 100)
                 {
-                    _progress.Remove(key);
-                    progressStack.Children.Remove(progress);
-                    if (progressStack.Children.Count == 0)
-                        progressStack.Visibility = System.Windows.Visibility.Collapsed;
+                    bool removed = false;
+                    lock (_progress)
+                    {
+                        if (_progress.ContainsKey(tuple.Key))
+                        {
+                            _progress.Remove(tuple.Key);
+                            removed = true;
+                        }
+                    }
+                    if (removed)
+                    {
+                        progressStack.Children.Remove(progress);
+                        if (progressStack.Children.Count == 0)
+                            progressStack.Visibility = System.Windows.Visibility.Collapsed;
+                    }
                 }
                 else
                 {
