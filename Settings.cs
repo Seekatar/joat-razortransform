@@ -1,4 +1,5 @@
 ﻿using RazorTransform.Model;
+using RtPsHost;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -114,6 +115,8 @@ namespace RazorTransform
             {
                 throw new DirectoryNotFoundException(String.Format(Resource.TemplateFolderNotFound, TemplateFolder));
             }
+
+            PowerShellConfig = new PsConfig(overrideParms);
         }
 
         public static Settings Instance { get; private set; }
@@ -176,6 +179,12 @@ namespace RazorTransform
         /// </summary>
         [IgnoreDataMemberAttribute]
         public string OverrideOutputFolder { get; set; }
+
+        /// <summary>
+        /// Gets the power shell configuration.
+        /// </summary>
+        [IgnoreDataMemberAttribute]
+        public IPsConfig PowerShellConfig { get; private set; }
 
         /// <summary>
         /// override template folder, if passed in from command line

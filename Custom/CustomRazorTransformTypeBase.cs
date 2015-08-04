@@ -27,5 +27,28 @@ namespace RazorTransform.Custom
         }
 
         public abstract void Initialize(IModelConfig config, IDictionary<string, string> parms);
+
+        /// <summary>
+        /// Sets the string properties that match parms passes in 
+        /// </summary>
+        /// <param name="parms">The parms.</param>
+        protected void setParms(IDictionary<string, string> parms)
+        {
+            if (parms != null)
+            {
+                var props = this.GetType().GetProperties().Where(o => o.PropertyType == typeof(string));
+                foreach (var p in parms)
+                {
+                    // do we have a property for this
+                    var prop = this.GetType().GetProperty(p.Key, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (prop != null && prop.PropertyType == typeof(string))
+                    {
+                        prop.SetValue(this, p.Value);
+                    }
+                }
+            }
+
+
+        }
     }
 }

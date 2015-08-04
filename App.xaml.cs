@@ -28,7 +28,7 @@ namespace RazorTransform
                 bool showHelp = false;
                 string outputFolder = "..";
                 string logFile = "RazorTransform.log";
-                Dictionary<string, object> parms = new Dictionary<string, object>();
+                Dictionary<string, object> parms = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
                 var options = new Mono.Options.OptionSet()
                     .Add("run", v => { parms["Run"] = true; run = true; })

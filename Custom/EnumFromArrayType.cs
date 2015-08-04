@@ -81,19 +81,7 @@ namespace RazorTransform.Custom
             config.ItemChanged += OnItemChanged;
             config.ModelLoaded += OnModelLoaded;
 
-            if ( parms != null )
-            {
-                var props = this.GetType().GetProperties().Where( o => o.PropertyType == typeof(string));
-                foreach ( var p in parms )
-                {
-                    // do we have a property for this
-                    var prop = this.GetType().GetProperty(p.Key, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    if ( prop != null && prop.PropertyType == typeof(string) )
-                    {
-                        prop.SetValue( this, p.Value );                        
-                    }
-                }
-            }
+            setParms(parms);
 
             if (ModelConfig.Instance.Enums.ContainsKey(enumName) && ModelConfig.Instance.Enums[enumName] != null)
             {

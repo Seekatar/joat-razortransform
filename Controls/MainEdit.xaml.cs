@@ -25,10 +25,6 @@ namespace RazorTransform
         private bool _embedded = false; // are we embedded in another app (hide certain buttons)
         private bool _runPowerShell = false;
         private bool _exportPs = false; // should we export variables to PowerShell via stdout?
-        private string _logFileName = "Deploy";
-        private string _workingDir = ".";
-        private string _scriptFname = "PsScripts.xml";
-        private bool _step = false;
         private ProcessingState _currentState = ProcessingState.idle;
         enum ProcessingState
         {
@@ -91,21 +87,6 @@ namespace RazorTransform
             _runPowerShell = runPowerShell || _parms.ContainsKey("PowerShell");
             _exportPs = _runPowerShell || _parms.ContainsKey("ExportPs");
 
-            // any overrides?
-            if (_overrides.ContainsKey("PsScriptFileName"))
-                _scriptFname = _overrides["PsScriptFileName"];
-            if (_overrides.ContainsKey("PsLogFileName"))
-                _logFileName = _overrides["PsLogFileName"];
-            if (_overrides.ContainsKey("PsStep") && !Boolean.TryParse(_overrides["PsStep"], out _step))
-                _step = false;
-            if (_overrides.ContainsKey("PsWorkingDir"))
-                _workingDir = _overrides["PsWorkingDir"];
-            _workingDir = System.IO.Path.GetFullPath(_workingDir); // convert .. to path
-            _logFileName = String.Format("{0}_{1}.log", _logFileName, DateTime.Now.ToString("yyMMdd-HHmmss"));
-
-            _workingDir = Path.GetFullPath(_workingDir);
-            _scriptFname = Path.GetFullPath(_scriptFname);
-            _logFileName = Path.GetFullPath(_logFileName);
         }
         /// <summary>
         /// handler for whem the transformer saves the RTValues.xml file
@@ -329,10 +310,8 @@ namespace RazorTransform
             {
                 dict[o.Key] = o.Value;
             }
-			
-            dict["PsLogFileName"] = _logFileName;
-            dict["PsWorkingDir"] = _workingDir;
-            dict["PsStep"] = _step ? "$True" : "$False";
+
+            Settings.Instance.PowerShellConfig.AppendExports(dict);
 
             return dict;
         }
@@ -343,22 +322,24 @@ namespace RazorTransform
 
             setButtonStates(ProcessingState.shellExecuting);
 
+            var psc = Settings.Instance.PowerShellConfig;
             var curDir = Directory.GetCurrentDirectory();
-            if (Directory.Exists(_workingDir))
+            if (Directory.Exists(psc.WorkingDir))
             {
                 try
                 {
+
                     // this doesn't appear to set it in the PSHost!
-                    Directory.SetCurrentDirectory(_workingDir);
-                    psConsole.WriteSystemMessage("Working dir set to " + _workingDir);
-                    if (File.Exists(_scriptFname))
+                    Directory.SetCurrentDirectory(psc.WorkingDir);
+                    psConsole.WriteSystemMessage("Working dir set to " + psc.WorkingDir);
+                    if (File.Exists(psc.ScriptFile))
                     {
                         // invoke all the scripts
-                        ret = (ProcessingResult)await psConsole.InvokeAsync(_scriptFname, _logFileName, _step, exportedItems());
+                        ret = (ProcessingResult)await psConsole.InvokeAsync(psc, exportedItems());
                     }
                     else
                     {
-                        _transformer.Output.ShowMessage(String.Format(Resource.FileNotFound, _scriptFname));
+                        _transformer.Output.ShowMessage(String.Format(Resource.FileNotFound, psc.ScriptFile));
                     }
                 }
                 finally
@@ -368,7 +349,7 @@ namespace RazorTransform
             }
             else
             {
-                _transformer.Output.ShowMessage(String.Format(Resource.FolderNotFound, _workingDir));
+                _transformer.Output.ShowMessage(String.Format(Resource.FolderNotFound, psc.WorkingDir));
             }
 
             setButtonStates(ProcessingState.shellExecuted);
@@ -488,9 +469,8 @@ namespace RazorTransform
 
                     psConsole.SyncContext = null;
                     psConsole.Initialize();
-                    var preLogFileName = Path.Combine(Path.GetDirectoryName(_logFileName), "Pre_" + Path.GetFileName(_logFileName));
 
-                    var result = await psConsole.InvokeAsync(_scriptFname, preLogFileName, _step, exportedItems(), ScriptInfo.ScriptType.preRun);
+                    var result = await psConsole.InvokeAsync(Settings.Instance.PowerShellConfig, exportedItems(), ScriptInfo.ScriptType.preRun);
                 }
                 if (!String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSForeground"]) && !String.IsNullOrWhiteSpace(_transformer.Settings["RTSettings_PSBackground"]))
                 {
@@ -501,6 +481,7 @@ namespace RazorTransform
                 setButtonStates(ProcessingState.idle);
                 _parent.SetTitle(TitleSuffix);
 
+                Settings.Instance.PowerShellConfig.Run = _runPowerShell;
 
             }
         }

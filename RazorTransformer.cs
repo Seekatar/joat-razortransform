@@ -52,6 +52,8 @@ namespace RazorTransform
                     _output = new GuiProgress(window);
 
                 _settings.Load(overrides);
+                _settings.PowerShellConfig.Run = parms.ContainsKey("powerShell");
+                   
 
                 bool ret = ModelConfig.Instance.Load(_settings);
                 if (ret)

@@ -96,7 +96,15 @@
     <item name="model3" displayName="ArrayByName" description="Get simple array value by name" defaultValue="@Model.itemAS[&quot;B&quot;].nameA" type="string"/>
     <item name="model4" displayName="NestedArray" description="Get nested array" defaultValue="@Model.itemA[0].itemAB[0].itemABC[&quot;Level3&quot;].nameC" type="string"/>
   </group>
+
+  <group name="PowerShell" description="Advanced options">
+    <item name="PsScriptSet" displayName="Script Set" description="Set of steps to execute when PowerShell runs" type="scriptSet" />
+    <item name="PsStep" displayName="Step" description="If set, steps through the scripts." defaultValue="False" type="Bool" hidden="false" />
+    <item name="PsSkipUntil" displayName="SkipUntil" description="Skip until this step.  Make sure you ran all previous steps successfully." defaultValue="" type="steps" hidden="false" />
+  </group>
+  
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
+  <custom name="ScriptSetLoader" classname="RazorTransform.Custom.ScriptSetEnum,RazorTransform" scriptName="scriptSet" stepName="steps"/>
 
   <enum name="EnumA">
     <value key="enumKeyA" value="Enum A" />
@@ -118,6 +126,10 @@
     <value key="horse" value="Horse"/>
     <value key="chicken" value="Chicken"/>
   </enum>
+
+  <enum name="scriptSet"/>
+  <enum name="steps"/>
+  
   <enum name="Dynamic" script="EnumTest.ps1" timeoutSecs="2" parms="extra=123;more=&quot;4\;56\=&quot;"/>
   
   <regex name="version4" value="^\d+\.\d+\.\d+\.\d+$" />

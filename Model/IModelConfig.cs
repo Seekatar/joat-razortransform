@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RtPsHost;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +13,19 @@ namespace RazorTransform.Model
     /// </summary>
     public interface IModelConfig
     {
+        /// <summary>
+        /// Gets the enumerations configured in the RtObject file
+        /// </summary>
         IDictionary<string, IDictionary<string, string>> Enums { get; }
 
+        /// <summary>
+        /// Gets the RegEx validators configured in the RtObject file
+        /// </summary>
         IDictionary<string, string> Regexes { get; }
 
+        /// <summary>
+        /// Gets the custom types configured in the RtObject file
+        /// </summary>
         IDictionary<string, Custom.ICustomRazorTransformType> CustomTypes { get; }
 
         /// <summary>

@@ -51,10 +51,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\RazorEngine.3.4.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
-    <Reference Include="RtPsHost, Version=1.0.4.2, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\RtPsHost.1.0.4.2\lib\net45\RtPsHost.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -115,6 +111,7 @@
     <Compile Include="Custom\CustomRazorTransformTypeBase.cs" />
     <Compile Include="Custom\EnumFromArrayType.cs" />
     <Compile Include="Custom\ICustomRazorTransformType.cs" />
+    <Compile Include="Custom\ScriptSetEnum.cs" />
     <Compile Include="EventArgs.cs" />
     <None Include="EnumTest.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -135,6 +132,7 @@
     <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\IModelConfig.cs" />
     <Compile Include="ModelImpl\PasswordItem.cs" />
+    <Compile Include="PowerShell\PsConfig.cs" />
     <Compile Include="PowerShell\UI\Prompt.xaml.cs" />
     <Compile Include="PowerShell\UI\PsConsole.xaml.cs" />
     <Compile Include="RazorTemplateUtil.cs" />
@@ -350,6 +348,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Clipboard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\joat-rtpshost\RtPsHost.csproj">
+      <Project>{412dc3ea-c4b8-4010-b9cd-7dbb5650ddb3}</Project>
+      <Name>RtPsHost</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

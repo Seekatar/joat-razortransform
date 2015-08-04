@@ -65,44 +65,46 @@ namespace PSHostGui
         /// <param name="logFname"></param>
         /// <param name="step"></param>
         /// <returns></returns>
-        public async Task<ProcessingResult> InvokeAsync(string scriptFname, string logFname, bool step, IDictionary<string, object> variables, ScriptInfo.ScriptType scriptType = ScriptInfo.ScriptType.normal)
+        public async Task<ProcessingResult> InvokeAsync(IPsConfig config, IDictionary<string, object> variables, ScriptInfo.ScriptType scriptType = ScriptInfo.ScriptType.normal)
         {
             if (scriptType == ScriptInfo.ScriptType.postRun)
                 throw new ArgumentException("scriptType cannot be postRun");
 
             ProcessingResult ret = ProcessingResult.ok;
 
-            if (!String.IsNullOrWhiteSpace(Path.GetDirectoryName(logFname)) &&
-                 !Directory.Exists(Path.GetDirectoryName(logFname)))
+            var logFileName = config.GetLogFileName(scriptType);
+
+            if (!String.IsNullOrWhiteSpace(Path.GetDirectoryName(logFileName)) &&
+                 !Directory.Exists(Path.GetDirectoryName(logFileName)))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(logFname));
+                Directory.CreateDirectory(Path.GetDirectoryName(logFileName));
             }
 
             var timings = new List<StepTiming>();
 
-            using (_loggingConsole = new LoggingConsole(logFname))
+            using (_loggingConsole = new LoggingConsole(logFileName))
             {
                 try
                 {
 
-                    WriteSystemMessage(String.Format("Logging to \"{0}\"", logFname));
+                    WriteSystemMessage(String.Format("Logging to \"{0}\"", logFileName));
 
-                    ret = await _psHost.InvokeAsync(scriptFname, step, variables, scriptType, timings: timings);
+                    ret = await _psHost.InvokeAsync(config, variables, scriptType, timings: timings);
 
                     if (scriptType == ScriptInfo.ScriptType.normal)
                     {
                         if (ret == ProcessingResult.ok)
                         {
-                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.postRun, timings: timings);
+                            await _psHost.InvokeAsync(config, variables, ScriptInfo.ScriptType.postRun, timings: timings);
                             writeTimings(timings);
                             _loggingConsole.Dispose();
-                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.success, timings: timings);
+                            await _psHost.InvokeAsync(config, variables, ScriptInfo.ScriptType.success, timings: timings);
                         }
                         else
                         {
                             writeTimings(timings);
                             _loggingConsole.Dispose();
-                            await _psHost.InvokeAsync(scriptFname, step, variables, ScriptInfo.ScriptType.fail, timings: timings);
+                            await _psHost.InvokeAsync(config, variables, ScriptInfo.ScriptType.fail, timings: timings);
                         }
                     }
                 }
@@ -111,7 +113,7 @@ namespace PSHostGui
                 }
             }
 
-            WriteSystemMessage(String.Format("Logged to \"{0}\"", logFname));
+            WriteSystemMessage(String.Format("Logged to \"{0}\"", logFileName));
 
             return ret;
         }

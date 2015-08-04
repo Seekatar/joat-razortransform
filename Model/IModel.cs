@@ -9,6 +9,12 @@ namespace RazorTransform.Model
 {
     public interface IModel
     {
+        /// <summary>
+        /// Gets the root-level items in this model.
+        /// </summary>
+        /// <value>
+        /// The items.
+        /// </value>
         IList<IItemBase> Items { get; }
 
         /// <summary>
