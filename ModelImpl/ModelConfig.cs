@@ -123,20 +123,20 @@ namespace RazorTransform.Model
         /// called before saving the model
         /// </summary>
         /// <param name="args"></param>
-        public void OnModelValidate()
+        public void OnModelValidate(ModelChangedArgs args)
         {
             var temp = ModelValidate;
-            if (temp != null) temp(this, new ModelChangedArgs());
+            if (temp != null) temp(this, args);
         }
 
         /// <summary>
         /// called after the model has been saved
         /// </summary>
         /// <param name="args"></param>
-        public void OnModelSaved()
+        public void OnModelSaved(ModelChangedArgs args)
         {
             var temp = ModelSaved;
-            if (temp != null) temp(this, new ModelChangedArgs());
+            if (temp != null) temp(this, args);
         }
         #endregion
 

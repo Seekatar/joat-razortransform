@@ -86,13 +86,14 @@ namespace RazorTransform.Model
         /// <summary>
         /// called before saving the model
         /// </summary>
-        void OnModelValidate();
+        /// <param name="args">The arguments.</param>
+        void OnModelValidate(ModelChangedArgs args);
 
         /// <summary>
         /// called after the model has been saved
         /// </summary>
-        /// <param name="args"></param>
-        void OnModelSaved();
+        /// <param name="args">The arguments.</param>
+        void OnModelSaved(ModelChangedArgs args);
 
 
     }

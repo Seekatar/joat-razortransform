@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Input file for Run-Deploy/ADM for running a full deploy
+-->
+<scripts>
+  <script name="Make deploy folders" description="Load modules, make folders" neverPrompt="True"  type="preRun">
+    if ( -not ($(Get-ExecutionPolicy) -match "RemoteSigned|Unrestricted|Bypass"))
+    {
+      Set-ExecutionPolicy RemoteSigned -Force -Scope Process
+    }
+    Write-Host "Changing dir to $PsWorkingDir"
+    cd $PsWorkingDir
+    Write-Host "Script = '$PsScriptSet'"
+  </script>
+  <script name="CustomStepBefore" description="" neverPrompt="True" type="preRun">
+      Write-Host "PreStep 2"
+  </script>
+  <script name="Run cleanup script" description=".\Scripts\Cleanup-OldVersion.ps1" type="preRun">
+    Write-Host "PreStep 3"
+  </script>
+  <script name="Populate RtValues" description=".\Scripts\Populate-RtValues.ps1 $sqlServer $instanceDbName"  type="preRun">
+    Write-Host "PreStep 4"
+  </script>
+  <script name="Create Block input for Artie" description="" type="preRun" echoScript="True">
+    Write-Host "PreStep 5"
+  </script>
+  <script name="Setting globals" description=". .\Output\ArtieGlobals.ps1" neverPrompt="True" echoScript="False" id="step0">
+    Write-Host "Step 0"
+    Write-Host "Variables"
+    dir variable: | select name,value | ft -a
+    Write-Host "Env"
+    dir env: | select name,value | ft -a
+  </script>
+  <script name="Test Instance Type" description="Make sure you know what you're doing" id="step1" >
+    Write-Host "Step 1"
+  </script>
+  <script name="Startup Email" description="Send Email at start"  id="step2">
+    Write-Host "Step 2"
+  </script>
+  <script name="Running Substitute SPN" description="Substituting the SPNs in the scripts." neverPrompt="True" echoScript="False"  id="step3">
+    Write-Host "Step 3"
+  </script>
+  <script name="Pre-deploy validation script" description=".\Validate-PreDeploy.ps1" promptOnError="True" echoScript="True"  id="step4">
+    Write-Host "Step 4"
+  </script>
+  <script name="Copy build files" description=""  id="step5">
+    Write-Host "Step 5"
+  </script>
+  <script name="Deploy seeddata" description=".\Scripts\Deploy-Seeddata.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\SeedData\SeedData.zip&quot; &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step6">
+    Write-Host "Step 6"
+  </script>
+  <script name="Deploy nuget" description=".\Scripts\Deploy-NuGet.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\nuget\NuGet.zip&quot; &quot;$SourceDir\Output\NuGet.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step7">
+    Write-Host "Step 7"
+  </script>
+  <script name="Copy script files" description="Copy script files to build machine" echoScript="True"  id="step8">
+    Write-Host "Step 8"
+  </script>
+  <script name="Stop web and app" description="" echoScript="True"  id="step9">
+    Write-Host "Step 9"
+  </script>
+  <script name="Create or upgrade databases" description=".\Create-Database.ps1" id="step10" >
+    Write-Host "Step 10"
+  </script>
+  <script name="Save Rt Values" description="" echoScript="True" id="step11">
+    Write-Host "Step 11"
+  </script>
+  <script name="Add any cross-tenant views" description="Add any views for tenants configured in the X-Tenant tab" echoScript="True" id="step12">
+    Write-Host "Step 12"
+  </script>
+  <script name="Update DataSync Config" description="Update the DataSync config settings in the database" echoScript="True" id="step13">
+    Write-Host "Step 13"
+  </script>
+  <script name="Run seeddata" description=".\Scripts\Run-Seeddata.ps1 &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; -BasePushImport: $Global:BasePushImport -CleanHtml: $Global:CleanHtml -Compile: $Global:Compile -Bootstrap $Bootstrap" echoScript="True" id="step14">
+    Write-Host "Step 14"
+  </script>
+  <script name="Update Tenant server URIs" description="Update the tenant config file server uris using me.exe" echoScript="True" id="step15">
+    Write-Host "Step 15"
+  </script>
+  <script name="Update Tenant connection strings" description="Update the tenant config file connection strings and log levels" echoScript="True" id="step16">
+    Write-Host "Step 16"
+  </script>
+  <script name="Migrate UserTenantSite" description="" echoScript="True" id="step17">
+    Write-Host "Step 17"
+  </script>
+  <script name="Update UI Site" description="" echoScript="True" id="step18">
+    Write-Host "Step 18"
+  </script>
+  <script name="Deploy" description="" echoScript="False"  id="step19">
+    Write-Host "Step 19"
+  </script>
+  <script name="Install Blocks" id="step20">
+    Write-Host "Step 20"
+  </script>
+  <script name="Check TranscriptErrors" description=".\Check-Services.ps1" neverPrompt="True" type="postRun">
+    Write-Host "Post Step 1"
+  </script>
+  <script name="Success" description="Run if successful" neverPrompt="True" type="success" >
+    Write-Host "Success Step 1"
+  </script>
+  <script name="Failed" description="Run if failed" neverPrompt="True" type="fail" >
+    Write-Host "Fail Step 1"
+  </script>
+  
+  <scriptSet name="Run 1-5" description="Only run steps 1-5" listType="white">
+    <step id="step1"/>
+    <step id="step2"/>
+    <step id="step3"/>
+    <step id="step4"/>
+    <step id="step5"/>
+  </scriptSet>
+  <scriptSet name="Odd Steps" description="Only run the odd steps" listType="white" noArtie="True">
+    <step id="step1"/>
+    <step id="step3"/>
+    <step id="step5"/>
+    <step id="step7"/>
+    <step id="step9"/>
+    <step id="step11"/>
+    <step id="step13"/>
+    <step id="step15"/>
+    <step id="step17"/>
+    <step id="step19"/>
+  </scriptSet>
+  <scriptSet name="Even Steps" description="Only run the even steps" listType="black" noArtie="True">
+    <step id="step1"/>
+    <step id="step3"/>
+    <step id="step5"/>
+    <step id="step7"/>
+    <step id="step9"/>
+    <step id="step11"/>
+    <step id="step13"/>
+    <step id="step15"/>
+    <step id="step17"/>
+    <step id="step19"/>
+  </scriptSet>
+</scripts>
+

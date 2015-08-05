@@ -193,7 +193,7 @@ namespace RazorTransform.Model
         {
             try
             {
-                ModelConfig.Instance.OnModelValidate();
+                ModelConfig.Instance.OnModelValidate(new ModelChangedArgs(this));
             }
             catch (Exception)
             {

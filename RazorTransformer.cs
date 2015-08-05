@@ -200,7 +200,7 @@ namespace RazorTransform
 
             _model.GenerateXml(root);
 
-            ModelConfig.Instance.OnModelSaved();
+            ModelConfig.Instance.OnModelSaved(new ModelChangedArgs(_model));
 
             return doc.ToString();
         }

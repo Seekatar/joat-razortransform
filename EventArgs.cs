@@ -23,6 +23,8 @@ namespace RazorTransform
     /// </summary>
     public class ModelChangedArgs : System.EventArgs
     {
+        public ModelChangedArgs(IModel model) { Model = model; }
+        public IModel Model { get; private set; }
     }
 
     /// <summary>
