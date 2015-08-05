@@ -24,41 +24,41 @@ Input file for Run-Deploy/ADM for running a full deploy
   <script name="Create Block input for Artie" description="" type="preRun" echoScript="True">
     Write-Host "PreStep 5"
   </script>
-  <script name="Setting globals" description=". .\Output\ArtieGlobals.ps1" neverPrompt="True" echoScript="False" id="step0">
+  <script name="0 Setting globals" description=". .\Output\ArtieGlobals.ps1" neverPrompt="True" echoScript="False" id="step0">
     Write-Host "Step 0"
     Write-Host "Variables"
     dir variable: | select name,value | ft -a
     Write-Host "Env"
     dir env: | select name,value | ft -a
   </script>
-  <script name="Test Instance Type" description="Make sure you know what you're doing" id="step1" >
+  <script name="1 Test Instance Type" description="Make sure you know what you're doing" id="step1" >
     Write-Host "Step 1"
   </script>
-  <script name="Startup Email" description="Send Email at start"  id="step2">
+  <script name="2 Startup Email" description="Send Email at start"  id="step2">
     Write-Host "Step 2"
   </script>
-  <script name="Running Substitute SPN" description="Substituting the SPNs in the scripts." neverPrompt="True" echoScript="False"  id="step3">
+  <script name="3 Running Substitute SPN" description="Substituting the SPNs in the scripts." neverPrompt="True" echoScript="False"  id="step3">
     Write-Host "Step 3"
   </script>
-  <script name="Pre-deploy validation script" description=".\Validate-PreDeploy.ps1" promptOnError="True" echoScript="True"  id="step4">
+  <script name="4 Pre-deploy validation script" description=".\Validate-PreDeploy.ps1" promptOnError="True" echoScript="True"  id="step4">
     Write-Host "Step 4"
   </script>
-  <script name="Copy build files" description=""  id="step5">
+  <script name="5 Copy build files" description=""  id="step5">
     Write-Host "Step 5"
   </script>
-  <script name="Deploy seeddata" description=".\Scripts\Deploy-Seeddata.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\SeedData\SeedData.zip&quot; &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step6">
+  <script name="6 Deploy seeddata" description=".\Scripts\Deploy-Seeddata.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\SeedData\SeedData.zip&quot; &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step6">
     Write-Host "Step 6"
   </script>
-  <script name="Deploy nuget" description=".\Scripts\Deploy-NuGet.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\nuget\NuGet.zip&quot; &quot;$SourceDir\Output\NuGet.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step7">
+  <script name="7 Deploy nuget" description=".\Scripts\Deploy-NuGet.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\nuget\NuGet.zip&quot; &quot;$SourceDir\Output\NuGet.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step7">
     Write-Host "Step 7"
   </script>
-  <script name="Copy script files" description="Copy script files to build machine" echoScript="True"  id="step8">
+  <script name="8 Copy script files" description="Copy script files to build machine" echoScript="True"  id="step8">
     Write-Host "Step 8"
   </script>
-  <script name="Stop web and app" description="" echoScript="True"  id="step9">
+  <script name="9 Stop web and app" description="" echoScript="True"  id="step9">
     Write-Host "Step 9"
   </script>
-  <script name="Create or upgrade databases" description=".\Create-Database.ps1" id="step10" >
+  <script name="10 Create or upgrade databases" description=".\Create-Database.ps1" id="step10" >
     Write-Host "Step 10"
   </script>
   <script name="Save Rt Values" description="" echoScript="True" id="step11">
