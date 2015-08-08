@@ -17,6 +17,7 @@ namespace RazorTransform.Custom
         string skipUntilName { get; set; }       // name of <enum> in RTObject.xml to fill in
         IItem scriptSet { get; set; }
         IItem skipUntil { get; set; }
+        IItem step { get; set; }
 
         #region EventHandlers
 
@@ -24,20 +25,26 @@ namespace RazorTransform.Custom
         {
             scriptSet = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == scriptSetName) as IItem;
             skipUntil = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == skipUntilName) as IItem;
+            step = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsStepName) as IItem;
 
-            // are we running PowerShell
-            if (Settings.Instance.PowerShellConfig.Run)
+            // only fill if we have items matching
+            if (scriptSet != null ) 
             {
                 var model = e.Model;
                 fillEnum(scriptSet.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetScriptSets(), scriptSet, "Default - Run all configured steps", Settings.Instance.PowerShellConfig.ScriptSet);
                 fillEnum(skipUntil.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetAllSteps(), skipUntil, "Default - Don't skip any steps", Settings.Instance.PowerShellConfig.SkipUntil);
-            }
-            else
-            {
-                if ( scriptSet != null )
+
+                scriptSet.NoSaveValue = true;
+                if ( skipUntil != null )
                 {
-                    scriptSet.Group.Hidden = true;
+                    skipUntil.NoSaveValue = true;
                 }
+                if ( step != null )
+                {
+                    step.NoSaveValue = true;
+                }
+                // can hide the group with this
+                // scriptSet.Group.Hidden = true;
             }
         }
 
@@ -52,12 +59,26 @@ namespace RazorTransform.Custom
             {
                 Settings.Instance.PowerShellConfig.SkipUntil = skipUntil.Value;
             }
-            var step = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == "PsStep") as IItem;
             if ( step != null )
             {
                 Settings.Instance.PowerShellConfig.Step = Convert.ToBoolean(step.Value);
             }
 
+        }
+
+        void OnModelValidate(object sender, ModelValidateArgs e)
+        {
+            if (e.Model.Parent == null) // only validate root
+            {
+                // make sure the step is in the script set, if set
+                if (skipUntil != null && skipUntil.Value != string.Empty && scriptSet != null && scriptSet.Value != string.Empty)
+                {
+                    if (!Settings.Instance.PowerShellConfig.IsStepInScriptSet(scriptSet.Value, skipUntil.Value))
+                    {
+                        e.Errors.Add(new ValidationError(String.Format("SkipUntil value of {0} is not in scriptSet {1}", skipUntil.Value, scriptSet.Value), skipUntil));
+                    }
+                }
+            }
         }
 
         private void fillEnum( string name, IDictionary<string,string> values, IItem item, string defaultName, string valueToMatch )
@@ -103,14 +124,9 @@ namespace RazorTransform.Custom
         {
             config.ModelLoaded += OnModelLoaded;
             config.ModelSaved += OnModelSaved;
+            config.ModelValidate += OnModelValidate;
 
             setParms(parms);
-
-            //if (!ModelConfig.Instance.Enums.ContainsKey(scriptSetName) && ModelConfig.Instance.Enums[scriptSetName] != null ||
-            //    !ModelConfig.Instance.Enums.ContainsKey(skipUntilName) && ModelConfig.Instance.Enums[skipUntilName] != null)
-            //{
-            //    throw new Exception(string.Format(Resource.InvalidEnumName, scriptSetName, Name));
-            //}
         }
     }
 }

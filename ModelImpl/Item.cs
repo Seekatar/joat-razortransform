@@ -187,6 +187,20 @@ namespace RazorTransform.Model
             get;
             set;
         }
+
+
+        private bool _noSaveValue = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to save the value to RtValues.  Passwords always return true.
+        /// </summary>
+        public bool NoSaveValue 
+        {
+            get { return _noSaveValue || IsPassword; }
+            set { _noSaveValue = value; }
+        }
+
+
         #endregion
 
         #region IItem/IItemBase methods

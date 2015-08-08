@@ -57,7 +57,7 @@ namespace RazorTransform.Model
         event EventHandler<ItemChangedArgs> ItemDeleted;
         event EventHandler<ModelLoadedArgs> ModelLoaded;
         event EventHandler<ModelChangedArgs> ModelSaved;
-        event EventHandler<ModelChangedArgs> ModelValidate;
+        event EventHandler<ModelValidateArgs> ModelValidate;
 
         /// <summary>
         /// Fired when an item is added to an array
@@ -87,7 +87,8 @@ namespace RazorTransform.Model
         /// called before saving the model
         /// </summary>
         /// <param name="args">The arguments.</param>
-        void OnModelValidate(ModelChangedArgs args);
+        /// <param name="errors">The errors colletion to add any errors to.</param>
+        void OnModelValidate(ModelValidateArgs args);
 
         /// <summary>
         /// called after the model has been saved

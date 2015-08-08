@@ -13,8 +13,11 @@ VariableItems has MSI specific names
 Unittest for transforms
 Add "Saved" & "Refreshed" indicator/toast or disable if not dirty?
 Test command line index override
+add an attribute to prevent saving of values in XML. Use on PowerShell, and some RTSettings values. 
+
 
 *New Features
+powerShell script, step, scriptSet support
 exportPs
 VisiblityGroups
 Search and replace, already have recursive find
@@ -31,6 +34,7 @@ Overriding index on command line
 @Model with index 
 
 *Resolved
+7/7/15 
 4/2 If default directory doesn't have a Templates folder, then doesn't find anything and quickly exits.  Should warn if no templates found
 4/2 - 3/27/15 Passwords set in Artie have no way to get to PS if running from CLI
 4/2 - 3/27/15 Should prompt "Do you want to cancel?" If hit Esc while PS is running

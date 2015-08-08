@@ -306,9 +306,7 @@
     <None Include="Templates\ArrayIndex.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\zBasic.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Templates\zBasic.txt" />
     <None Include="Templates\ItemBTranforms.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

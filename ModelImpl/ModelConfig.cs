@@ -76,7 +76,7 @@ namespace RazorTransform.Model
         public event EventHandler<ItemChangedArgs> ItemAdded;
         public event EventHandler<ItemChangedArgs> ItemDeleted;
         public event EventHandler<ModelLoadedArgs> ModelLoaded;
-        public event EventHandler<ModelChangedArgs> ModelValidate;
+        public event EventHandler<ModelValidateArgs> ModelValidate;
         public event EventHandler<ModelChangedArgs> ModelSaved;
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace RazorTransform.Model
         /// called before saving the model
         /// </summary>
         /// <param name="args"></param>
-        public void OnModelValidate(ModelChangedArgs args)
+        public void OnModelValidate(ModelValidateArgs args)
         {
             var temp = ModelValidate;
             if (temp != null) temp(this, args);

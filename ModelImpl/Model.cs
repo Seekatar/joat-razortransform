@@ -193,7 +193,7 @@ namespace RazorTransform.Model
         {
             try
             {
-                ModelConfig.Instance.OnModelValidate(new ModelChangedArgs(this));
+                ModelConfig.Instance.OnModelValidate(new ModelValidateArgs(this, errors));
             }
             catch (Exception)
             {
@@ -216,7 +216,7 @@ namespace RazorTransform.Model
             {
                 foreach (var item in g)
                 {
-                    if (!(item is IItem) || !(item as IItem).IsPassword)
+                    if (!(item is IItem) || !(item as IItem).NoSaveValue) // never put passwords or other no save items in XML
                         item.GenerateXml(root);
                 }
             }

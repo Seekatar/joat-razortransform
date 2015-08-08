@@ -46,6 +46,11 @@ namespace RazorTransform.Model
         bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to save the value to RtValues.  Passwords always return true.
+        /// </summary>
+        bool NoSaveValue { get; set; }
+
+        /// <summary>
         /// Gets or sets the optional regex for validation
         /// </summary>
         string Regex { get; set; }

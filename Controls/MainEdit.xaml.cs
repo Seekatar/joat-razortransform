@@ -164,7 +164,9 @@ namespace RazorTransform
                 }
                 else if (_exportPs)
                 {
-                    LogProgress.WriteExports(_transformer.Model.ExportedItems());
+                    //var exportedItems = _transformer.Model.ExportedItems();
+                    //Settings.Instance.PowerShellConfig.AppendExports(exportedItems);
+                    LogProgress.WriteExports(exportedItems());
                 }
 
                 RanTransformOk = transformResult.Result == ProcessingResult.ok;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace RazorTransform
 {
@@ -14,34 +15,38 @@ namespace RazorTransform
     /// </summary>
     internal class PsConfig : IPsConfig
     {
+        const string PsScriptSetName = "PsScriptSet";
+        public const string PsStepName = "PsStep";
+        const string PsNoPromptName = "PsNoPrompt";
+        const string PsSkipUntilName = "PsSkipUntil";
+        const string PsWorkingDirName = "PsWorkingDir";
+        const string PsLogFileName = "PsLogFileName";
+
+        // script file cached
+        private XDocument _scriptFile;
+        private DateTime _scriptFileWriteTime;
+
         public PsConfig(IDictionary<string, string> overrideParms)
         {
-            if (overrideParms.ContainsKey("PsScriptSet"))
-                ScriptSet = overrideParms["PsScriptSet"];
+            if (overrideParms.ContainsKey(PsScriptSetName))
+                ScriptSet = overrideParms[PsScriptSetName];
 
-            if (overrideParms.ContainsKey("PsStep"))
+            if (overrideParms.ContainsKey(PsStepName))
             {
                 bool temp;
-                if ( bool.TryParse( overrideParms["PsStep"], out temp))
+                if ( bool.TryParse( overrideParms[PsStepName], out temp))
                     Step = temp;
             }
 
-            if (overrideParms.ContainsKey("PsNoPrompt"))
+            if (overrideParms.ContainsKey(PsNoPromptName))
             {
                 bool temp;
-                if (bool.TryParse(overrideParms["PsNoPrompt"], out temp))
+                if (bool.TryParse(overrideParms[PsNoPromptName], out temp))
                     NoPrompt = temp;
             }
 
-            if (overrideParms.ContainsKey("PsStep"))
-            {
-                bool temp;
-                if (bool.TryParse(overrideParms["PsStep"], out temp))
-                    Step = temp;
-            }
-
-            if (overrideParms.ContainsKey("PsLogFileName"))
-                LogFileName = overrideParms["PsLogFileName"];
+            if (overrideParms.ContainsKey(PsLogFileName))
+                LogFileName = overrideParms[PsLogFileName];
             else
                 LogFileName = "Deploy";
 
@@ -53,15 +58,15 @@ namespace RazorTransform
             else
                 ScriptFile = "PsScripts.xml";
 
-            if (overrideParms.ContainsKey("PsWorkingDir"))
-                WorkingDir = overrideParms["PsWorkingDir"];
+            if (overrideParms.ContainsKey(PsWorkingDirName))
+                WorkingDir = overrideParms[PsWorkingDirName];
             else
                 WorkingDir = ".";
 
             WorkingDir = System.IO.Path.GetFullPath(WorkingDir); // convert .. to path
 
-            if (overrideParms.ContainsKey("PsSkipUntil"))
-                SkipUntil = overrideParms["PsSkipUntil"];
+            if (overrideParms.ContainsKey(PsSkipUntilName))
+                SkipUntil = overrideParms[PsSkipUntilName];
 
         }
 
@@ -104,9 +109,11 @@ namespace RazorTransform
         /// <param name="dict">The dictionary.</param>
         public void AppendExports(Dictionary<string, object> dict)
         {
-            dict["PsLogFileName"] = LogFileName;
-            dict["PsWorkingDir"] = WorkingDir;
-            dict["PsStep"] = Step ? "$True" : "$False";
+            dict[PsLogFileName] = LogFileName;
+            dict[PsWorkingDirName] = WorkingDir;
+            dict[PsStepName] = Step ? "$True" : "$False";
+            dict[PsSkipUntilName] = SkipUntil;
+            dict[PsScriptSetName] = ScriptSet;
         }
 
         /// <summary>
@@ -117,15 +124,9 @@ namespace RazorTransform
         /// </returns>
         public IDictionary<string, string> GetScriptSets()
         {
-            if (File.Exists(ScriptFile))
-            {
-                var doc = XDocument.Load(ScriptFile);
-                return doc.Root.Descendants("scriptSet").ToDictionary(o => o.Attribute("name").Value, p => String.Format("{0} - {1}",p.Attribute("name").Value, p.Attribute("description").Value));
-            }
-            else
-            {
-                throw new FileNotFoundException(String.Format(Resource.FileNotFound, ScriptFile));
-            }
+            loadScriptFile();
+
+            return _scriptFile.Root.Descendants("scriptSet").ToDictionary(o => o.Attribute("name").Value, p => String.Format("{0} - {1}", p.Attribute("name").Value, p.Attribute("description").Value));
         }
 
         /// <summary>
@@ -134,17 +135,48 @@ namespace RazorTransform
         /// <returns>list of step names and descriptions</returns>
         public IDictionary<string, string> GetAllSteps()
         {
+            loadScriptFile();
+
+            return _scriptFile.Root.Descendants("script").Where(o => o.Attribute("id") != null && (o.Attribute("type") == null || String.Equals(o.Attribute("type").Value, "postRun") || String.Equals(o.Attribute("type").Value, "normal")))
+                                                     .ToDictionary(o => o.Attribute("id").Value, p => String.Format("{0} - {1}", p.Attribute("name").Value, p.Attribute("description") != null ? p.Attribute("description").Value : String.Empty));
+
+        }
+
+        private void loadScriptFile()
+        {
             if (File.Exists(ScriptFile))
             {
-                var doc = XDocument.Load(ScriptFile);
-                return doc.Root.Descendants("script").Where(o => o.Attribute("type") == null || String.Equals(o.Attribute("type").Value, "postRun") || String.Equals(o.Attribute("type").Value, "normal"))
-                                                     .ToDictionary(o => o.Attribute("name").Value, p => String.Format("{0} - {1}", p.Attribute("name").Value, p.Attribute("description") != null ? p.Attribute("description").Value : String.Empty));
+                var writeTime = File.GetLastWriteTimeUtc(ScriptFile);
+                if (_scriptFile == null || writeTime != _scriptFileWriteTime)
+                {
+                    _scriptFile = XDocument.Load(ScriptFile);
+                    _scriptFileWriteTime = writeTime;
+                }
             }
             else
             {
                 throw new FileNotFoundException(String.Format(Resource.FileNotFound, ScriptFile));
             }
 
+        }
+
+        public bool IsStepInScriptSet( string scriptSet, string stepId )
+        {
+            if (String.IsNullOrEmpty(scriptSet) || String.IsNullOrEmpty(stepId))
+                return true;
+            else 
+            {
+                loadScriptFile();
+
+                // get all the steps for the set
+                var set = _scriptFile.Root.XPathSelectElement(String.Format("/scripts/scriptSet[@name=\"{0}\"]", scriptSet));
+                var color = (string)set.Attribute("listType");
+
+                if ( string.Equals(color, "black", StringComparison.CurrentCultureIgnoreCase) ) // black list step shouldn't be in list, otherwise in the list
+                    return _scriptFile.Root.XPathSelectElement(String.Format("/scripts/scriptSet[@name=\"{0}\"]/step[@id=\"{1}\"]", scriptSet, stepId)) == null;
+                else 
+                    return _scriptFile.Root.XPathSelectElement(String.Format("/scripts/scriptSet[@name=\"{0}\"]/step[@id=\"{1}\"]", scriptSet, stepId )) != null;
+            }
         }
 
 

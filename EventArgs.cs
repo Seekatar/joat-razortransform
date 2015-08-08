@@ -1,5 +1,6 @@
 ﻿
 using RazorTransform.Model;
+using System.Collections.Generic;
 namespace RazorTransform
 {
     /// <summary>
@@ -34,6 +35,16 @@ namespace RazorTransform
     {
         public ModelLoadedArgs(IModel model) { Model = model; }
         public IModel Model { get; private set; }
+    }
+
+    /// <summary>
+    /// class use when validating
+    /// </summary>
+    public class ModelValidateArgs
+    {
+        public ModelValidateArgs(IModel model, ICollection<ValidationError> errors) { Model = model; Errors = errors; }
+        public IModel Model { get; private set; }
+        public ICollection<ValidationError> Errors { get; private set; }
     }
 
 
