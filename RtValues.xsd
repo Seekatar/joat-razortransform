@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema id="RtValuesSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           targetNamespace="my://RtValues" 
-           xmlns="my://RtValues" 
+           targetNamespace="http://joatbrothers.com/RtValues.xsd" 
+           xmlns="http://joatbrothers.com/RtValues.xsd" 
            attributeFormDefault="unqualified" 
            elementFormDefault="qualified">
   <xs:element name="RtValues">

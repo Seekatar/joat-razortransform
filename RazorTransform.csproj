@@ -278,6 +278,9 @@
     <EmbeddedResource Include="Resources\Settings.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="PsScripts.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="RazorTransform.nuspec">
       <SubType>Designer</SubType>
     </None>

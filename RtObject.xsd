@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema id="RtObjectSchema"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="my://RtObject"
-           xmlns="my://RtObject"
+           targetNamespace="http://joatbrothers.com/RtObject.xsd"
+           xmlns="http://joatbrothers.com/RtObject.xsd"
            attributeFormDefault="unqualified"
            elementFormDefault="qualified">
   <xs:element name="RtObject">
@@ -19,15 +19,19 @@
     <xs:complexType>
       <xs:attribute name="classname" use="required" type="xs:token"/>
       <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <!-- allow adding parameters as attributes -->
+      <xs:anyAttribute namespace="##any" processContents="skip"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="enum">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="value"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="value"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:NCName"/>
       <xs:attribute name="script" type="xs:string"/>
+      <xs:attribute name="timeoutSecs" type="xs:unsignedInt"/>
+      <xs:attribute name="parms" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="value">
@@ -56,7 +60,7 @@
       <xs:attribute name="max" type="xs:integer"/>
       <xs:attribute name="min" type="xs:integer"/>
       <xs:attribute name="name" use="required" type="xs:string"/>
-      <xs:attribute name="sort" type="dotNetBool"/>
+      <xs:attribute name="sort" type="sortValue"/>
       <xs:attribute name="unique" type="dotNetBool"/>
     </xs:complexType>
   </xs:element>
@@ -72,6 +76,9 @@
       <xs:attribute name="type" use="required" type="xs:NCName"/>
       <xs:attribute name="max" type="xs:integer"/>
       <xs:attribute name="min" type="xs:integer"/>
+      <xs:attribute name="units" type="xs:string"/>  
+      <xs:attribute name="multiline" type="dotNetBool"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:simpleType name="dotNetBool">
@@ -80,7 +87,14 @@
       <xs:enumeration value="false"/>
     </xs:restriction>
   </xs:simpleType> 
-  <xs:simpleType name="range">
+  <xs:simpleType name="sortValue">
+    <xs:restriction base="xs:NCName">
+      <xs:enumeration value="ascending"/>
+      <xs:enumeration value="descending"/>
+      <xs:enumeration value="true"/>
+      <xs:enumeration value="false"/>
+    </xs:restriction>
+  </xs:simpleType>   <xs:simpleType name="range">
     <xs:restriction base="xs:string">
       <xs:pattern value="[0-9]+\-[0-9]+"/>
     </xs:restriction>

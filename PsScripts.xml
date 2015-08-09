@@ -2,8 +2,8 @@
 <!--
 Input file for Testing Artie scripting
 -->
-<scripts>
-  <script name="Pre1" description="Load modules, make folders" neverPrompt="True"  type="preRun">
+<scripts xmlns="http://joatbrothers.com/PsScripts.xsd">
+  <script name="Pre1" id="pre1" description="Load modules, make folders" neverPrompt="true"  type="preRun">
     if ( -not ($(Get-ExecutionPolicy) -match "RemoteSigned|Unrestricted|Bypass"))
     {
       Set-ExecutionPolicy RemoteSigned -Force -Scope Process
@@ -12,10 +12,10 @@ Input file for Testing Artie scripting
     cd $PsWorkingDir
     Write-Host "Script = '$PsScriptSet'"
   </script>
-  <script name="Pre2" description="" neverPrompt="True" type="preRun">
+  <script name="Pre2" id="pre2" description="" neverPrompt="true" type="preRun">
       Write-Host "PreStep 2"
   </script>
-  <script name="0 Setting globals" description=". .\Output\ArtieGlobals.ps1" neverPrompt="True" echoScript="False" id="step0">
+  <script name="0 Setting globals" description=". .\Output\ArtieGlobals.ps1" neverPrompt="true" echoScript="false" id="step0">
     Write-Host "Step 0"
     Write-Host "Variables"
     dir variable: | select name,value | ft -a
@@ -28,67 +28,67 @@ Input file for Testing Artie scripting
   <script name="2 Startup Email" description="Send Email at start"  id="step2">
     Write-Host "Step 2"
   </script>
-  <script name="3 Running Substitute SPN" description="Substituting the SPNs in the scripts." neverPrompt="True" echoScript="False"  id="step3">
+  <script name="3 Running Substitute SPN" description="Substituting the SPNs in the scripts." neverPrompt="true" echoScript="false"  id="step3">
     Write-Host "Step 3"
   </script>
-  <script name="4 Pre-deploy validation script" description=".\Validate-PreDeploy.ps1" promptOnError="True" echoScript="True"  id="step4">
+  <script name="4 Pre-deploy validation script" description=".\Validate-PreDeploy.ps1" promptOnError="true" echoScript="true"  id="step4">
     Write-Host "Step 4"
   </script>
   <script name="5 Copy build files" description=""  id="step5">
     Write-Host "Step 5"
   </script>
-  <script name="6 Deploy seeddata" description=".\Scripts\Deploy-Seeddata.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\SeedData\SeedData.zip&quot; &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step6">
+  <script name="6 Deploy seeddata" description=".\Scripts\Deploy-Seeddata.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\SeedData\SeedData.zip&quot; &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="true"  id="step6">
     Write-Host "Step 6"
   </script>
-  <script name="7 Deploy nuget" description=".\Scripts\Deploy-NuGet.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\nuget\NuGet.zip&quot; &quot;$SourceDir\Output\NuGet.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="True"  id="step7">
+  <script name="7 Deploy nuget" description=".\Scripts\Deploy-NuGet.ps1 &quot;$SourceDir\Builds\$BuildVersionNumber\nuget\NuGet.zip&quot; &quot;$SourceDir\Output\NuGet.SetParameters.xml&quot; &quot;localhost&quot; -WhatIf: $WhatIfPreference " echoScript="true"  id="step7">
     Write-Host "Step 7"
   </script>
-  <script name="8 Copy script files" description="Copy script files to build machine" echoScript="True"  id="step8">
+  <script name="8 Copy script files" description="Copy script files to build machine" echoScript="true"  id="step8">
     Write-Host "Step 8"
   </script>
-  <script name="9 Stop web and app" description="" echoScript="True"  id="step9">
+  <script name="9 Stop web and app" description="" echoScript="true"  id="step9">
     Write-Host "Step 9"
   </script>
   <script name="10 Create or upgrade databases" description=".\Create-Database.ps1" id="step10" >
     Write-Host "Step 10"
   </script>
-  <script name="Save Rt Values" description="" echoScript="True" id="step11">
+  <script name="Save Rt Values" description="" echoScript="true" id="step11">
     Write-Host "Step 11"
   </script>
-  <script name="Add any cross-tenant views" description="Add any views for tenants configured in the X-Tenant tab" echoScript="True" id="step12">
+  <script name="Add any cross-tenant views" description="Add any views for tenants configured in the X-Tenant tab" echoScript="true" id="step12">
     Write-Host "Step 12"
   </script>
-  <script name="Update DataSync Config" description="Update the DataSync config settings in the database" echoScript="True" id="step13">
+  <script name="Update DataSync Config" description="Update the DataSync config settings in the database" echoScript="true" id="step13">
     Write-Host "Step 13"
   </script>
-  <script name="Run seeddata" description=".\Scripts\Run-Seeddata.ps1 &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; -BasePushImport: $Global:BasePushImport -CleanHtml: $Global:CleanHtml -Compile: $Global:Compile -Bootstrap $Bootstrap" echoScript="True" id="step14">
+  <script name="Run seeddata" description=".\Scripts\Run-Seeddata.ps1 &quot;$SourceDir\Output\SeedData.SetParameters.xml&quot; -BasePushImport: $Global:BasePushImport -CleanHtml: $Global:CleanHtml -Compile: $Global:Compile -Bootstrap $Bootstrap" echoScript="true" id="step14">
     Write-Host "Step 14"
   </script>
-  <script name="Update Tenant server URIs" description="Update the tenant config file server uris using me.exe" echoScript="True" id="step15">
+  <script name="Update Tenant server URIs" description="Update the tenant config file server uris using me.exe" echoScript="true" id="step15">
     Write-Host "Step 15"
   </script>
-  <script name="Update Tenant connection strings" description="Update the tenant config file connection strings and log levels" echoScript="True" id="step16">
+  <script name="Update Tenant connection strings" description="Update the tenant config file connection strings and log levels" echoScript="true" id="step16">
     Write-Host "Step 16"
   </script>
-  <script name="Migrate UserTenantSite" description="" echoScript="True" id="step17">
+  <script name="Migrate UserTenantSite" description="" echoScript="true" id="step17">
     Write-Host "Step 17"
   </script>
-  <script name="Update UI Site" description="" echoScript="True" id="step18">
+  <script name="Update UI Site" description="" echoScript="true" id="step18">
     Write-Host "Step 18"
   </script>
-  <script name="Deploy" description="" echoScript="False"  id="step19">
+  <script name="Deploy" description="" echoScript="false"  id="step19">
     Write-Host "Step 19"
   </script>
   <script name="Install Blocks" id="step20">
     Write-Host "Step 20"
   </script>
-  <script name="Check TranscriptErrors" description=".\Check-Services.ps1" neverPrompt="True" type="postRun">
+  <script name="Check TranscriptErrors" id="post1" description=".\Check-Services.ps1" neverPrompt="true" type="postRun">
     Write-Host "Post Step 1"
   </script>
-  <script name="Success" description="Run if successful" neverPrompt="True" type="success" >
+  <script name="Success" id="success" description="Run if successful" neverPrompt="true" type="success" >
     Write-Host "Success Step 1"
   </script>
-  <script name="Failed" description="Run if failed" neverPrompt="True" type="fail" >
+  <script name="Failed" id="fail" description="Run if failed" neverPrompt="true" type="fail" >
     Write-Host "Fail Step 1"
   </script>
   
@@ -100,7 +100,7 @@ Input file for Testing Artie scripting
     <step id="step4"/>
     <step id="step5"/>
   </scriptSet>
-  <scriptSet name="Odd Steps" description="Only run the odd steps" listType="white" noArtie="True">
+  <scriptSet name="Odd Steps" description="Only run the odd steps" listType="white" noArtie="true">
     <step id="step0"/>
     <step id="step1"/>
     <step id="step3"/>
@@ -113,7 +113,7 @@ Input file for Testing Artie scripting
     <step id="step17"/>
     <step id="step19"/>
   </scriptSet>
-  <scriptSet name="Even Steps" description="Only run the even steps" listType="black" noArtie="True">
+  <scriptSet name="Even Steps" description="Only run the even steps" listType="black" noArtie="true">
     <step id="step1"/>
     <step id="step3"/>
     <step id="step5"/>

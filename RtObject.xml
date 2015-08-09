@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- <RtObject could break code that gets XElement.Name since it would include ns now xmlns="my://RtObject"--> 
-<RtObject>
+<RtObject xmlns="http://joatbrothers.com/RtObject.xsd">
   <group name="Hello" description="Welcome to Artie" hidden="true">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
     <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" /> 

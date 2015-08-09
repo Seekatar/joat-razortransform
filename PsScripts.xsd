@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://joatbrothers.com/PsScripts.xsd"
+           xmlns="http://joatbrothers.com/PsScripts.xsd"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+  <xs:element name="scripts">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="script"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scriptSet"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="script">
+    <xs:complexType mixed="true">
+      <xs:attribute name="description"/>
+      <xs:attribute name="echoScript" type="xs:boolean"/>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="neverPrompt" type="xs:boolean"/>
+      <xs:attribute name="promptOnError" type="xs:boolean"/>
+      <xs:attribute name="type" type="scriptType"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="scriptSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="step"/>
+      </xs:sequence>
+      <xs:attribute name="description" use="required"/>
+      <xs:attribute name="listType" use="required" type="listType"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="noArtie" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="step">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="scriptType">
+    <xs:restriction base="xs:NCName">
+      <xs:enumeration value="preRun"/>
+      <xs:enumeration value="postRun"/>
+      <xs:enumeration value="success"/>
+      <xs:enumeration value="fail"/>
+      <xs:enumeration value="transform"/> <!-- run artie, only used in Run-Deploy.ps1 -->
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="listType">
+    <xs:restriction base="xs:NCName">
+      <xs:enumeration value="black"/>
+      <xs:enumeration value="white"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
