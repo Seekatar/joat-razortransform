@@ -25,34 +25,43 @@ namespace RazorTransform.Custom
         void OnModelLoaded(object sender, ModelLoadedArgs e)
         {
             scriptSet = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == scriptSetName) as IItem;
-            skipUntil = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == skipUntilName) as IItem;
-            step = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsStepName) as IItem;
-            test = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsTestName) as IItem;
-
-            // only fill if we have items matching
-            if (scriptSet != null ) 
+            if (System.IO.File.Exists(Settings.Instance.PowerShellConfig.ScriptFile))
             {
+                skipUntil = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == skipUntilName) as IItem;
+                step = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsStepName) as IItem;
+                test = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsTestName) as IItem;
+
                 var model = e.Model;
-                fillEnum(scriptSet.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetScriptSets(), scriptSet, "Default - Run all configured steps", Settings.Instance.PowerShellConfig.ScriptSet);
-                fillEnum(skipUntil.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetAllSteps(), skipUntil, "Default - Don't skip any steps", Settings.Instance.PowerShellConfig.SkipUntil);
+                // only fill if we have items matching
+                if (scriptSet != null)
+                {
+                    fillEnum(scriptSet.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetScriptSets(), scriptSet, "Default - Run all configured steps", Settings.Instance.PowerShellConfig.ScriptSet);
+                }
+                if (skipUntil != null)
+                {
+                    fillEnum(skipUntil.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetAllSteps(), skipUntil, "Default - Don't skip any steps", Settings.Instance.PowerShellConfig.SkipUntil);
+                }
 
                 scriptSet.NoSaveValue = true;
-                if ( skipUntil != null )
+                if (skipUntil != null)
                 {
                     skipUntil.NoSaveValue = true;
                 }
-                if ( step != null )
+                if (step != null)
                 {
                     step.NoSaveValue = true;
                 }
-                if ( test != null )
+                if (test != null)
                 {
                     test.NoSaveValue = true;
                 }
-
-                // can hide the group with this
-                // scriptSet.Group.Hidden = true;
             }
+            else if (scriptSet != null)
+            {
+                // hide the group with this
+                scriptSet.Group.Hidden = true;
+            }
+            
         }
 
         void OnModelSaved( object sender, ModelChangedArgs e )
