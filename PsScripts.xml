@@ -2,7 +2,7 @@
 <!--
 Input file for Testing Artie scripting
 -->
-<scripts xmlns="http://joatbrothers.com/PsScripts.xsd">
+<scripts>
   <script name="Pre1" id="pre1" description="Load modules, make folders" neverPrompt="true"  type="preRun">
     if ( -not ($(Get-ExecutionPolicy) -match "RemoteSigned|Unrestricted|Bypass"))
     {

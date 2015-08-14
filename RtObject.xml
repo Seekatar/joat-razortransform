@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- <RtObject could break code that gets XElement.Name since it would include ns now xmlns="my://RtObject"--> 
-<RtObject xmlns="http://joatbrothers.com/RtObject.xsd">
+<RtObject>
   <group name="Hello" description="Welcome to Artie" hidden="true">
     <item name="w1" displayName="Hi" description="Welcome String1" defaultValue="This is a sample configuration" type="Label" />
     <item name="w2" displayName="Help" description="Welcome String2" defaultValue="Hover over names and values for help." type="Label" /> 
@@ -100,7 +100,8 @@
   <group name="PowerShell" description="Advanced options">
     <item name="PsScriptSet" displayName="Script Set" description="Set of steps to execute when PowerShell runs" type="scriptSets" />
     <item name="PsStep" displayName="Step" description="If set, steps through the scripts." defaultValue="False" type="Bool" hidden="false" />
-    <item name="PsSkipUntil" displayName="SkipUntil" description="Skip until this step.  Make sure you ran all previous steps successfully." defaultValue="" type="steps" hidden="false" />
+    <item name="PsSkipUntil" displayName="Skip Until" description="Skip until this step.  Make sure you ran all previous steps successfully." defaultValue="" type="steps" hidden="false" />
+    <item name="PsTest" displayName="Test" description="Dont run any scripts." defaultValue="false" type="bool" hidden="false" />
   </group>
   
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>

@@ -18,6 +18,7 @@ namespace RazorTransform.Custom
         IItem scriptSet { get; set; }
         IItem skipUntil { get; set; }
         IItem step { get; set; }
+        IItem test { get; set; }
 
         #region EventHandlers
 
@@ -26,6 +27,7 @@ namespace RazorTransform.Custom
             scriptSet = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == scriptSetName) as IItem;
             skipUntil = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Enum && (o as IItem).Name == skipUntilName) as IItem;
             step = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsStepName) as IItem;
+            test = e.Model.Items.FirstOrDefault(o => o is IItem && (o as IItem).Type == RtType.Bool && (o as IItem).Name == PsConfig.PsTestName) as IItem;
 
             // only fill if we have items matching
             if (scriptSet != null ) 
@@ -43,6 +45,11 @@ namespace RazorTransform.Custom
                 {
                     step.NoSaveValue = true;
                 }
+                if ( test != null )
+                {
+                    test.NoSaveValue = true;
+                }
+
                 // can hide the group with this
                 // scriptSet.Group.Hidden = true;
             }
@@ -63,7 +70,10 @@ namespace RazorTransform.Custom
             {
                 Settings.Instance.PowerShellConfig.Step = Convert.ToBoolean(step.Value);
             }
-
+            if ( test != null )
+            {
+                Settings.Instance.PowerShellConfig.Test = Convert.ToBoolean(test.Value);
+            }
         }
 
         void OnModelValidate(object sender, ModelValidateArgs e)

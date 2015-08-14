@@ -17,6 +17,7 @@ namespace RazorTransform
     {
         const string PsScriptSetName = "PsScriptSet";
         public const string PsStepName = "PsStep";
+        public const string PsTestName = "PsTest";
         const string PsNoPromptName = "PsNoPrompt";
         const string PsSkipUntilName = "PsSkipUntil";
         const string PsWorkingDirName = "PsWorkingDir";
@@ -79,6 +80,8 @@ namespace RazorTransform
         public bool Run { get; set; }
 
         public bool Step { get; set; }
+
+        public bool Test { get; set; }
 
         public string ScriptFile { get; set; }
 
