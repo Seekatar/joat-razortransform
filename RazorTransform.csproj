@@ -51,8 +51,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\RazorEngine.3.4.0\lib\net45\RazorEngine.dll</HintPath>
     </Reference>
-    <Reference Include="RtPsHost, Version=1.0.4.3, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
-      <HintPath>packages\RtPsHost.1.0.4.3\lib\net45\RtPsHost.dll</HintPath>
+    <Reference Include="RtPsHost, Version=1.0.4.4, Culture=neutral, PublicKeyToken=535039ec35d9fb50, processorArchitecture=MSIL">
+      <HintPath>packages\RtPsHost.1.0.4.4\lib\net45\RtPsHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
