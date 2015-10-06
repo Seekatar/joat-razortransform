@@ -98,14 +98,14 @@
   </group>
 
   <group name="PowerShell" description="Advanced options">
-    <item name="PsScriptSet" displayName="Script Set" description="Set of steps to execute when PowerShell runs" type="scriptSets" />
+    <item name="RtPsScriptSet" displayName="Script Set" description="Set of steps to execute when PowerShell runs" type="scriptSets" />
     <item name="PsStep" displayName="Step" description="If set, steps through the scripts." defaultValue="False" type="Bool" hidden="false" />
-    <item name="PsSkipUntil" displayName="Skip Until" description="Skip until this step.  Make sure you ran all previous steps successfully." defaultValue="" type="steps" hidden="false" />
-    <item name="PsTest" displayName="Test" description="Dont run any scripts." defaultValue="false" type="bool" hidden="false" />
+    <item name="RtPsSkipUntil" displayName="Skip Until" description="Skip until this step.  Make sure you ran all previous steps successfully." defaultValue="" type="steps" hidden="false" />
+    <item name="RtPsTest" displayName="Test" description="Dont run any scripts." defaultValue="false" type="bool" hidden="false" />
   </group>
   
   <custom name="ColorType" classname="RazorTransform.Custom.ColorType,RazorTransform"/>
-  <custom name="ScriptSetLoader" classname="RazorTransform.Custom.ScriptSetEnum,RazorTransform" scriptSetName="PsScriptSet" skipUntilName="PsSkipUntil"/>
+  <custom name="ScriptSetLoader" classname="RazorTransform.Custom.ScriptSetEnum,RazorTransform" scriptSetName="RtPsScriptSet" skipUntilName="RtPsSkipUntil"/>
 
   <enum name="EnumA">
     <value key="enumKeyA" value="Enum A" />

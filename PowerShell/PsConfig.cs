@@ -15,13 +15,14 @@ namespace RazorTransform
     /// </summary>
     internal class PsConfig : IPsConfig
     {
-        const string PsScriptSetName = "PsScriptSet";
-        public const string PsStepName = "PsStep";
-        public const string PsTestName = "PsTest";
-        const string PsNoPromptName = "PsNoPrompt";
-        const string PsSkipUntilName = "PsSkipUntil";
-        const string PsWorkingDirName = "PsWorkingDir";
-        const string PsLogFileName = "PsLogFileName";
+        const string PsScriptSetName = "RtPsScriptSet";
+        public const string PsStepName = "RtPsStep";
+        public const string PsTestName = "RtPsTest";
+        const string PsNoPromptName = "RtPsNoPrompt";
+        const string PsSkipUntilName = "RtPsSkipUntil";
+        const string PsWorkingDirName = "RtPsWorkingDir";
+        const string PsLogFileName = "RtPsLogFileName";
+        const string PsScriptFileName = "RtPsScriptFileName";
 
         // script file cached
         private XDocument _scriptFile;
@@ -54,8 +55,8 @@ namespace RazorTransform
             LogFileName = String.Format("{0}_{1}.log", LogFileName, DateTime.Now.ToString("yyMMdd-HHmmss"));
             LogFileName = Path.GetFullPath(LogFileName);
 
-            if (overrideParms.ContainsKey("PsScriptFileName"))
-                ScriptFile = overrideParms["PsScriptFileName"];
+            if (overrideParms.ContainsKey(PsScriptFileName))
+                ScriptFile = overrideParms[PsScriptFileName];
             else
                 ScriptFile = "PsScripts.xml";
 

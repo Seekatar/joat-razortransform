@@ -36,21 +36,20 @@ namespace RazorTransform.Custom
                 if (scriptSet != null)
                 {
                     fillEnum(scriptSet.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetScriptSets(), scriptSet, "Default - Run all configured steps", Settings.Instance.PowerShellConfig.ScriptSet);
+                    scriptSet.NoSaveValue = true;
                 }
+
                 if (skipUntil != null)
                 {
                     fillEnum(skipUntil.OriginalTypeStr, Settings.Instance.PowerShellConfig.GetAllSteps(), skipUntil, "Default - Don't skip any steps", Settings.Instance.PowerShellConfig.SkipUntil);
-                }
-
-                scriptSet.NoSaveValue = true;
-                if (skipUntil != null)
-                {
                     skipUntil.NoSaveValue = true;
                 }
+
                 if (step != null)
                 {
                     step.NoSaveValue = true;
                 }
+
                 if (test != null)
                 {
                     test.NoSaveValue = true;
