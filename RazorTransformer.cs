@@ -53,9 +53,9 @@ namespace RazorTransform
 
                 _settings.Load(overrides);
                 _settings.PowerShellConfig.Run = parms.ContainsKey("powerShell");
-                   
 
-                bool ret = ModelConfig.Instance.Load(_settings);
+                List<Exception> warnings = new List<Exception>();
+                bool ret = ModelConfig.Instance.Load(_settings, warnings:warnings);
                 if (ret)
                 {
                     _model.LoadFromXml(ModelConfig.Instance.Root, ModelConfig.Instance.ValuesRoot, overrides);
@@ -69,6 +69,8 @@ namespace RazorTransform
                     // TODO could use a checksum embedded in to see if changed since last time.
                     var task = await RefreshModelAsync(false, true); // don't validate, assume dirty 
                 }
+                if (warnings.Count > 0)
+                    throw new AggregateException(warnings);
                 return ret;
             }
             catch (Exception settingsException)
@@ -178,6 +180,7 @@ namespace RazorTransform
                 var docModel = await RefreshModelAsync(validateModel, dirty);
                 if (docModel.Item1 != null)
                 {
+
                     docModel.Item1.Save(Settings.ValuesFile);
 
                     if (OnValuesSave != null)

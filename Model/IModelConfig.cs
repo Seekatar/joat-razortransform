@@ -49,8 +49,11 @@ namespace RazorTransform.Model
         /// <param name="settings">Settings object with all the environment settings</param>
         /// <param name="loadValues">if true load values from the file in settings</param>
         /// <param name="objectRoot">override object model root node</param>
-        /// <returns>true if loaded ok</returns>
-        bool Load(Settings settings, bool loadValues = true, XElement objectRoot = null);
+        /// <param name="warnings">The warnings.</param>
+        /// <returns>
+        /// true if loaded ok
+        /// </returns>
+        bool Load(Settings settings, bool loadValues = true, XElement objectRoot = null, IList<Exception> warnings = null);
 
         event EventHandler<ItemChangedArgs> ItemAdded;
         event EventHandler<ItemChangedArgs> ItemChanged;

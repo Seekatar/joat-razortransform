@@ -147,8 +147,11 @@ namespace RazorTransform.Model
         /// <param name="settings">Settings object with all the environment settings</param>
         /// <param name="loadValues">if true load values from the file in settings</param>
         /// <param name="objectRoot">override object model root node</param>
-        /// <returns>true if loaded ok</returns>
-        public bool Load(Settings settings, bool loadValues = true, XElement objectRoot = null)
+        /// <param name="warnings">The warnings.</param>
+        /// <returns>
+        /// true if loaded ok
+        /// </returns>
+        public bool Load(Settings settings, bool loadValues = true, XElement objectRoot = null, IList<Exception> warnings = null)
         {
             var _settings = settings;
 
@@ -170,7 +173,8 @@ namespace RazorTransform.Model
 
             ValuesRoot = objectValues;
 
-            return loadFromXElement(Root, objectValues);
+            var ret = loadFromXElement(Root, objectValues, warnings );
+            return ret;
         }
         #endregion
 
@@ -200,7 +204,7 @@ namespace RazorTransform.Model
         /// <param name="objectRoot">root node of RtObject.xml</param>
         /// <param name="values">root node of RtValues.xml, if it exists</param>
         /// <returns>true if loaded ok</returns>
-        private bool loadFromXElement(XElement objectRoot, XElement values)
+        private bool loadFromXElement(XElement objectRoot, XElement values, IList<Exception> exceptions )
         {
             // check RtValues file version
             RtValuesVersion = Constants.CurrentRtValuesVersion; // if no values at all, default to current
@@ -247,33 +251,43 @@ namespace RazorTransform.Model
                         {
                             // not fully qualified or in current dir, is it with the object file?
                             path = Path.Combine(Path.GetDirectoryName(Settings.Instance.ObjectFile), path);
-                            if (!File.Exists(path))
-                            {
-                                throw new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value));
-                            }
                         }
                     }
-                    path = System.IO.Path.GetFullPath(path);
-
-                    Dictionary<string, object> parms = parseParms((String)x.Attribute(Constants.Parameters) ?? null);
-
-                    // run the script to generate the enums
-                    var ps = RtPsHost.PsHostFactory.CreateHost();
-                    var task = ps.InvokeScriptAsync(path, (System.Collections.IDictionary o) =>
+                    if (!File.Exists(path))
                     {
-                        foreach (var i in o.Keys)
+                        exceptions.Add(new ArgumentException(String.Format(Resource.InvalidEnumScript, name.Value, scriptAttr.Value)));
+                    }
+                    else
+                    {
+                        path = System.IO.Path.GetFullPath(path);
+
+                        Dictionary<string, object> parms = parseParms((String)x.Attribute(Constants.Parameters) ?? null);
+
+                        // run the script to generate the enums
+                        var ps = RtPsHost.PsHostFactory.CreateHost();
+                        var task = ps.InvokeScriptAsync(path, (System.Collections.IDictionary o) =>
                         {
-                            dict[o[i].ToString()] = i.ToString();
+                            foreach (var i in o.Keys)
+                            {
+                                dict[o[i].ToString()] = i.ToString();
+                            }
+                        }, parms);
+                        try
+                        {
+                            task.Wait(timeout);
                         }
-                    }, parms);
-                    task.Wait(timeout);
-                    if (task.Status != TaskStatus.RanToCompletion)
-                    {
-                        throw new ArgumentException(String.Format(Resource.EnumScriptTimeout, name.Value, path));
-                    }
-                    if (dict.Count == 0)
-                    {
-                        throw new ArgumentException(String.Format(Resource.NoEnumContent, name.Value, path));
+                        catch (Exception e )
+                        {
+                            exceptions.Add(e);
+                        }
+                        if (task.Status != TaskStatus.RanToCompletion)
+                        {
+                            exceptions.Add(new ArgumentException(String.Format(Resource.EnumScriptTimeout, name.Value, path)));
+                        }
+                        if (dict.Count == 0)
+                        {
+                            exceptions.Add(new ArgumentException(String.Format(Resource.NoEnumContent, name.Value, path)));
+                        }
                     }
                     loaded = true;
                 }
