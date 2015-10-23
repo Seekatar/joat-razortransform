@@ -355,9 +355,9 @@
     <Resource Include="Resources\Clipboard.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="license.txt">
+    <None Include="license.txt">
       <SubType>Form</SubType>
-    </Resource>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
