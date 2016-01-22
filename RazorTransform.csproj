@@ -305,10 +305,6 @@
     <Resource Include="Resources\Cancel.png" />
     <Resource Include="Resources\PlayClose.png" />
     <Resource Include="Resources\Apply.png" />
-    <None Include="RtObject.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Templates\ZReflection.txt" />
     <None Include="Templates\ArrayIndex.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -358,6 +354,11 @@
     <None Include="license.txt">
       <SubType>Form</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="RtObject2.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

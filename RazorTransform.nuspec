@@ -11,7 +11,8 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.1.4 tolerate scripts for enums missing, remove ADM-specific code for powershell.
+    <releaseNotes>2.1.5 Add Constant support to always use value from RtObject
+2.1.4 tolerate scripts for enums missing, remove ADM-specific code for powershell.
 2.1.3 Add support for controlling ScriptSets when running PowerShell scripts
 2.1.2 Show Expanded values with @Model strings and numbers, move to GitHub, fix for password, multiline edit support, exportPs option, parallel progress fix
 2.1.1.0 Add enum
@@ -19,7 +20,7 @@
 2.1.0.0 Rewrite of internal model.  Label type added.  Settings fixes.  @Model.array indexing by number, name support
 2.0.0.10 Variouis fixes 
 2.0.0.2 First Nuget Package</releaseNotes>
-        <copyright>Copyright (c) Jim Wallace 2010-2015</copyright>
+        <copyright>Copyright (c) Jim Wallace 2010-2016</copyright>
         <tags>Razor File Generator Free Deploy Tool</tags>
         <dependencies>
             <dependency id="RazorEngine" version="3.4.0" />

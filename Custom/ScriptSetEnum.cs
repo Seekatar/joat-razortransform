@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace RazorTransform.Custom
 {
     /// <summary>
-    /// custom class for popuating dropdown with script sets
+    /// custom class for populating dropdown with script sets
     /// </summary>
     class ScriptSetEnum : CustomRazorTransformTypeBase
     {

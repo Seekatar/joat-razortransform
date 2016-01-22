@@ -57,6 +57,11 @@ namespace RazorTransform.Model
             IsPassword = src.IsPassword;
             Hidden = src.Hidden;
             ExpandedValue = src.ExpandedValue;
+            IsExported = src.IsExported;
+            ReadOnly = src.ReadOnly;
+            Constant = src.Constant;
+            NoSaveValue = src.NoSaveValue;
+
             _visibilityGroups = src._visibilityGroups;
             _element = src._element;
         }
@@ -147,6 +152,12 @@ namespace RazorTransform.Model
         }
 
         public bool ReadOnly
+        {
+            get;
+            set;
+        }
+
+        public bool Constant
         {
             get;
             set;
@@ -309,6 +320,9 @@ namespace RazorTransform.Model
 
         public void LoadValuesFromXml(XElement values, IDictionary<string, string> overrides)
         {
+            if (Constant)
+                return; // don't load value from XML if constant
+
             if (overrides != null && overrides.ContainsKey(Name))
             {
                 Value = overrides[Name];
@@ -344,13 +358,21 @@ namespace RazorTransform.Model
                     {
                         v = element.Value;
 
-                        // show the original value as Value in the model
-                        // and filled in one in tooltip
-                        var attr = element.Attribute(Constants.Original);
-                        if (attr != null && !String.IsNullOrWhiteSpace(attr.Value) && attr.Value.Contains('@'))
+                        if (!Constant)
                         {
-                            ExpandedValue = v;
-                            v = attr.Value;
+                            // show the original value as Value in the model
+                            // and filled in one in tooltip
+                            var attr = element.Attribute(Constants.Original);
+                            if (attr != null && !String.IsNullOrWhiteSpace(attr.Value) && attr.Value.Contains('@'))
+                            {
+                                ExpandedValue = v;
+                                v = attr.Value;
+                            }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("Constant " + Name);
+                            v = null;
                         }
                     }
                 }
@@ -400,7 +422,12 @@ namespace RazorTransform.Model
                 throw new Exception("Invalid type for property " + Name);
             }
 
-            ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
+            
+            Constant = (bool?)itemXml.Attribute(Constants.Constant) ?? false;
+            if (Constant)
+                ReadOnly = true;
+            else
+                ReadOnly = (bool?)itemXml.Attribute(Constants.ReadOnly) ?? false;
 
             Regex = (string)itemXml.Attribute(Constants.RegEx) ?? String.Empty;
             if (!String.IsNullOrWhiteSpace(Regex) && !ModelConfig.Instance.Regexes.ContainsKey(Regex))

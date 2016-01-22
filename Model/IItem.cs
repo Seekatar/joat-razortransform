@@ -46,6 +46,15 @@ namespace RazorTransform.Model
         bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether [constant] value, e.g. value always taken from object file
+        /// and is readonly
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [constant]; otherwise, <c>false</c>.
+        /// </value>
+        bool Constant{ get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to save the value to RtValues.  Passwords always return true.
         /// </summary>
         bool NoSaveValue { get; set; }

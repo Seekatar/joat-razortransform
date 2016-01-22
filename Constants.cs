@@ -75,6 +75,7 @@ namespace RazorTransform
         internal const string Multiline = "multiline";
         internal const string Units = "units";
         internal const string ExportToPs = "exportToPs";
+        internal const string Constant= "constant";
 
         // Version history
         // 2 = switch RtValues to use names instead of value for everything
