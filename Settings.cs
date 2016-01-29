@@ -229,11 +229,11 @@ namespace RazorTransform
                     var i = o.IndexOf("="); // use this instead of split in case have = in value
                     if (i > 0)
                     {
-                        var s = o.Substring(0, i).Trim();
+                        var k = o.Substring(0, i).Trim();
                         var v = o.Substring(i + 1).Trim();
-                        if (s.Length > 0 && v.Length > 0)
+                        if (k.Length > 0) // key must have something, but allow empty values to clear out a value
                         {
-                            ret.Add(s, v);
+                            ret.Add(k, v);
                         }
                     }
                     else

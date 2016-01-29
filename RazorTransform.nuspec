@@ -11,7 +11,7 @@
     <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>2.1.5 Add Constant support to always use value from RtObject
+    <releaseNotes>2.1.5 Add Constant support to always use value from RtObject, allow empty override values
 2.1.4 tolerate scripts for enums missing, remove ADM-specific code for powershell.
 2.1.3 Add support for controlling ScriptSets when running PowerShell scripts
 2.1.2 Show Expanded values with @Model strings and numbers, move to GitHub, fix for password, multiline edit support, exportPs option, parallel progress fix
