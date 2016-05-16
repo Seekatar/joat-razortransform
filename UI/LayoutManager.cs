@@ -42,6 +42,17 @@ namespace RazorTransform
             int i = 0;
             foreach (var ci in controls.OfType<IItem>())
             {
+                var binding = new Binding();
+                binding.Source = ci;
+                binding.Path = new PropertyPath("Value");
+                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+                Control t = CreateControl(ci, binding, itemChanged);
+                if (ci.Hidden)
+                {
+                    continue; // create may have changed it for custom items
+                }
+
                 var l = new MyLabel() { Content = ci.DisplayName };
 
                 l.ToolTip = ci.Description;
@@ -51,12 +62,6 @@ namespace RazorTransform
 
                 Breadcrumb.SetContextMenu(l, ci.Name);
 
-                var binding = new Binding();
-                binding.Source = ci;
-                binding.Path = new PropertyPath("Value");
-                binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-
-                Control t = CreateControl(ci, binding, itemChanged);
                 if (!String.IsNullOrWhiteSpace(ci.ExpandedValue))
                 {
                     // build a stack panel for the tooltip to look like this:

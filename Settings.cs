@@ -111,12 +111,12 @@ namespace RazorTransform
                  (output as Item).Value = (output as Item).ExpandedValue = OutputFolder;
             }
 
+            PowerShellConfig = new PsConfig(overrideParms);
+
             if (!Directory.Exists(TemplateFolder))
             {
                 throw new DirectoryNotFoundException(String.Format(Resource.TemplateFolderNotFound, TemplateFolder));
             }
-
-            PowerShellConfig = new PsConfig(overrideParms);
         }
 
         public static Settings Instance { get; private set; }

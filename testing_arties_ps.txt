@@ -1,0 +1,7 @@
+
+
+ 
+.\Bootstrap\RazorTransform.exe -output .\output -powerShell -template .\Bootstrap\Templates -object .\Bootstrap\RtObject.xml -values .\Bootstrap\RTValues.xml PsScriptFileName=.\DefaultXml\DeployScripts.xml PsWorkingDir=.
+ 
+ 
+/location:LocalDebug /step

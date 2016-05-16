@@ -11,3 +11,5 @@ bin
 *.netrc
 _netrc
 *.msi
+/Custom/CustomDomainParameter.cs
+/RtValues.xml

@@ -119,7 +119,12 @@ namespace RazorTransform
             }
             else
             {
-                await _transformer.SaveAsync(true, editControl.Dirty); // validate, only save if dirty
+                var m = await _transformer.SaveAsync(true, editControl.Dirty); // validate, only save if dirty
+                if (m == null)
+                {
+                    setButtonStates(ProcessingState.transformed);
+                    return ProcessingResult.failed;
+                }
             }
             editControl.Dirty = false;
 
