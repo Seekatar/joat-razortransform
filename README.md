@@ -1,7 +1,7 @@
 # What is Artie? #
 Artie is long for RT which is short for RazorTransform.  Artie uses XML files to describe an object that is editable in Artie's UI.  It will then use template files to generates output from them using values in the object using the Razor view model introduced in ASP.NET 4.0.  Generated files can be ASP.NET web pages, XML, or any other text file, such as a PowerShell script.
 
-![https://joat-razortransform.googlecode.com/git-history/V2/Doc/MainScreenSample1.png](https://joat-razortransform.googlecode.com/git-history/V2/Doc/MainScreenSample1.png)
+![https://github.com/Seekatar/joat-razortransform/raw/master/Doc/MainScreenSample1.png](https://github.com/Seekatar/joat-razortransform/raw/master/Doc/MainScreenSample1.png)
 
 The need for Artie arose after painfully watching the IT department do a deployment of our product that required editing a myriad of XML and PowerShell files.  Many of the files were very similar, and much of the data between them was redundant creating a very tedious and error-prone process just to create the files needed to begin the deploy.
 
