@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RazorTransform.Model
 {
-    class Group : IGroup
+	class Group : IGroup
     {
         List<string> _visibilityGroups = new List<string>();
 

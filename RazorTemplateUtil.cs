@@ -5,13 +5,12 @@ using System.Text;
 using System.CodeDom.Compiler;
 using System.Reflection;
 using System.IO;
-using RazorEngine.Configuration;
 using RazorEngine.Templating;
 using RazorEngine;
 
 namespace RazorTransform
 {
-    public class RazorTemplateUtil
+	public class RazorTemplateUtil
     {
         /// <summary>
         /// static constructor.

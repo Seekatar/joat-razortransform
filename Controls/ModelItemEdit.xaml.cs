@@ -1,12 +1,11 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
 using System;
 
 namespace RazorTransform
 {
-    //[System.Windows.Markup.ContentProperty("Text")]
-    public partial class ModelItemEdit : UserControl
+	//[System.Windows.Markup.ContentProperty("Text")]
+	public partial class ModelItemEdit : UserControl
     {
         RazorTransform.Model.IItem _item; 
 

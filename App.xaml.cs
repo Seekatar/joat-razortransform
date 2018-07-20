@@ -60,8 +60,7 @@ namespace RazorTransform
                         try
                         {
                             Console.WriteLine(Resource.Starting);
-                            var ok = transformer.InitializeAsync(parms, overrideDict );
-                            ok.Wait();
+							var ok = transformer.InitializeAsync(parms, overrideDict).ConfigureAwait(false).GetAwaiter().GetResult();
 
                             transformer.Output.Report(new ProgressInfo(transformer.Settings.ToString(transformer.Model)));
                             if (transformer.Settings.Test)
@@ -71,16 +70,15 @@ namespace RazorTransform
 
                             if (upgrade) // only upgrading
                             {
-                                transformer.SaveAsync(false, false).Wait();
+                                transformer.SaveAsync(false, false).ConfigureAwait(false).GetAwaiter().GetResult();
                                 transformer.Output.Report(new ProgressInfo(Resource.ConversionComplete, percentComplete: 100));
                                 ret = EXIT_NO_ERROR;
                             }
                             else
                             {
-                                var result = transformer.DoTransformAsync(false);
-                                result.Wait();
+                                var result = transformer.DoTransformAsync(false).ConfigureAwait(false).GetAwaiter().GetResult();
 
-                                if (result.Result.Result == ProcessingResult.ok)
+                                if (result.Result == ProcessingResult.ok)
                                 {
                                     LogProgress.WriteExports(transformer.Model.ExportedItems());
 

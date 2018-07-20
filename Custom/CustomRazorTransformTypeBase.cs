@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RazorTransform.Custom
 {
-    /// <summary>
-    /// helper just to avoid boiler plate code
-    /// </summary>
-    public abstract class CustomRazorTransformTypeBase : ICustomRazorTransformType
+	/// <summary>
+	/// helper just to avoid boiler plate code
+	/// </summary>
+	public abstract class CustomRazorTransformTypeBase : ICustomRazorTransformType
     {
         public string Name { get; set; }
 

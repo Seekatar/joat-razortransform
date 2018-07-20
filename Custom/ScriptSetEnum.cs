@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RazorTransform.Custom
 {
-    /// <summary>
-    /// custom class for populating dropdown with script sets
-    /// </summary>
-    class ScriptSetEnum : CustomRazorTransformTypeBase
+	/// <summary>
+	/// custom class for populating dropdown with script sets
+	/// </summary>
+	class ScriptSetEnum : CustomRazorTransformTypeBase
     {
 
         string scriptSetName { get; set; }       // name of <enum> in RTObject.xml to fill in

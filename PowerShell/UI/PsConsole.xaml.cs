@@ -9,14 +9,13 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using RazorTransform;
 using RtPsHost;
-using System.Security;
 
 namespace PSHostGui
 {
-    /// <summary>
-    /// Interaction logic for PsConsole.xaml
-    /// </summary>
-    public partial class PsConsole : UserControl, IPsConsole, IDisposable
+	/// <summary>
+	/// Interaction logic for PsConsole.xaml
+	/// </summary>
+	public partial class PsConsole : UserControl, IPsConsole, IDisposable
     {
         private Paragraph _lastParagraph = null;
         private LoggingConsole _loggingConsole;

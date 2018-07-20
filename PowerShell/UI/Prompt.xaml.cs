@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using RazorTransform.Controls;
 using RtPsHost;
 using System.Security;
 
 namespace PSHostGui
 {
-    /// <summary>
-    /// Interaction logic for Prompt.xaml
-    /// </summary>
-    public partial class Prompt : Window
+	/// <summary>
+	/// Interaction logic for Prompt.xaml
+	/// </summary>
+	public partial class Prompt : Window
     {
         public Prompt(string caption, string message, IEnumerable<PromptChoice> choices, int defaultChoice, bool getText = false, bool textAsPassword = false )
         {
@@ -45,7 +44,7 @@ namespace PSHostGui
             int i = 0;
             foreach (var c in choices)
             {
-                var b = new MyButton()
+                var b = new Button()
                 {
                     Content = c.Name.Replace("&","_"), // label
                     IsDefault = defaultChoice == i,

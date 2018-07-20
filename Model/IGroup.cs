@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
-    /// <summary>
-    /// interface for a group.  All items and list have a group
-    /// </summary>
-    public interface IGroup
+	/// <summary>
+	/// interface for a group.  All items and list have a group
+	/// </summary>
+	public interface IGroup
     {
         /// <summary>
         /// Display name of this item.  May have spaces, special characters, etc.

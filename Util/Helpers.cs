@@ -4,11 +4,10 @@ using System.Windows;
 using System.Runtime.InteropServices;
 using System;
 using System.Windows.Interop;
-using RazorTransform.Properties;
 
 namespace Joat
 {
-    public class TaskDialog
+	public class TaskDialog
     {
         [DllImport("comctl32.dll", CharSet = CharSet.Unicode, EntryPoint="TaskDialog")]
         static extern int _TaskDialog(IntPtr hWndParent, IntPtr hInstance, String pszWindowTitle, String pszMainInstruction, String pszContent, int dwCommonButtons, IntPtr pszIcon, out int pnButton);

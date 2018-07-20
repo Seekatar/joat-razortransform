@@ -1,13 +1,12 @@
 ﻿using RazorTransform.Model;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace RazorTransform
 {
-    /// <summary>
-    /// Interaction logic for ArrayItemEdit.xaml
-    /// </summary>
-    public partial class ArrayItemEdit : Window
+	/// <summary>
+	/// Interaction logic for ArrayItemEdit.xaml
+	/// </summary>
+	public partial class ArrayItemEdit : Window
     {
         public ArrayItemEdit()
         {

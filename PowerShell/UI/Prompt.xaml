@@ -1,7 +1,6 @@
 ﻿<Window x:Class="PSHostGui.Prompt"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:my="clr-namespace:RazorTransform.Controls"
         ShowInTaskbar="False"
         Title="PowerShell Prompt" Closing="Window_Closing_1"
         SizeToContent="WidthAndHeight"

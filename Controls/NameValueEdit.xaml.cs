@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using RazorTransform.Controls;
-using System.Threading.Tasks;
 using RazorTransform.Model;
 
 namespace RazorTransform
 {
-    /// <summary>
-    /// Interaction logic for NameValueEdit.xaml
-    /// </summary>
-    public partial class NameValueEdit : UserControl
+	/// <summary>
+	/// Interaction logic for NameValueEdit.xaml
+	/// </summary>
+	public partial class NameValueEdit : UserControl
     {
-        MyTabControl _tabCtrl;
+
+		TabControl _tabCtrl;
         IModel _model;
 
         public NameValueEdit()
@@ -46,7 +44,7 @@ namespace RazorTransform
             }
 
             StackPanel lastExpanderStack = null;
-            _tabCtrl = new MyTabControl();
+            _tabCtrl = new TabControl();
             _tabCtrl.Style = (Style)this.FindResource("tabControlStyle");
             _tabCtrl.Background = Brushes.White;
 
@@ -111,10 +109,10 @@ namespace RazorTransform
         /// </summary>
         /// <param name="group"></param>
         /// <returns></returns>
-        private MyTabItem createTab(IGroup group)
+        private TabItem createTab(IGroup group)
         {
             System.Diagnostics.Debug.WriteLine("Dirty is " + Dirty);
-            var tab = new MyTabItem();
+            var tab = new TabItem();
             tab.Style = this.FindResource("tabStyle") as Style;
             tab.Header = CreateTabHeader(group.DisplayName);
             if (group.Description != null)

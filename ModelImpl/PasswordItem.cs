@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
-    /// <summary>
-    /// class to use the Password box since can't easily do binding
-    /// </summary>
-    internal class PasswordItem : Item
+	/// <summary>
+	/// class to use the Password box since can't easily do binding
+	/// </summary>
+	internal class PasswordItem : Item
     {
         public PasswordItem(IModel parent, IGroup group) : base(parent, group)
         {

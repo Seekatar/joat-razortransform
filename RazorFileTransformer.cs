@@ -92,7 +92,7 @@ namespace RazorTransform
                 var fname = Path.Combine(System.IO.Path.GetTempPath(), "RazorTransform.xml");
                 try
                 {
-                    System.IO.File.WriteAllText(fname, e.SourceCode);
+					File.WriteAllText(fname, e.SourceCode);
                     sb.AppendLine("    Output written to " + fname);
                 }
                 catch (Exception) { }

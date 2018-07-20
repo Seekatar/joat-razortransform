@@ -9,14 +9,13 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using RtPsHost;
 using RazorTransform.Model;
-using System.Linq;
 
 namespace RazorTransform
 {
-    /// <summary>
-    /// Interaction logic for MainEdit.xaml
-    /// </summary>
-    public partial class MainEdit : UserControl, IDisposable
+	/// <summary>
+	/// Interaction logic for MainEdit.xaml
+	/// </summary>
+	public partial class MainEdit : UserControl, IDisposable
     {
         private RazorTransformer _transformer = new RazorTransformer();
         private IDictionary<string, object> _parms;

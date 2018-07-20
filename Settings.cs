@@ -3,7 +3,6 @@ using RtPsHost;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,12 +13,12 @@ using System.Xml.XPath;
 
 namespace RazorTransform
 {
-    /// <summary>
-    /// encapsulation of settings.
-    /// </summary>
-    /// use RT for managing the settings -- wheee!
-    /// could have used more static class, but eat our own dog food
-    public class Settings 
+	/// <summary>
+	/// encapsulation of settings.
+	/// </summary>
+	/// use RT for managing the settings -- wheee!
+	/// could have used more static class, but eat our own dog food
+	public class Settings 
     {
         private RazorTransform.Model.Model _settings;
         private string _objectFile;

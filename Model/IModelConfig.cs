@@ -1,17 +1,13 @@
-﻿using RtPsHost;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace RazorTransform.Model
 {
-    /// <summary>
-    /// model configuration data from the RtObject.xml and RtValues files
-    /// </summary>
-    public interface IModelConfig
+	/// <summary>
+	/// model configuration data from the RtObject.xml and RtValues files
+	/// </summary>
+	public interface IModelConfig
     {
         /// <summary>
         /// Gets the enumerations configured in the RtObject file

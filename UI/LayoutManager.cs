@@ -5,14 +5,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using RazorTransform.Controls;
-using System.Windows.Documents;
 using RazorTransform.Model;
 using System.Collections.Generic;
 
 namespace RazorTransform
 {
-    public static class LayoutManager
+	public static class LayoutManager
     {
         public static UI.Breadcrumb Breadcrumb = new UI.Breadcrumb();
         
@@ -53,7 +51,7 @@ namespace RazorTransform
                     continue; // create may have changed it for custom items
                 }
 
-                var l = new MyLabel() { Content = ci.DisplayName };
+                var l = new Label() { Content = ci.DisplayName };
 
                 l.ToolTip = ci.Description;
                 l.SetValue(Grid.ColumnProperty, 0);
@@ -171,7 +169,7 @@ namespace RazorTransform
             p.Background = GetButtonRowBrush();
 
             // add a New button under the expander
-            var add = new MyButton()
+            var add = new Button()
                 { 
                     Content = String.Format( Resource.NewItem, list.DisplayName ), 
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Right, 
@@ -206,7 +204,7 @@ namespace RazorTransform
             bool nameSet = false;
             foreach (var c in items)
             {
-                var l = new MyLabel() { Tag = new ArrayItem(list, c) };
+                var l = new Label() { Tag = new ArrayItem(list, c) };
                 if (!nameSet)
                 {
                     nameSet = true;

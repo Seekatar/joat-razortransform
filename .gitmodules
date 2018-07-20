@@ -1,0 +1,3 @@
+[submodule "joat-rtpshost"]
+	path = joat-rtpshost
+	url = https://github.com/Seekatar/joat-rtpshost.git

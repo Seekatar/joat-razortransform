@@ -3,17 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace RazorTransform
 {
-    /// <summary>
-    /// implementation of PowerShell configuration
-    /// </summary>
-    internal class PsConfig : IPsConfig
+	/// <summary>
+	/// implementation of PowerShell configuration
+	/// </summary>
+	internal class PsConfig : IPsConfig
     {
         const string PsScriptSetName = "RtPsScriptSet";
         public const string PsStepName = "RtPsStep";

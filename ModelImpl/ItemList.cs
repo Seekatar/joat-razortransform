@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace RazorTransform.Model
 {
-    /// <summary>
-    /// implementation of IItemList
-    /// </summary>
-    class ItemList : System.Dynamic.DynamicObject, IItemList
+	/// <summary>
+	/// implementation of IItemList
+	/// </summary>
+	class ItemList : System.Dynamic.DynamicObject, IItemList
     {
         private List<string> _keyReplacements = new List<string>();
         private List<IModel> _models = new List<IModel>();
