@@ -4,6 +4,7 @@
 
 obj
 bin
+.vs
 /packages
 /templates/bak
 *.user
