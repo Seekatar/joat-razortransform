@@ -23,7 +23,7 @@
         <copyright>Copyright (c) Jim Wallace 2010-2016</copyright>
         <tags>Razor File Generator Free Deploy Tool</tags>
         <dependencies>
-            <dependency id="RazorEngine" version="3.4.0" />
+            <dependency id="RazorEngine" version="4.5.0-rc1" />
             <dependency id="Microsoft.AspNet.Razor" version="3.0.0" />
             <dependency id="Extended.Wpf.Toolkit" version="2.2.1" />
             <dependency id="RtPsHost" version="1.0.3.1" />
